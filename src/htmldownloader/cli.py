@@ -30,7 +30,7 @@ def download_html(url: str, output_dir: Path) -> None:
         parsed_url = urlparse(url)
         path = parsed_url.path.rstrip('/')
         
-        if path and path != '/':
+        if path:
             filename = path.split('/')[-1]
         else:
             filename = ""
