@@ -26,11 +26,24 @@ def download_html(url: str, output_dir: Path) -> None:
             html_content = response.read()
         
         # Extract filename from URL or use default
-        filename = url.rstrip('/').split('/')[-1]
-        if not filename or '.' not in filename:
+        from urllib.parse import urlparse
+        parsed_url = urlparse(url)
+        path = parsed_url.path.rstrip('/')
+        
+        if path and path != '/':
+            filename = path.split('/')[-1]
+        else:
+            filename = ""
+        
+        # If no filename or filename has no extension, use index.html
+        if not filename:
             filename = "index.html"
-        elif not filename.endswith('.html'):
+        elif '.' not in filename:
+            # Filename without extension, append .html
             filename = f"{filename}.html"
+        elif not filename.endswith(('.html', '.htm')):
+            # Has an extension but not .html/.htm, keep as is
+            pass
         
         # Save to file
         output_path = output_dir / filename
