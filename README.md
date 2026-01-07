@@ -1,2 +1,50 @@
 # HtmlDownloader
-Document's HTML Downloader
+
+A simple CLI tool to download HTML pages from a URL to a specified directory.
+
+## Installation
+
+Install with uv:
+
+```bash
+uv pip install .
+```
+
+Or install directly from the repository:
+
+```bash
+uv pip install git+https://github.com/Ogekuri/HtmlDownloader.git
+```
+
+## Usage
+
+Run with uvx (without installation):
+
+```bash
+uvx --from . htmldownloader --from-url <URL> --to-dir <DIRECTORY>
+```
+
+Or after installation:
+
+```bash
+htmldownloader --from-url <URL> --to-dir <DIRECTORY>
+```
+
+### Examples
+
+Download a webpage to the current directory:
+
+```bash
+htmldownloader --from-url https://example.com --to-dir ./downloads
+```
+
+Run with uvx:
+
+```bash
+uvx --from . htmldownloader --from-url https://example.com --to-dir ./downloads
+```
+
+## Parameters
+
+- `--from-url`: The URL of the web page to download (required)
+- `--to-dir`: The directory where the HTML file will be saved (required)
