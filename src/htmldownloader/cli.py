@@ -6,6 +6,7 @@ import sys
 from pathlib import Path
 from urllib.request import urlopen
 from urllib.error import URLError, HTTPError
+from urllib.parse import urlparse
 
 
 def download_html(url: str, output_dir: Path) -> None:
@@ -26,7 +27,6 @@ def download_html(url: str, output_dir: Path) -> None:
             html_content = response.read()
         
         # Extract filename from URL or use default
-        from urllib.parse import urlparse
         parsed_url = urlparse(url)
         path = parsed_url.path.rstrip('/')
         
@@ -41,9 +41,6 @@ def download_html(url: str, output_dir: Path) -> None:
         elif '.' not in filename:
             # Filename without extension, append .html
             filename = f"{filename}.html"
-        elif not filename.endswith(('.html', '.htm')):
-            # Has an extension but not .html/.htm, keep as is
-            pass
         
         # Save to file
         output_path = output_dir / filename
