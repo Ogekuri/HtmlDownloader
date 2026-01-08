@@ -26,7 +26,5 @@ source ${VENVDIR}/bin/activate
 
 echo -n "Install python requirements ..."
 ${VENVDIR}/bin/pip install -r requirements.txt
-
 ${VENVDIR}/bin/playwright install chromium
-
 echo "done."

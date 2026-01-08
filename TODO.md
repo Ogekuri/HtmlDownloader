@@ -6,6 +6,8 @@
 #### Todo List ✓
 - [ ] new: Initial alpha stage release
 - [ ] test: Testing and bug fixes
+- [ ] https://software-dl.ti.com/processor-industrial-sw/esd/ind_comms_sdk/am64x/latest/docs/api_guide_am64x/index.html
+- [ ] https://software-dl.ti.com/mcu-plus-sdk/esd/AM263X/latest/exports/docs/api_guide_am263x/index.html
 - [ ] new: Initial beta stage release
 
 ### Beta Stage
