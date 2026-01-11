@@ -1,5 +1,5 @@
 #!/bin/bash
-# VERSION: 0.0.1
+# VERSION: 0.0.2
 # AUTHORS: Ogekuri
 
 rm -rf temp/
