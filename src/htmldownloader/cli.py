@@ -26,6 +26,7 @@ import argparse
 import mimetypes
 import os
 import re
+import subprocess
 import sys
 import time
 from dataclasses import dataclass, field
@@ -40,6 +41,73 @@ from tqdm import tqdm
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
 from .version import __version__
+
+
+GITHUB_API_TIMEOUT_S = 1
+
+
+def _parse_version_tuple(v: str) -> Optional[Tuple[int, ...]]:
+    v = (v or "").strip()
+    if not v:
+        return None
+    if v.startswith(("v", "V")):
+        v = v[1:]
+    if not re.fullmatch(r"\d+(?:\.\d+)*", v):
+        return None
+    try:
+        return tuple(int(p) for p in v.split("."))
+    except Exception:
+        return None
+
+
+def _is_version_newer(latest: str, current: str) -> bool:
+    latest_t = _parse_version_tuple(latest)
+    current_t = _parse_version_tuple(current)
+    if not latest_t or not current_t:
+        return False
+    width = max(len(latest_t), len(current_t))
+    latest_t = latest_t + (0,) * (width - len(latest_t))
+    current_t = current_t + (0,) * (width - len(current_t))
+    return latest_t > current_t
+
+
+def _get_latest_version_from_github(owner: str, repo: str) -> Optional[str]:
+    url = f"https://api.github.com/repos/{owner}/{repo}/releases/latest"
+    try:
+        r = requests.get(
+            url,
+            timeout=GITHUB_API_TIMEOUT_S,
+            headers={"Accept": "application/vnd.github+json"},
+        )
+        r.raise_for_status()
+        data = r.json()
+        if not isinstance(data, dict):
+            return None
+        tag = data.get("tag_name") or data.get("name")
+        if not isinstance(tag, str):
+            return None
+        tag = tag.strip()
+        if tag.startswith(("v", "V")):
+            tag = tag[1:]
+        return tag if _parse_version_tuple(tag) else None
+    except Exception:
+        return None
+
+
+def check_for_new_version(program: str, current_version: str) -> None:
+    """Check GitHub releases for a newer version.
+
+    Any failure is treated as "no update" and produces no output.
+    """
+
+    latest = _get_latest_version_from_github("Ogekuri", "HtmlDownloader")
+    if not latest:
+        return
+    if _is_version_newer(latest, current_version):
+        print(
+            f"A new version of {program} is available: current {current_version}, latest {latest}. "
+            f"To upgrade, run: {program} --upgrade"
+        )
 
 
 # ----------------------------
@@ -321,6 +389,30 @@ class Logger:
     def check(self, msg: str) -> None:
         if self.verbose_enabled or self.debug_enabled:
             print(msg)
+
+
+class UpgradeAction(argparse.Action):
+    def __call__(
+        self,
+        parser: argparse.ArgumentParser,
+        namespace: argparse.Namespace,
+        values,
+        option_string: Optional[str] = None,
+    ) -> None:
+        try:
+            proc = subprocess.run(
+                [
+                    sys.executable,
+                    "-m",
+                    "pip",
+                    "install",
+                    "--upgrade",
+                    "htmldownloader",
+                ]
+            )
+            parser.exit(proc.returncode)
+        except Exception as exc:
+            parser.exit(1, f"Upgrade failed: {exc}\n")
 
 
 def iter_asset_urls(soup: BeautifulSoup, page_url: str) -> Set[str]:
@@ -4179,6 +4271,12 @@ def build_arg_parser() -> argparse.ArgumentParser:
         action="version",
         version=__version__,
     )
+    ap.add_argument(
+        "--upgrade",
+        action=UpgradeAction,
+        nargs=0,
+        help="Aggiorna il pacchetto htmldownloader via pip e termina",
+    )
     ap.add_argument("--from-url", required=True)
     ap.add_argument("--to-dir", required=True)
     ap.add_argument(
@@ -4209,6 +4307,8 @@ def build_arg_parser() -> argparse.ArgumentParser:
 def main() -> int:
     ap = build_arg_parser()
     args = ap.parse_args()
+
+    check_for_new_version(ap.prog, __version__)
 
     from_url = args.from_url.strip()
     out_dir = Path(args.to_dir).expanduser().resolve()

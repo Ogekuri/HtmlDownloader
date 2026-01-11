@@ -1,7 +1,7 @@
 ---
 title: "Requisiti di HtmlDownloader"
 description: Specifica dei requisiti software
-version: "0.33"
+version: "0.34"
 date: "2026-01-11"
 author: "Ogekuri"
 scope:
@@ -18,7 +18,7 @@ tags: ["markdown", "requirements"]
 ---
 
 # Requisiti di HtmlDownloader
-**Versione**: 0.33
+**Versione**: 0.34
 **Autore**: Ogekuri
 **Data**: 2026-01-11
 
@@ -128,6 +128,9 @@ HtmlDownloader/
 - **REQ-015**: Per URL `https://dev.ti.com/tirex/explore/node` la CLI deve selezionare `ResourceExplorerDownloader`; se nessun modulo si attiva deve terminare con errore.
 - **REQ-016**: Il modulo `RMModuleDoxigen` deve attivarsi quando la pagina contiene un `div.css-1aefuid-contentContainer` con un `iframe` o `frame` dotato di `src`, deve costruire l'URL Doxygen usando base `https://dev.ti.com/tirex/explore/` e delegare il download a `DoxygenExportDownloader` passando tutte le opzioni CLI (inclusi `--limit`, `--user-agent`, `--verbose`, `--debug`, `--disable-numbering`).
 - **REQ-017**: La CLI deve esporre le opzioni `--version` e `--ver` che stampano su stdout solo la versione corrente del programma (es: `0.2.3`) e terminano immediatamente l'esecuzione (exit code 0), senza richiedere `--from-url`/`--to-dir` e senza altri messaggi.
+- **REQ-018**: La CLI, dopo aver validato gli input e prima di eseguire qualsiasi altra operazione, deve verificare la disponibilita' di una nuova versione tramite chiamata HTTP GET all'endpoint `https://api.github.com/repos/Ogekuri/HtmlDownloader/releases/latest` con timeout di 1 secondo; se la chiamata fallisce o la versione non e' determinabile deve procedere senza segnalare nulla.
+- **REQ-019**: Se la chiamata di verifica versione ha successo e la versione disponibile e' maggiore di quella corrente, la CLI deve stampare su stdout un messaggio nel formato: `A new version of <program> is available: current <current>, latest <latest>. To upgrade, run: <program> --upgrade`.
+- **REQ-020**: La CLI deve esporre l'opzione `--upgrade` che aggiorna il pacchetto `htmldownloader` e termina immediatamente l'esecuzione (exit code 0 se l'upgrade ha successo, non-zero se fallisce), senza richiedere `--from-url`/`--to-dir`.
 
 ### 3.3 Output del documento
 - **REQ-010**: Il crawler `doxygen-export` deve inserire all'inizio di `document.html` una riga di titolo con il nome del documento ottenuto dall'intestazione superiore della pagina (`#titlearea`/`#projectname`/`#projectnumber` quando presenti); il titolo deve precedere tutte le sezioni scaricate.
@@ -159,10 +162,13 @@ HtmlDownloader/
 | **TST-022** | **DES-023**, **REQ-014** | Eseguire la funzione di test `test_api_guide_post_links` nel file `tests/test_api_guide_limit.py` con le stesse regole di validazione link di TST-020 su `temp/test_api_guide_am64x/document.html`. |
 | **TST-023** | **REQ-015**, **REQ-016**, **DES-024** | Eseguire la CLI con `https://dev.ti.com/tirex/explore/node?node=A__AD2nw6Uu4txAz2eqZdShBg__DIGITAL-POWER-SDK-AM263X__k-hvNHd__LATEST` e `--limit 30`; verificare che la CLI completi con successo, che `toc.html` e `document.html` esistano, che `toc.html` contenga 30 voci, che ogni link della TOC punti a un anchor presente in `document.html` e che gli eventuali anchor `page-*` non superino `page-30`; verificare inoltre che l'output indichi `resource-explorer` come downloader selezionato. |
 | **TST-024** | **REQ-017** | Eseguire il parser della CLI con `--version` e con `--ver` e verificare che: (1) la CLI termini immediatamente con exit code 0; (2) stdout contenga esclusivamente la stringa della versione seguita da newline (`<versione>\n`), senza altri messaggi. |
+| **TST-025** | **REQ-018**, **REQ-019** | Mockare la chiamata HTTP a GitHub (`requests.get`) e verificare che: (1) in caso di errore/timeout o risposta senza versione valida, non venga stampato alcun messaggio; (2) in caso di risposta valida con `tag_name` maggiore della versione corrente, venga stampato il messaggio di aggiornamento con versione corrente, versione latest e istruzione `--upgrade`. |
+| **TST-026** | **REQ-020** | Mockare l'esecuzione del comando di upgrade (`subprocess.run`) e verificare che l'opzione `--upgrade` termini immediatamente con exit code coerente e invochi `python -m pip install --upgrade htmldownloader` senza richiedere altri parametri. |
 
 ## 5. Cronologia revisioni
 | Data | Versione | Motivazione e descrizione cambiamento |
 |------|----------|---------------------------------------|
+| 2026-01-11 | 0.34 | Aggiunto controllo non bloccante della disponibilita' di una nuova versione tramite GitHub Releases e opzione CLI `--upgrade`; aggiunti requisiti REQ-018/REQ-019/REQ-020 e test TST-025/TST-026. |
 | 2026-01-11 | 0.33 | Aggiunto comando CLI `--version`/`--ver` per stampare la versione del programma e terminare immediatamente; aggiunto requisito REQ-017 e test TST-024. |
 | 2026-01-11 | 0.32 | Consolidati i test post-link TST-020, TST-021, TST-022 nei rispettivi file di test di download, eliminando i file separati e la dipendenza dalla variabile d'ambiente RUN_POST_LINK_TESTS. |
 | 2026-01-10 | 0.31 | Estesa funzione `_add_document_style` per aggiungere bordi anche alle immagini non contenute in tabelle, con lo stesso spessore dei bordi delle tabelle. |
