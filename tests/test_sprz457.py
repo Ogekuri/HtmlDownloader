@@ -19,6 +19,8 @@ from typing import Optional
 from bs4 import BeautifulSoup
 from urllib.parse import urldefrag
 
+from tests.document_links_check import assert_document_links_valid
+
 
 # Elementi richiesti nella TOC
 REQUIRED_TOC_ITEMS = [
@@ -125,7 +127,7 @@ def verify_toc(toc_file: Path) -> tuple[bool, list[str]]:
         return False, ["missing first TOC link"]
     first_text = " ".join(first_link.get_text(" ", strip=True).split())
     if not first_text.startswith("1 "):
-        return False, ["first TOC entry does not start with '1 '"]
+        return False, ["first TOC entry should start with '1 ' (numbering should be present)"]
 
     if "Apri documento completo" in toc_text:
         return False, ["toc.html must not include 'Apri documento completo'"]
@@ -421,6 +423,22 @@ def test_sprz457_download_and_verify():
     print(f"All required document.html content verified")
     print(f"Output saved to: {output_dir}")
     print("=" * 80)
+
+
+def test_sprz457_post_links():
+    """Verifica che tutti i link in document.html siano validi (TST-020)."""
+    project_root = Path(__file__).parent.parent
+    output_dir = project_root / "temp" / "test_sprz457"
+    test_url = "https://www.ti.com/document-viewer/lit/html/sprz457"
+
+    # Ensure download is present
+    if not (output_dir / "document.html").exists():
+        output_dir.mkdir(parents=True, exist_ok=True)
+        download_success = run_download(test_url, output_dir)
+        assert download_success, "Download failed"
+
+    doc_path = output_dir / "document.html"
+    assert_document_links_valid(doc_path)
 
 
 def main():

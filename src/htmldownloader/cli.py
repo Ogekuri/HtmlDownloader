@@ -39,16 +39,29 @@ from tqdm import tqdm
 
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
+from .version import __version__
+
 
 # ----------------------------
 # Shared helpers
 # ----------------------------
+
 
 def safe_filename(path: str) -> str:
     path = (path or "").strip()
     path = re.sub(r"[<>:\"|?*\x00-\x1F]", "_", path)
     path = path.replace("\\", "_")
     return path
+
+
+def positive_int(value: str) -> int:
+    try:
+        parsed = int(value)
+    except Exception as exc:
+        raise argparse.ArgumentTypeError("deve essere un intero") from exc
+    if parsed <= 0:
+        raise argparse.ArgumentTypeError("deve essere un intero positivo")
+    return parsed
 
 
 def is_http_url(s: str) -> bool:
@@ -91,7 +104,9 @@ def local_path_for_url(asset_url: str, out_dir: Path) -> Path:
     return out_dir / "assets" / host / p
 
 
-def download_one(session: requests.Session, url: str, dest: Path, timeout: int = 60) -> bool:
+def download_one(
+    session: requests.Session, url: str, dest: Path, timeout: int = 60
+) -> bool:
     ensure_parent(dest)
     try:
         with session.get(url, stream=True, timeout=timeout, allow_redirects=True) as r:
@@ -106,11 +121,13 @@ def download_one(session: requests.Session, url: str, dest: Path, timeout: int =
 
 
 def escape_html(s: str) -> str:
-    return (s.replace("&", "&amp;")
-              .replace("<", "&lt;")
-              .replace(">", "&gt;")
-              .replace('"', "&quot;")
-              .replace("'", "&#39;"))
+    return (
+        s.replace("&", "&amp;")
+        .replace("<", "&lt;")
+        .replace(">", "&gt;")
+        .replace('"', "&quot;")
+        .replace("'", "&#39;")
+    )
 
 
 @dataclass
@@ -118,6 +135,27 @@ class TocNode:
     title: str
     href: str
     children: List["TocNode"] = field(default_factory=list)
+
+
+def limit_toc_nodes(nodes: List[TocNode], max_entries: Optional[int]) -> List[TocNode]:
+    """Tronca la TOC alle prime ``max_entries`` voci in visita pre-order."""
+    if not max_entries or max_entries <= 0:
+        return nodes
+
+    count = 0
+
+    def trim_list(items: List[TocNode]) -> List[TocNode]:
+        nonlocal count
+        out: List[TocNode] = []
+        for n in items:
+            if count >= max_entries:
+                break
+            count += 1
+            n.children = trim_list(n.children)
+            out.append(n)
+        return out
+
+    return trim_list(nodes)
 
 
 def ensure_heading_ids(soup: BeautifulSoup) -> None:
@@ -140,7 +178,7 @@ def ensure_heading_ids(soup: BeautifulSoup) -> None:
 
 
 def strip_styles(soup: BeautifulSoup) -> None:
-    """Remove external stylesheets, inline styles, and style tags."""
+    """Remove external stylesheets, inline styles, style tags, and class attributes."""
     for link in list(soup.find_all("link", rel=lambda v: v and "stylesheet" in v)):
         link.decompose()
     for style in list(soup.find_all("style")):
@@ -148,6 +186,8 @@ def strip_styles(soup: BeautifulSoup) -> None:
     for tag in soup.find_all(True):
         if tag.has_attr("style"):
             del tag["style"]
+        if tag.has_attr("class"):
+            del tag["class"]
 
 
 def toc_from_headings(soup: BeautifulSoup) -> List[TocNode]:
@@ -210,12 +250,54 @@ def toc_from_nav_html(toc_html: str, base_url: str) -> List[TocNode]:
     return out
 
 
+def nav_outline_from_html(nav_html: str) -> str:
+    """Produce a deterministic, ASCII outline from the expanded nav tree HTML."""
+    soup = BeautifulSoup(nav_html or "", "lxml")
+    root_ul = soup.find("ul")
+    lines: List[str] = []
+
+    def norm_text(t: str) -> str:
+        clean = " ".join((t or "").replace("\xa0", " ").split())
+        return clean.replace(" ", "_")
+
+    def bullet(depth: int) -> str:
+        if depth == 0:
+            return "*"
+        if depth == 1:
+            return "o"
+        return "#"
+
+    def walk_ul(ul, depth: int) -> None:
+        for li in ul.find_all("li", recursive=False):
+            label_el = None
+            if hasattr(li, "select_one"):
+                label_el = li.select_one(":scope > div .label a") or li.select_one(
+                    ":scope > span.label a"
+                )
+            title = ""
+            if label_el:
+                title = norm_text(label_el.get_text(" ", strip=True))
+            if title:
+                indent = " " * (4 + depth * 6)
+                lines.append(f"{indent}{bullet(depth)} {title}")
+            child_ul = li.find("ul", recursive=False)
+            if child_ul:
+                walk_ul(child_ul, depth + 1)
+
+    if root_ul:
+        walk_ul(root_ul, 0)
+
+    return "\n".join(lines)
+
+
 ASSET_ATTRS = [
     ("img", "src"),
     ("img", "data-src"),
     ("source", "srcset"),
     ("link", "href"),
 ]
+
+HEADING_TAG_RE = re.compile(r"^h[1-6]$")
 
 
 class Logger:
@@ -273,7 +355,9 @@ def iter_asset_urls(soup: BeautifulSoup, page_url: str) -> Set[str]:
     return urls
 
 
-def rewrite_asset_links_inplace(soup: BeautifulSoup, base_url: str, out_dir: Path) -> None:
+def rewrite_asset_links_inplace(
+    soup: BeautifulSoup, base_url: str, out_dir: Path
+) -> None:
     def to_rel(u: str) -> str:
         u2 = normalize_url(u, base_url)
         if not is_http_url(u2):
@@ -303,10 +387,148 @@ def rewrite_asset_links_inplace(soup: BeautifulSoup, base_url: str, out_dir: Pat
     bg_re = re.compile(r"url\(([^)]+)\)")
     for t in soup.find_all(style=True):
         style = t.get("style") or ""
+
         def repl(m):
             raw = m.group(1).strip().strip("'\"")
             return f"url('{to_rel(raw)}')"
+
         t["style"] = bg_re.sub(repl, style)
+
+
+ALLOWED_EXTERNAL_LINK_SCHEMES = {
+    "http",
+    "https",
+    "ftp",
+    "ftps",
+}
+
+
+def normalize_document_links_inplace(soup: BeautifulSoup, logger: Optional[Logger]) -> None:
+    """Normalize <a href> links inside document.html.
+
+    Allowed outcomes:
+    - External links with explicit scheme (http/https/ftp/ftps)
+    - In-document anchors of the form #<id> where <id> exists in the document
+
+    Any other href is either rewritten to an in-document anchor (if the fragment exists)
+    or made non-clickable by removing the href attribute.
+    """
+
+    if not soup:
+        return
+
+    # Index document ids case-insensitively
+    id_map: Dict[str, str] = {}
+    for el in soup.find_all(True):
+        el_id = (el.get("id") or "").strip()
+        if el_id:
+            id_map.setdefault(el_id.lower(), el_id)
+
+    total = 0
+    kept_external = 0
+    kept_anchor = 0
+    rewritten = 0
+    removed = 0
+
+    debug_samples: List[str] = []
+
+    for a in soup.find_all("a"):
+        if not a.has_attr("href"):
+            continue
+        href_raw = (a.get("href") or "").strip()
+        if href_raw == "":
+            total += 1
+            try:
+                del a["href"]
+            except Exception:
+                a["href"] = None
+            removed += 1
+            if logger and logger.debug_enabled and len(debug_samples) < 10:
+                debug_samples.append("drop empty href")
+            continue
+
+        total += 1
+
+        # Direct in-document anchor
+        if href_raw.startswith("#"):
+            frag = href_raw[1:].strip()
+            if not frag:
+                try:
+                    del a["href"]
+                except Exception:
+                    a["href"] = None
+                removed += 1
+                if logger and logger.debug_enabled and len(debug_samples) < 10:
+                    debug_samples.append("drop anchor '#' (empty fragment)")
+                continue
+            actual = id_map.get(frag.lower())
+            if actual:
+                # Normalize casing
+                if actual != frag:
+                    a["href"] = f"#{actual}"
+                    rewritten += 1
+                    if logger and logger.debug_enabled and len(debug_samples) < 10:
+                        debug_samples.append(f"rewrite '#{frag}' -> '#{actual}'")
+                else:
+                    kept_anchor += 1
+                continue
+
+            # Unknown fragment → drop href
+            try:
+                del a["href"]
+            except Exception:
+                a["href"] = None
+            removed += 1
+            if logger and logger.debug_enabled and len(debug_samples) < 10:
+                debug_samples.append(f"drop unknown in-doc anchor '#{frag}'")
+            continue
+
+        parsed = urlparse(href_raw)
+        scheme = (parsed.scheme or "").lower()
+
+        # External link with explicit scheme
+        if scheme in ALLOWED_EXTERNAL_LINK_SCHEMES:
+            kept_external += 1
+            continue
+
+        # Attempt to rewrite any URL-with-fragment to a local in-doc anchor
+        _, frag = urldefrag(href_raw)
+        frag = (frag or "").strip()
+        if frag:
+            actual = id_map.get(frag.lower())
+            if actual:
+                a["href"] = f"#{actual}"
+                rewritten += 1
+                if logger and logger.debug_enabled and len(debug_samples) < 10:
+                    debug_samples.append(f"rewrite '{href_raw}' -> '#{actual}'")
+                continue
+            try:
+                del a["href"]
+            except Exception:
+                a["href"] = None
+            removed += 1
+            if logger and logger.debug_enabled and len(debug_samples) < 10:
+                debug_samples.append(f"drop unresolved fragment '{href_raw}'")
+            continue
+
+        # No fragment and not an allowed external scheme → drop href
+        try:
+            del a["href"]
+        except Exception:
+            a["href"] = None
+        removed += 1
+        if logger and logger.debug_enabled and len(debug_samples) < 10:
+            debug_samples.append(f"drop disallowed href '{href_raw}'")
+
+    if logger:
+        logger.verbose(
+            f"[verbose] normalize_document_links: links={total}, kept_external={kept_external}, kept_anchor={kept_anchor}, rewritten={rewritten}, removed={removed}"
+        )
+        if logger.debug_enabled and debug_samples:
+            logger.debug(
+                "[debug] normalize_document_links samples: "
+                + "; ".join(debug_samples[:10])
+            )
 
 
 def build_toc_html(
@@ -331,9 +553,10 @@ def build_toc_html(
             href = resolved_href(n.href)
             children_html = render_nodes(n.children)
             items.append(
-                f"<li><a target=\"{escape_html(target_frame)}\" href=\"{href}\">{escape_html(n.title)}</a>{children_html}</li>"
+                f'<li><a target="{escape_html(target_frame)}" href="{href}">{escape_html(n.title)}</a>{children_html}</li>'
             )
         return f"<ul>{''.join(items)}</ul>"
+
     toc_html = render_nodes(toc_items)
 
     return f"""<!doctype html>
@@ -355,7 +578,9 @@ def build_toc_html(
 """
 
 
-def build_frameset_index(toc_filename: str = "toc.html", document_filename: str = "document.html") -> str:
+def build_frameset_index(
+    toc_filename: str = "toc.html", document_filename: str = "document.html"
+) -> str:
     return f"""<!doctype html>
 <html lang="it">
 <head>
@@ -376,7 +601,9 @@ def build_frameset_index(toc_filename: str = "toc.html", document_filename: str 
 """
 
 
-def minimal_readable_wrapper(inner_html: str, title: str = "Documento (offline)") -> str:
+def minimal_readable_wrapper(
+    inner_html: str, title: str = "Documento (offline)"
+) -> str:
     return f"""<!doctype html>
 <html lang="it">
 <head>
@@ -395,14 +622,41 @@ def minimal_readable_wrapper(inner_html: str, title: str = "Documento (offline)"
 # Downloader framework
 # ----------------------------
 
+
 class BaseDownloader:
     name: str = "base"
 
-    def __init__(self, from_url: str, out_dir: Path, session: requests.Session, logger: Optional[Logger] = None):
+    def __init__(
+        self,
+        from_url: str,
+        out_dir: Path,
+        session: requests.Session,
+        logger: Optional[Logger] = None,
+        limit: Optional[int] = None,
+        toc_only: bool = False,
+        disable_numbering: bool = False,
+    ):
         self.from_url = from_url
         self.out_dir = out_dir
         self.session = session
         self.log = logger or Logger()
+        self.limit = limit
+        self.toc_only = toc_only
+        self.disable_numbering = disable_numbering
+        self.post_process_pipeline = [
+            self._clean_document_style,
+            self._add_document_style,
+            self._normalize_document_links,
+            self._verify_toc_consistency,
+            self._verify_toc_depth,
+            self._prune_toc_and_clean_headings,
+            self._enforce_toc_headings,
+            self._test_toc_headings,
+            self.fix_heading_ref_position,
+            self._enforce_toc_headings,
+            self.fix_heading_numbering,
+            self._test_toc_headings,
+        ]
 
     @classmethod
     def matches_url(cls, url: str) -> bool:
@@ -414,6 +668,788 @@ class BaseDownloader:
 
     def run(self) -> None:
         raise NotImplementedError
+
+    def post_process(self) -> None:
+        """Execute post-processing pipeline to verify generated files."""
+        for func in self.post_process_pipeline:
+            try:
+                func()
+            except Exception as e:
+                self.log.debug(f"[debug] Post-process {func.__name__} failed: {e}")
+
+    def _verify_toc_consistency(self) -> None:
+        """Verify that each link in toc.html points to an existing anchor in document.html
+        and that the link text matches the heading text in document.html."""
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        # Find all links in TOC
+        toc_links = toc_soup.find_all("a", href=True)
+        issues = []
+
+        for link in toc_links:
+            href = link.get("href", "").strip()
+            if not href.startswith("#"):
+                continue
+            anchor_id = href[1:]
+            link_text = " ".join(link.get_text(" ", strip=True).split())
+
+            # Find corresponding element in document.html
+            target = doc_soup.find(id=anchor_id)
+            if not target:
+                issues.append(
+                    f"Missing anchor '{anchor_id}' for TOC link '{link_text}'"
+                )
+                continue
+
+            # Check if it's a heading and text matches
+            if target.name in ("h1", "h2", "h3", "h4", "h5", "h6"):
+                heading_text = " ".join(target.get_text(" ", strip=True).split())
+                if link_text.lower() != heading_text.lower():
+                    issues.append(
+                        f"TOC text '{link_text}' does not match heading '{heading_text}' for anchor '{anchor_id}'"
+                    )
+
+        if issues:
+            self.log.verbose("[verbose] TOC consistency issues found:")
+            for issue in issues:
+                self.log.verbose(f"  - {issue}")
+        else:
+            self.log.check("[check] TOC consistency verified")
+
+    def _verify_toc_depth(self) -> None:
+        """Verify the maximum depth of the TOC and warn if it exceeds 6 levels."""
+        toc_path = self.out_dir / "toc.html"
+        if not toc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+
+        def get_max_depth(ul, current_depth=0):
+            if not ul:
+                return current_depth
+            max_d = current_depth
+            for li in ul.find_all("li", recursive=False):
+                child_ul = li.find("ul", recursive=False)
+                if child_ul:
+                    max_d = max(max_d, get_max_depth(child_ul, current_depth + 1))
+            return max_d
+
+        root_ul = toc_soup.find("ul")
+        max_depth = get_max_depth(root_ul, 1) if root_ul else 0
+
+        if max_depth > 6:
+            self.log.info(
+                f"[warning] TOC depth is {max_depth} levels, which exceeds the recommended maximum of 6"
+            )
+        else:
+            self.log.check(f"[check] TOC depth is {max_depth} levels (within limit)")
+
+    def _prune_toc_and_clean_headings(self) -> None:
+        """Prune TOC entries at depth >=7 and remove heading prefixes from TOC links and document headings."""
+        import re
+
+        heading_prefix_re = re.compile(r"^\d+(\.\d+)*\s+")
+
+        def href_fragment_id(href: str) -> str:
+            href = (href or "").strip()
+            if not href:
+                return ""
+            _, frag = urldefrag(href)
+            return (frag or "").strip()
+
+        # Process toc.html
+        toc_path = self.out_dir / "toc.html"
+        if toc_path.exists():
+            toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+
+            pruned_ids: Set[str] = set()
+
+            # Prune TOC at depth >=7
+            root_ul = toc_soup.find("ul")
+            if root_ul:
+
+                def prune_ul(ul, depth):
+                    for li in list(ul.find_all("li", recursive=False)):
+                        if depth >= 7:
+                            a = li.find("a", href=True)
+                            if a:
+                                frag = href_fragment_id(a.get("href") or "")
+                                if frag:
+                                    pruned_ids.add(frag.lower())
+                            li.decompose()
+                            continue
+                        child_ul = li.find("ul", recursive=False)
+                        if child_ul:
+                            prune_ul(child_ul, depth + 1)
+
+                prune_ul(root_ul, 1)  # root ul depth 1, li depth 2
+
+            # Clean heading prefixes from TOC links
+            for a in toc_soup.find_all("a"):
+                if a.string:
+                    a.string = heading_prefix_re.sub("", a.string)
+
+            toc_path.write_text(str(toc_soup), encoding="utf-8")
+
+        # Process document.html
+        doc_path = self.out_dir / "document.html"
+        if doc_path.exists():
+            doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+            # Clean heading prefixes from headings
+            for h in doc_soup.find_all(re.compile(r"^h[1-7]$")):
+                if h.string:
+                    h.string = heading_prefix_re.sub("", h.string)
+
+            # If we pruned deep TOC entries, demote their corresponding headings in document.html.
+            # A heading is associated to a pruned TOC entry if:
+            # - the heading id is referenced by a pruned TOC href, OR
+            # - the heading is contained in a div/section whose id is referenced by a pruned TOC href.
+            try:
+                pruned_ids
+            except NameError:
+                pruned_ids = set()
+
+            if pruned_ids:
+                for h in list(doc_soup.find_all(re.compile(r"^h[1-6]$"))):
+                    hid = (h.get("id") or "").strip()
+                    hid_l = hid.lower() if hid else ""
+                    container_id_l = ""
+                    for parent in h.parents:
+                        if getattr(parent, "name", None) in ("section", "div"):
+                            pid = (parent.get("id") or "").strip()
+                            if pid:
+                                pid_l = pid.lower()
+                                if pid_l in pruned_ids:
+                                    container_id_l = pid_l
+                                    break
+
+                    if (hid_l and hid_l in pruned_ids) or container_id_l:
+                        text = h.get_text(" ", strip=True).upper()
+                        new_tag = doc_soup.new_tag("strong")
+                        new_tag.string = text
+                        if hid:
+                            new_tag["id"] = hid
+                        h.replace_with(new_tag)
+
+            doc_path.write_text(str(doc_soup), encoding="utf-8")
+
+    def _enforce_toc_headings(self) -> None:
+        """Convert to bold uppercase the headings (h1-h6) that are NOT referenced by toc.html.
+
+        A heading is considered referenced if:
+        - its own id is referenced by a toc.html href, OR
+        - it is contained in a div/section whose id is referenced by a toc.html href.
+
+        If referenced, verify the heading level matches the TOC nesting level and correct hx accordingly.
+        """
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        def href_fragment_id(href: str) -> str:
+            href = (href or "").strip()
+            if not href:
+                return ""
+            _, frag = urldefrag(href)
+            return (frag or "").strip()
+
+        # Map fragment id -> toc depth (depth = number of UL ancestors)
+        referenced_depth: Dict[str, int] = {}
+        for a in toc_soup.select("ul a[href]"):
+            frag = href_fragment_id(a.get("href") or "")
+            if not frag:
+                continue
+            depth = len(a.find_parents("ul"))
+            frag_l = frag.lower()
+            if frag_l not in referenced_depth:
+                referenced_depth[frag_l] = depth
+
+        def clamp_heading_level(depth: int) -> int:
+            try:
+                depth_i = int(depth)
+            except Exception:
+                depth_i = 1
+            if depth_i < 1:
+                return 1
+            if depth_i > 6:
+                return 6
+            return depth_i
+
+        def find_referenced_container_id(h) -> str:
+            for parent in h.parents:
+                if getattr(parent, "name", None) not in ("section", "div"):
+                    continue
+                pid = (parent.get("id") or "").strip()
+                if not pid:
+                    continue
+                pid_l = pid.lower()
+                if pid_l in referenced_depth:
+                    return pid_l
+            return ""
+
+        # Process headings in document.html
+        for h in list(doc_soup.find_all(re.compile(r"^h[1-6]$"))):
+            hid = (h.get("id") or "").strip()
+            hid_l = hid.lower() if hid else ""
+
+            expected_depth = None
+            referenced_by = ""
+
+            if hid_l and hid_l in referenced_depth:
+                expected_depth = referenced_depth[hid_l]
+                referenced_by = "id"
+            else:
+                container_id_l = find_referenced_container_id(h)
+                if container_id_l:
+                    expected_depth = referenced_depth[container_id_l]
+                    referenced_by = "container"
+
+            if expected_depth is None:
+                # Not referenced: convert to bold uppercase non-heading
+                text = h.get_text(" ", strip=True).upper()
+                new_tag = doc_soup.new_tag("strong")
+                new_tag.string = text
+                if hid:
+                    new_tag["id"] = hid
+                h.replace_with(new_tag)
+                continue
+
+            # Referenced: correct heading level based on TOC depth.
+            # For container-based references, correct only the first heading inside that container
+            # to avoid flattening internal structure.
+            if referenced_by == "container":
+                container = h.find_parent(["section", "div"], id=True)
+                if container:
+                    first_h = container.find(re.compile(r"^h[1-6]$"))
+                    if first_h is not h:
+                        continue
+
+            expected_level = clamp_heading_level(expected_depth)
+            expected_name = f"h{expected_level}"
+            if h.name != expected_name:
+                h.name = expected_name
+
+        # Write back document.html
+        doc_path.write_text(str(doc_soup), encoding="utf-8")
+
+    def _test_toc_headings(self) -> None:
+        """Verifica finale: TOC e heading devono essere coerenti e allo stesso livello."""
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        self.log.verbose("[verbose] test_toc_headings: avvio controlli TOC↔heading")
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        def href_fragment_id(href: str) -> str:
+            href = (href or "").strip()
+            if not href:
+                return ""
+            _, frag = urldefrag(href)
+            return (frag or "").strip()
+
+        def clamp_heading_level(depth: int) -> int:
+            try:
+                value = int(depth)
+            except Exception:
+                value = 1
+            return max(1, min(6, value))
+
+        referenced_depth: Dict[str, int] = {}
+        for a in toc_soup.select("ul a[href]"):
+            frag = href_fragment_id(a.get("href") or "")
+            if not frag:
+                continue
+            depth = len(a.find_parents("ul"))
+            frag_l = frag.lower()
+            if frag_l not in referenced_depth:
+                referenced_depth[frag_l] = depth
+
+        if not referenced_depth:
+            self.log.verbose(
+                "[verbose] test_toc_headings: nessun href con frammento trovato, controllo saltato"
+            )
+            return
+
+        doc_by_id: Dict[str, object] = {}
+        for el in doc_soup.find_all(True):
+            el_id = (el.get("id") or "").strip()
+            if el_id:
+                doc_by_id.setdefault(el_id.lower(), el)
+
+        self.log.verbose(
+            f"[verbose] test_toc_headings: verifico {len(referenced_depth)} href presenti nella TOC"
+        )
+
+        missing_targets: List[str] = []
+        invalid_targets: List[str] = []
+        depth_mismatch: List[str] = []
+
+        for frag, depth in referenced_depth.items():
+            target = doc_by_id.get(frag)
+            if not target:
+                missing_targets.append(frag)
+                continue
+
+            expected_level = clamp_heading_level(depth)
+            tag_name = (getattr(target, "name", "") or "").lower()
+
+            if HEADING_TAG_RE.match(tag_name):
+                level = int(tag_name[1])
+                if level != expected_level:
+                    depth_mismatch.append(
+                        f"{frag} atteso h{expected_level} trovato {tag_name}"
+                    )
+                else:
+                    self.log.debug(
+                        f"[debug] test_toc_headings: '{frag}' referenziato tramite heading id (h{level})"
+                    )
+                continue
+
+            if tag_name in ("div", "section"):
+                heading = target.find(HEADING_TAG_RE)
+                if not heading:
+                    invalid_targets.append(f"{frag} (contenitore senza heading)")
+                    continue
+                level = int(heading.name[1])
+                if level != expected_level:
+                    depth_mismatch.append(
+                        f"{frag} atteso h{expected_level} trovato {heading.name}"
+                    )
+                else:
+                    self.log.debug(
+                        f"[debug] test_toc_headings: '{frag}' referenziato tramite contenitore → {heading.name}"
+                    )
+                continue
+
+            invalid_targets.append(f"{frag} (tag={tag_name or 'unknown'})")
+
+        referenced_fragments = set(referenced_depth.keys())
+        total_headings = 0
+        referenced_headings = 0
+        unreferenced_headings: List[str] = []
+
+        self.log.verbose(
+            "[verbose] test_toc_headings: controllo copertura heading in document.html"
+        )
+
+        for heading in doc_soup.find_all(HEADING_TAG_RE):
+            total_headings += 1
+            hid = (heading.get("id") or "").strip()
+            hid_l = hid.lower() if hid else ""
+            referenced = False
+
+            if hid_l and hid_l in referenced_fragments:
+                referenced = True
+                referenced_headings += 1
+                self.log.debug(
+                    f"[debug] test_toc_headings: heading {heading.name}#{hid or '<no-id>'} referenziato tramite id"
+                )
+            else:
+                for parent in heading.parents:
+                    pname = (getattr(parent, "name", "") or "").lower()
+                    if pname not in ("div", "section"):
+                        continue
+                    pid = (parent.get("id") or "").strip()
+                    if not pid:
+                        continue
+                    pid_l = pid.lower()
+                    if pid_l in referenced_fragments:
+                        referenced = True
+                        referenced_headings += 1
+                        self.log.debug(
+                            f"[debug] test_toc_headings: heading {heading.name}#{hid or '<no-id>'} referenziato tramite contenitore {pid}"
+                        )
+                        break
+
+            if not referenced:
+                title = " ".join(heading.get_text(" ", strip=True).split())
+                unreferenced_headings.append(
+                    f"{heading.name}#{hid or '<no-id>'} {title or '<senza testo>'}"
+                )
+
+        self.log.verbose(
+            f"[verbose] test_toc_headings: heading referenziati {referenced_headings}/{total_headings}"
+        )
+
+        def summarize(items: List[str]) -> str:
+            if not items:
+                return ""
+            preview = ", ".join(items[:5])
+            if len(items) > 5:
+                preview += ", ..."
+            return preview
+
+        issues: List[str] = []
+        if missing_targets:
+            issues.append(
+                f"missing anchors ({len(missing_targets)}): {summarize(missing_targets)}"
+            )
+        if invalid_targets:
+            issues.append(
+                f"invalid targets ({len(invalid_targets)}): {summarize(invalid_targets)}"
+            )
+        if depth_mismatch:
+            issues.append(
+                f"depth mismatch ({len(depth_mismatch)}): {summarize(depth_mismatch)}"
+            )
+        if unreferenced_headings:
+            issues.append(
+                f"unreferenced headings ({len(unreferenced_headings)}): {summarize(unreferenced_headings)}"
+            )
+
+        if issues:
+            raise ValueError("test_toc_headings: " + "; ".join(issues))
+
+        self.log.check("[check] test_toc_headings completato")
+
+    def fix_heading_ref_position(self) -> None:
+        """Sposta gli id referenziati dalla TOC sugli heading h1..h6.
+
+        Se un fragment `#...` in toc.html punta a un contenitore (div/section/...), e quel
+        contenitore contiene almeno un heading h1..h6, allora l'id viene spostato sul primo
+        heading contenuto e rimosso dal contenitore.
+
+        Al termine, tutti gli href della TOC devono puntare a heading (h1..h6).
+        """
+
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        toc_fragments: List[str] = []
+        toc_fragments_l: Set[str] = set()
+        for a in toc_soup.find_all("a", href=True):
+            href = (a.get("href") or "").strip()
+            _, frag = urldefrag(href)
+            frag = (frag or "").strip()
+            if not frag:
+                continue
+            frag_l = frag.lower()
+            if frag_l in toc_fragments_l:
+                continue
+            toc_fragments_l.add(frag_l)
+            toc_fragments.append(frag)
+
+        if not toc_fragments:
+            self.log.verbose(
+                "[verbose] fix_heading_ref_position: nessun href con frammento trovato, controllo saltato"
+            )
+            return
+
+        # Build an index of ids in the document (case-insensitive).
+        doc_by_id: Dict[str, List[object]] = {}
+        for el in doc_soup.find_all(True):
+            el_id = (el.get("id") or "").strip()
+            if not el_id:
+                continue
+            doc_by_id.setdefault(el_id.lower(), []).append(el)
+
+        self.log.verbose(
+            f"[verbose] fix_heading_ref_position: verifico {len(toc_fragments)} frammenti della TOC"
+        )
+
+        moved: List[str] = []
+        missing: List[str] = []
+        invalid: List[str] = []
+        conflicts: List[str] = []
+
+        for frag in toc_fragments:
+            frag_l = frag.lower()
+            targets = doc_by_id.get(frag_l) or []
+            if not targets:
+                missing.append(frag)
+                continue
+
+            target = targets[0]
+            tag_name = (getattr(target, "name", "") or "").lower()
+
+            if HEADING_TAG_RE.match(tag_name):
+                continue
+
+            heading = None
+            if hasattr(target, "find"):
+                heading = target.find(HEADING_TAG_RE)
+            if not heading:
+                invalid.append(f"{frag} (tag={tag_name or 'unknown'} senza heading)")
+                continue
+
+            old_heading_id = (heading.get("id") or "").strip()
+            if old_heading_id and old_heading_id.lower() in toc_fragments_l and old_heading_id.lower() != frag_l:
+                conflicts.append(
+                    f"{frag} (heading interno ha gia' id referenziato dalla TOC: {old_heading_id})"
+                )
+                continue
+
+            # Remove id from the container and assign the TOC fragment id to the heading.
+            if hasattr(target, "attrs") and target.get("id") is not None:
+                try:
+                    del target["id"]
+                except Exception:
+                    target["id"] = None
+
+            if old_heading_id and old_heading_id != frag:
+                # Try to preserve the old heading id by moving it to the container,
+                # but only if it does not collide with another element.
+                other_els = [e for e in doc_soup.find_all(id=old_heading_id) if e is not heading]
+                if not other_els:
+                    try:
+                        target["id"] = old_heading_id
+                    except Exception:
+                        pass
+
+            heading["id"] = frag
+            moved.append(frag)
+
+        # Re-index after modifications and ensure all TOC href fragments point to headings.
+        if moved:
+            doc_by_id2: Dict[str, object] = {}
+            for el in doc_soup.find_all(True):
+                el_id = (el.get("id") or "").strip()
+                if el_id:
+                    doc_by_id2.setdefault(el_id.lower(), el)
+
+            not_headings: List[str] = []
+            for frag in toc_fragments:
+                t = doc_by_id2.get(frag.lower())
+                name = (getattr(t, "name", "") or "").lower() if t else ""
+                if not t or not HEADING_TAG_RE.match(name):
+                    not_headings.append(frag)
+
+            if not_headings:
+                invalid.extend([f"{f} (non punta a heading dopo fix)" for f in not_headings])
+
+            doc_path.write_text(str(doc_soup), encoding="utf-8")
+
+        if moved:
+            self.log.verbose(
+                f"[verbose] fix_heading_ref_position: spostati {len(moved)} id dalla sezione al heading"
+            )
+            self.log.debug(
+                f"[debug] fix_heading_ref_position: spostati: {', '.join(moved[:8])}{', ...' if len(moved) > 8 else ''}"
+            )
+
+        issues: List[str] = []
+        if missing:
+            issues.append(f"missing anchors ({len(missing)}): {', '.join(missing[:5])}{', ...' if len(missing) > 5 else ''}")
+        if conflicts:
+            issues.append(f"conflicts ({len(conflicts)}): {conflicts[0]}{', ...' if len(conflicts) > 1 else ''}")
+        if invalid:
+            issues.append(f"invalid targets ({len(invalid)}): {invalid[0]}{', ...' if len(invalid) > 1 else ''}")
+
+        if issues:
+            raise ValueError("fix_heading_ref_position: " + "; ".join(issues))
+
+        self.log.check("[check] fix_heading_ref_position completato")
+
+    def fix_heading_numbering(self) -> None:
+        """Normalizza il numbering di TOC e heading in base alla struttura della TOC.
+
+        Operazioni:
+        1) Rimuove prefissi numerici pre-esistenti (es: "1 ", "1.", "1.2 ", "1.2.")
+           da toc.html (testo dei link) e da document.html (heading h1..h6).
+        2) Se non e' attivo --disable-numbering, aggiunge una numerazione coerente con
+           posizione e livello nella TOC sia in toc.html sia nei relativi heading.
+        """
+
+        import re
+        from bs4 import NavigableString
+
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        # Matches: "1 ", "1.", "1.2 ", "1.2.", "1.2.3 ", "1.2.3.", ...
+        numbering_prefix_re = re.compile(r"^\s*\d+(?:\.\d+)*\.?\s+")
+
+        def normalize_ws(text: str) -> str:
+            return " ".join((text or "").split())
+
+        def strip_numbering_prefix(text: str) -> str:
+            return normalize_ws(numbering_prefix_re.sub("", normalize_ws(text)))
+
+        def set_flat_text(tag, text: str) -> None:
+            tag.clear()
+            tag.append(NavigableString(text))
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        # Phase 1: remove existing numbering from all TOC link texts
+        toc_links = list(toc_soup.select("ul a[href]"))
+        for a in toc_links:
+            cleaned = strip_numbering_prefix(a.get_text(" ", strip=True))
+            set_flat_text(a, cleaned)
+
+        # Phase 1: remove existing numbering from all headings in the document
+        for h in doc_soup.find_all(re.compile(r"^h[1-6]$")):
+            cleaned = strip_numbering_prefix(h.get_text(" ", strip=True))
+            set_flat_text(h, cleaned)
+
+        if self.disable_numbering:
+            toc_path.write_text(str(toc_soup), encoding="utf-8")
+            doc_path.write_text(str(doc_soup), encoding="utf-8")
+            self.log.check("[check] fix_heading_numbering completato (aggiunta numbering disabilitata)")
+            return
+
+        # Build numbering from TOC structure (depth inferred from UL nesting)
+        def href_fragment_id(href: str) -> str:
+            href = (href or "").strip()
+            if not href:
+                return ""
+            _, frag = urldefrag(href)
+            return (frag or "").strip()
+
+        counters: List[int] = []
+        numbering_by_frag: Dict[str, str] = {}
+        title_by_frag: Dict[str, str] = {}
+
+        for a in toc_links:
+            frag = href_fragment_id(a.get("href") or "")
+            if not frag:
+                continue
+            depth = len(a.find_parents("ul"))
+            if depth < 1:
+                depth = 1
+
+            # Maintain counters per depth
+            if len(counters) < depth:
+                counters.extend([0] * (depth - len(counters)))
+            elif len(counters) > depth:
+                counters = counters[:depth]
+
+            counters[depth - 1] += 1
+            for i in range(depth, len(counters)):
+                counters[i] = 0
+
+            number = ".".join(str(c) for c in counters[:depth] if c)
+            title_clean = strip_numbering_prefix(a.get_text(" ", strip=True))
+            numbered_title = f"{number} {title_clean}" if title_clean else number
+
+            frag_l = frag.lower()
+            numbering_by_frag[frag_l] = number
+            title_by_frag[frag_l] = title_clean
+            set_flat_text(a, numbered_title)
+
+        # Apply numbering to corresponding headings (by fragment id)
+        doc_by_id: Dict[str, object] = {}
+        for el in doc_soup.find_all(True):
+            el_id = (el.get("id") or "").strip()
+            if el_id:
+                doc_by_id.setdefault(el_id.lower(), el)
+
+        for frag_l, number in numbering_by_frag.items():
+            target = doc_by_id.get(frag_l)
+            if not target:
+                continue
+            tag_name = (getattr(target, "name", "") or "").lower()
+            heading = target if HEADING_TAG_RE.match(tag_name) else None
+            if heading is None and hasattr(target, "find"):
+                heading = target.find(HEADING_TAG_RE)
+            if not heading:
+                continue
+
+            title_clean = title_by_frag.get(frag_l, strip_numbering_prefix(heading.get_text(" ", strip=True)))
+            numbered_title = f"{number} {title_clean}" if title_clean else number
+            set_flat_text(heading, numbered_title)
+
+        toc_path.write_text(str(toc_soup), encoding="utf-8")
+        doc_path.write_text(str(doc_soup), encoding="utf-8")
+        self.log.check("[check] fix_heading_numbering completato")
+
+    def _clean_document_style(self) -> None:
+        """Remove all style references from document.html and toc.html."""
+        # Process document.html
+        doc_path = self.out_dir / "document.html"
+        if doc_path.exists():
+            soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+            strip_styles(soup)
+            doc_path.write_text(str(soup), encoding="utf-8")
+
+        # Process toc.html
+        toc_path = self.out_dir / "toc.html"
+        if toc_path.exists():
+            soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+            strip_styles(soup)
+            toc_path.write_text(str(soup), encoding="utf-8")
+
+    def _add_document_style(self) -> None:
+        """Add border lines to tables and images in document.html by injecting CSS styles.
+
+        Images that are not inside a table receive a border with the same thickness
+        as table borders (1px solid black).
+        """
+        doc_path = self.out_dir / "document.html"
+        if not doc_path.exists():
+            return
+
+        soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        # Check if there are any tables or images in the document
+        tables = soup.find_all("table")
+        images = soup.find_all("img")
+        if not tables and not images:
+            return
+
+        # Create or find the head element
+        head = soup.find("head")
+        if not head:
+            html_tag = soup.find("html")
+            if html_tag:
+                head = soup.new_tag("head")
+                html_tag.insert(0, head)
+            else:
+                return
+
+        # Create style tag with table border CSS and image border CSS
+        style_tag = soup.new_tag("style")
+        style_tag.string = """
+table {
+    border-collapse: collapse;
+}
+table, th, td {
+    border: 1px solid black;
+}
+img:not(table img) {
+    border: 1px solid black;
+}
+"""
+        head.append(style_tag)
+
+        doc_path.write_text(str(soup), encoding="utf-8")
+
+    def _normalize_document_links(self) -> None:
+        """Normalize all <a href> links in document.html.
+
+        Allowed links:
+        - External URLs with explicit scheme (http/https/ftp/ftps)
+        - In-document anchors (#id) where id exists in document.html
+        """
+        doc_path = self.out_dir / "document.html"
+        if not doc_path.exists():
+            return
+
+        soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+        normalize_document_links_inplace(soup, self.log)
+        doc_path.write_text(str(soup), encoding="utf-8")
 
 
 class DownloaderRegistry:
@@ -444,12 +1480,15 @@ class DownloaderRegistry:
             return html_matches[0]
         if url_matches:
             return url_matches[0]
-        raise RuntimeError("Impossibile determinare il tipo di downloader per questa URL.")
+        raise RuntimeError(
+            "Impossibile determinare il tipo di downloader per questa URL."
+        )
 
 
 # ----------------------------
 # Document-viewer (TI) downloader
 # ----------------------------
+
 
 def guess_ext_from_content_type(ct: str) -> str:
     ct = (ct or "").split(";")[0].strip().lower()
@@ -470,6 +1509,7 @@ class NetworkImageRecorder:
     Capture ALL image responses loaded by the browser (TI viewer loads many images lazily / via CSS).
     We only care about images because you said style isn't important; this also keeps assets smaller.
     """
+
     def __init__(self, out_dir: Path):
         self.out_dir = out_dir
         self.saved: Dict[str, Path] = {}
@@ -510,17 +1550,35 @@ class NetworkImageRecorder:
 class DocumentViewerDownloader(BaseDownloader):
     name = "document-viewer"
 
-    TOC_SELECTORS = ["#viewer_navTree", "nav", "[role='navigation']", "aside", "#contents", ".contents", ".toc"]
+    TOC_SELECTORS = [
+        "#viewer_navTree",
+        "nav",
+        "[role='navigation']",
+        "aside",
+        "#contents",
+        ".contents",
+        ".toc",
+    ]
     CONTENT_SELECTORS = [
         "ti-library-viewer-content-area",  # TI's actual content area component
         ".viewer-content",  # Content area class
         ".content-area",  # Alternative content class
         "#loadContentArea",  # TI's content loading area
         ".cardWrapper",  # Card wrapper containing document sections
-        "main:not(.viewer-sidebar)", "[role='main']:not(.viewer-sidebar)", 
-        "article", ".document", ".content:not(.tab-slider-content)", "#content"
+        "main:not(.viewer-sidebar)",
+        "[role='main']:not(.viewer-sidebar)",
+        "article",
+        ".document",
+        ".content:not(.tab-slider-content)",
+        "#content",
     ]
-    TOC_SCROLL_SELECTORS = ["nav", "[role='navigation']", "#contents", ".contents", ".toc"]
+    TOC_SCROLL_SELECTORS = [
+        "nav",
+        "[role='navigation']",
+        "#contents",
+        ".contents",
+        ".toc",
+    ]
 
     @classmethod
     def matches_url(cls, url: str) -> bool:
@@ -556,7 +1614,9 @@ class DocumentViewerDownloader(BaseDownloader):
         except Exception:
             return None
 
-    def _expand_full_toc(self, page, max_rounds: int = 10, settle_ms: int = 400) -> None:
+    def _expand_full_toc(
+        self, page, max_rounds: int = 10, settle_ms: int = 400
+    ) -> None:
         selectors = [
             "button[aria-expanded='false']",
             "[role='treeitem'] > button[aria-expanded='false']",
@@ -598,13 +1658,17 @@ class DocumentViewerDownloader(BaseDownloader):
             except Exception:
                 remaining = 0
 
-            self.log.verbose(f"[verbose] toc-expand round={i+1} clicked={clicked} remaining={remaining}")
+            self.log.verbose(
+                f"[verbose] toc-expand round={i + 1} clicked={clicked} remaining={remaining}"
+            )
             page.wait_for_timeout(settle_ms)
 
             if clicked == 0 and remaining == 0:
                 break
 
-    def _scroll_toc_container(self, page, step_px: int = 900, max_rounds: int = 40, settle_ms: int = 200) -> None:
+    def _scroll_toc_container(
+        self, page, step_px: int = 900, max_rounds: int = 40, settle_ms: int = 200
+    ) -> None:
         for sel in self.TOC_SCROLL_SELECTORS:
             try:
                 info = page.evaluate(
@@ -643,7 +1707,10 @@ class DocumentViewerDownloader(BaseDownloader):
                 if stable >= 3:
                     break
             try:
-                page.evaluate("(sel) => { const el = document.querySelector(sel); if (el) el.scrollTo(0, 0); }", sel)
+                page.evaluate(
+                    "(sel) => { const el = document.querySelector(sel); if (el) el.scrollTo(0, 0); }",
+                    sel,
+                )
             except Exception:
                 pass
 
@@ -745,12 +1812,18 @@ class DocumentViewerDownloader(BaseDownloader):
             else:
                 stable = 0
             if i % 8 == 0:
-                self.log.verbose(f"[verbose] auto-scroll round={i+1} height={height} stable={stable} ({label})")
+                self.log.verbose(
+                    f"[verbose] auto-scroll round={i + 1} height={height} stable={stable} ({label})"
+                )
             if stable >= stable_rounds:
-                self.log.verbose(f"[verbose] auto-scroll stop round={i+1} stable={stable} height={height} ({label})")
+                self.log.verbose(
+                    f"[verbose] auto-scroll stop round={i + 1} stable={stable} height={height} ({label})"
+                )
                 break
             if scroll_top == last_scroll_top and (scroll_top + client_h >= height - 2):
-                self.log.verbose(f"[verbose] auto-scroll stop round={i+1} bottom reached ({label})")
+                self.log.verbose(
+                    f"[verbose] auto-scroll stop round={i + 1} bottom reached ({label})"
+                )
                 break
             last_height = height
             last_scroll_top = scroll_top
@@ -768,7 +1841,14 @@ class DocumentViewerDownloader(BaseDownloader):
             pass
         return True
 
-    def _auto_scroll(self, page, settle_ms: int = 300, step_px: int = 1400, max_rounds: int = 320, stable_rounds: int = 6) -> None:
+    def _auto_scroll(
+        self,
+        page,
+        settle_ms: int = 300,
+        step_px: int = 1400,
+        max_rounds: int = 320,
+        stable_rounds: int = 6,
+    ) -> None:
         scroll_el = self._find_scroll_container(page)
         if scroll_el and self._auto_scroll_element(
             page,
@@ -790,8 +1870,12 @@ class DocumentViewerDownloader(BaseDownloader):
         stable = 0
         for i in range(max_rounds):
             try:
-                height = page.evaluate("() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)")
-                client_h = page.evaluate("() => Math.max(document.body.clientHeight, document.documentElement.clientHeight, window.innerHeight)")
+                height = page.evaluate(
+                    "() => Math.max(document.body.scrollHeight, document.documentElement.scrollHeight)"
+                )
+                client_h = page.evaluate(
+                    "() => Math.max(document.body.clientHeight, document.documentElement.clientHeight, window.innerHeight)"
+                )
             except Exception:
                 break
             if height <= client_h + 10:
@@ -803,9 +1887,13 @@ class DocumentViewerDownloader(BaseDownloader):
             else:
                 stable = 0
             if i % 8 == 0:
-                self.log.verbose(f"[verbose] auto-scroll round={i+1} height={height} stable={stable}")
+                self.log.verbose(
+                    f"[verbose] auto-scroll round={i + 1} height={height} stable={stable}"
+                )
             if stable >= stable_rounds:
-                self.log.verbose(f"[verbose] auto-scroll stop round={i+1} stable={stable} height={height}")
+                self.log.verbose(
+                    f"[verbose] auto-scroll stop round={i + 1} stable={stable} height={height}"
+                )
                 break
             last_height = height
             page.evaluate(f"() => window.scrollBy(0, {step_px})")
@@ -891,7 +1979,9 @@ class DocumentViewerDownloader(BaseDownloader):
 
         return cards
 
-    def _best_card_for_fragment(self, cards: Dict[str, str], fragment: str) -> Optional[Tuple[str, str]]:
+    def _best_card_for_fragment(
+        self, cards: Dict[str, str], fragment: str
+    ) -> Optional[Tuple[str, str]]:
         frag = unquote((fragment or "").lstrip("#").strip())
         if not frag:
             return None
@@ -972,10 +2062,69 @@ class DocumentViewerDownloader(BaseDownloader):
         if start_idx is not None:
             trimmed = trimmed[start_idx:]
 
-        if trimmed and DocumentViewerDownloader._is_important_notice_label(trimmed[-1].title):
+        if trimmed and DocumentViewerDownloader._is_important_notice_label(
+            trimmed[-1].title
+        ):
             trimmed = trimmed[:-1]
 
         return trimmed if trimmed else list(nodes)
+
+    @staticmethod
+    def _limit_toc_nodes(
+        nodes: List[TocNode], max_entries: Optional[int]
+    ) -> List[TocNode]:
+        return limit_toc_nodes(nodes, max_entries)
+
+    @staticmethod
+    def _limit_by_reading_order(
+        nodes: List[TocNode], max_entries: Optional[int]
+    ) -> List[TocNode]:
+        """Return the first ``max_entries`` nodes following pre-order (reading) traversal."""
+        if not max_entries or max_entries <= 0:
+            return nodes
+        node_ids = {id(n) for n in nodes}
+        has_descendants_in_list = False
+        for n in nodes:
+            for child in DocumentViewerDownloader._iter_nodes(n.children):
+                if id(child) in node_ids:
+                    has_descendants_in_list = True
+                    break
+            if has_descendants_in_list:
+                break
+
+        if has_descendants_in_list:
+            limited: List[TocNode] = []
+            seen: Set[int] = set()
+            for n in nodes:
+                nid = id(n)
+                if nid in seen:
+                    continue
+                seen.add(nid)
+                limited.append(n)
+                if len(limited) >= max_entries:
+                    break
+            return limited
+
+        flat = list(DocumentViewerDownloader._iter_nodes(nodes))
+        return flat[:max_entries]
+
+    @staticmethod
+    def _prune_toc_to_allowed(
+        nodes: List[TocNode], allowed_ids: Set[int]
+    ) -> List[TocNode]:
+        """Prune a TOC tree to only nodes present in ``allowed_ids`` (by object id), preserving structure."""
+        pruned: List[TocNode] = []
+        for n in nodes:
+            kept_children = DocumentViewerDownloader._prune_toc_to_allowed(
+                n.children, allowed_ids
+            )
+            is_allowed = id(n) in allowed_ids
+            if is_allowed:
+                n.children = kept_children
+                pruned.append(n)
+            elif kept_children:
+                pruned.extend(kept_children)
+        return pruned
 
     @staticmethod
     def _first_toc_entry_title(nodes: List[TocNode]) -> Optional[str]:
@@ -994,7 +2143,9 @@ class DocumentViewerDownloader(BaseDownloader):
     def _is_important_notice_section(section_html: str) -> bool:
         soup = BeautifulSoup(section_html, "lxml")
         heading = soup.find(re.compile(r"^h[1-6]$"))
-        if heading and DocumentViewerDownloader._is_important_notice_label(heading.get_text(" ", strip=True)):
+        if heading and DocumentViewerDownloader._is_important_notice_label(
+            heading.get_text(" ", strip=True)
+        ):
             return True
         flat_text = " ".join(soup.get_text(" ", strip=True).split()).lower()
         return "important notice and disclaimer" in flat_text
@@ -1086,7 +2237,7 @@ class DocumentViewerDownloader(BaseDownloader):
         for tag_name in toc_tag_names:
             for elem in list(soup.find_all(tag_name)):
                 elem.decompose()
-        
+
         # Remove by selector
         toc_selectors = [
             "#viewer_navTree",  # Main navigation tree
@@ -1106,7 +2257,9 @@ class DocumentViewerDownloader(BaseDownloader):
             for elem in list(soup.select(sel)):
                 elem.decompose()
 
-    def _extract_fragment_only(self, soup: BeautifulSoup, fragment: str) -> BeautifulSoup:
+    def _extract_fragment_only(
+        self, soup: BeautifulSoup, fragment: str
+    ) -> BeautifulSoup:
         """Return soup narrowed to the element matching the fragment id/name, if present (case-insensitive)."""
         frag = unquote((fragment or "").lstrip("#").strip())
         if not frag:
@@ -1145,14 +2298,18 @@ class DocumentViewerDownloader(BaseDownloader):
                 if score <= 0:
                     continue
                 text_len = len(el.get_text(" ", strip=True))
-                if score > best_score or (score == best_score and (best_len is None or text_len < best_len)):
+                if score > best_score or (
+                    score == best_score and (best_len is None or text_len < best_len)
+                ):
                     best = el
                     best_score = score
                     best_len = text_len
             return best
 
         # Prefer a single documentSection card that matches the fragment to avoid duplicated parent cards.
-        candidates = soup.select(".documentSection[data-url]") or soup.find_all(attrs={"data-url": True})
+        candidates = soup.select(".documentSection[data-url]") or soup.find_all(
+            attrs={"data-url": True}
+        )
         best_section = pick_best_section(candidates)
         if best_section:
             narrowed = BeautifulSoup("", "lxml")
@@ -1249,17 +2406,19 @@ class DocumentViewerDownloader(BaseDownloader):
         if not frag:
             return False
         try:
-            return bool(page.evaluate(
-                "(frag) => {\n"
-                "  const links = Array.from(document.querySelectorAll('a'));\n"
-                "  const target = links.find(a => (a.getAttribute('href') || '').includes(frag));\n"
-                "  if (!target) return false;\n"
-                "  target.scrollIntoView({ block: 'center' });\n"
-                "  target.click();\n"
-                "  return true;\n"
-                "}\n",
-                frag,
-            ))
+            return bool(
+                page.evaluate(
+                    "(frag) => {\n"
+                    "  const links = Array.from(document.querySelectorAll('a'));\n"
+                    "  const target = links.find(a => (a.getAttribute('href') || '').includes(frag));\n"
+                    "  if (!target) return false;\n"
+                    "  target.scrollIntoView({ block: 'center' });\n"
+                    "  target.click();\n"
+                    "  return true;\n"
+                    "}\n",
+                    frag,
+                )
+            )
         except Exception:
             return False
 
@@ -1291,7 +2450,11 @@ class DocumentViewerDownloader(BaseDownloader):
 
             disclaimer_tag = None
             for candidate in section.find_all(["p", "div"]):
-                text = " ".join(candidate.get_text(" ", strip=True).split()).strip().lower()
+                text = (
+                    " ".join(candidate.get_text(" ", strip=True).split())
+                    .strip()
+                    .lower()
+                )
                 if text.startswith("ti provides technical and reliability data"):
                     disclaimer_tag = candidate
                     break
@@ -1327,19 +2490,25 @@ class DocumentViewerDownloader(BaseDownloader):
             toc_html = self._pick_best_outerhtml(page, self.TOC_SELECTORS)
             if not toc_html:
                 try:
-                    toc_html = page.evaluate("() => { const nav = document.querySelector('nav'); return nav ? nav.outerHTML : null; }")
+                    toc_html = page.evaluate(
+                        "() => { const nav = document.querySelector('nav'); return nav ? nav.outerHTML : null; }"
+                    )
                 except Exception:
                     toc_html = None
 
             if toc_html:
                 self.log.check("[check] TOC HTML catturata dalla pagina")
             else:
-                self.log.debug("[debug] Nessuna TOC HTML catturata, si useranno le intestazioni")
+                self.log.debug(
+                    "[debug] Nessuna TOC HTML catturata, si useranno le intestazioni"
+                )
 
             # Also capture doc-lister title if present (TI pages have this as a separate element)
             doc_title_html = None
             try:
-                doc_title_html = page.evaluate("() => { const el = document.querySelector('#doc-lister'); return el ? el.outerHTML : null; }")
+                doc_title_html = page.evaluate(
+                    "() => { const el = document.querySelector('#doc-lister'); return el ? el.outerHTML : null; }"
+                )
             except Exception:
                 pass
 
@@ -1372,28 +2541,53 @@ class DocumentViewerDownloader(BaseDownloader):
             section_nodes = self._select_section_nodes(toc_nodes)
             display_toc_nodes = self._trim_toc_nodes(toc_nodes)
 
+            # Apply reading-order limit: take the first <limit> entries across all levels
+            if self.limit:
+                section_nodes = self._limit_by_reading_order(section_nodes, self.limit)
+                allowed_ids = {id(n) for n in section_nodes}
+                display_toc_nodes = self._prune_toc_to_allowed(
+                    display_toc_nodes, allowed_ids
+                )
+            else:
+                allowed_ids = {id(n) for n in section_nodes}
+
             if not section_nodes:
-                section_nodes = toc_nodes
+                section_nodes = list(self._iter_nodes(toc_nodes))
+                allowed_ids = {id(n) for n in section_nodes}
 
             if not display_toc_nodes:
-                display_toc_nodes = section_nodes
+                display_toc_nodes = self._prune_toc_to_allowed(toc_nodes, allowed_ids)
 
             clean_display_toc_nodes: List[TocNode] = []
             cleaned_title: Optional[str] = None
             if display_toc_nodes:
-                clean_display_toc_nodes = self._dedup_toc_nodes_by_href(display_toc_nodes)
+                clean_display_toc_nodes = self._dedup_toc_nodes_by_href(
+                    display_toc_nodes
+                )
                 cleaned_title = self._first_toc_entry_title(clean_display_toc_nodes)
 
             title_text: Optional[str] = pre_trim_title_text or cleaned_title
             used_ids: Set[str] = set()
-            section_plan: List[Tuple[str, str, str, str]] = []  # (full_url_with_fragment, anchor, title, fragment)
-            section_to_toc_node: Dict[int, TocNode] = {}  # Map section index to TOC node
-            url_to_anchor: Dict[str, str] = {}  # Map section URL -> anchor kept in document
-            frag_to_anchor: Dict[str, str] = {}  # Map normalized fragment -> chosen anchor
+            section_plan: List[
+                Tuple[str, str, str, str]
+            ] = []  # (full_url_with_fragment, anchor, title, fragment)
+            section_to_toc_node: Dict[
+                int, TocNode
+            ] = {}  # Map section index to TOC node
+            url_to_anchor: Dict[
+                str, str
+            ] = {}  # Map section URL -> anchor kept in document
+            frag_to_anchor: Dict[
+                str, str
+            ] = {}  # Map normalized fragment -> chosen anchor
 
             for node in section_nodes:
                 raw_href = node.href or ""
-                full_href = normalize_url(raw_href, self.from_url) if raw_href else self.from_url
+                full_href = (
+                    normalize_url(raw_href, self.from_url)
+                    if raw_href
+                    else self.from_url
+                )
                 base_url, frag = urldefrag(full_href)
                 if not base_url:
                     base_url = self.from_url
@@ -1428,8 +2622,17 @@ class DocumentViewerDownloader(BaseDownloader):
                 section_to_toc_node[section_idx] = node
 
             if not section_plan:
-                self.log.verbose("[verbose] No TOC sections detected; using full document")
-                section_plan.append((self.from_url, make_anchor("", "documento", used_ids), "Documento", ""))
+                self.log.verbose(
+                    "[verbose] No TOC sections detected; using full document"
+                )
+                section_plan.append(
+                    (
+                        self.from_url,
+                        make_anchor("", "documento", used_ids),
+                        "Documento",
+                        "",
+                    )
+                )
 
             if not title_text and section_plan:
                 title_text = (section_plan[0][2] or "").strip()
@@ -1444,10 +2647,16 @@ class DocumentViewerDownloader(BaseDownloader):
                     scroll_container.evaluate("el => { el.scrollTop = 0; }")
                 except Exception:
                     pass
-                cards_by_url = self._collect_cards_from_container(page, scroll_container)
-                self.log.debug(f"[debug] Collected {len(cards_by_url)} cards from scroll container")
+                cards_by_url = self._collect_cards_from_container(
+                    page, scroll_container
+                )
+                self.log.debug(
+                    f"[debug] Collected {len(cards_by_url)} cards from scroll container"
+                )
                 if cards_by_url and len(cards_by_url) < max(3, len(section_plan) // 2):
-                    self.log.debug("[debug] Card cache incomplete; falling back to per-section load")
+                    self.log.debug(
+                        "[debug] Card cache incomplete; falling back to per-section load"
+                    )
                     cards_by_url = {}
             else:
                 self._auto_scroll(page)
@@ -1461,13 +2670,17 @@ class DocumentViewerDownloader(BaseDownloader):
             for section_idx, (section_url, anchor, title, raw_fragment) in enumerate(
                 section_plan[first_scrollable_idx:], start=first_scrollable_idx
             ):
-                self.log.verbose(f"[verbose] Fetching section {section_idx+1}/{len(section_plan)} -> {section_url}")
+                self.log.verbose(
+                    f"[verbose] Fetching section {section_idx + 1}/{len(section_plan)} -> {section_url}"
+                )
                 section_html = None
                 card_url = None
                 from_cache = False
 
                 if cards_by_url:
-                    card_match = self._best_card_for_fragment(cards_by_url, raw_fragment)
+                    card_match = self._best_card_for_fragment(
+                        cards_by_url, raw_fragment
+                    )
                     if card_match:
                         card_url, section_html = card_match
                         if card_url in seen_card_urls:
@@ -1483,7 +2696,9 @@ class DocumentViewerDownloader(BaseDownloader):
                     fragment_ready = False
                     if self._click_toc_link(page, raw_fragment):
                         page.wait_for_timeout(500)
-                        fragment_ready = self._wait_for_fragment(page, raw_fragment, timeout_ms=12000)
+                        fragment_ready = self._wait_for_fragment(
+                            page, raw_fragment, timeout_ms=12000
+                        )
 
                     if not fragment_ready:
                         try:
@@ -1494,38 +2709,64 @@ class DocumentViewerDownloader(BaseDownloader):
                             except Exception:
                                 pass
                         page.wait_for_timeout(500)
-                        fragment_ready = self._wait_for_fragment(page, raw_fragment, timeout_ms=12000)
+                        fragment_ready = self._wait_for_fragment(
+                            page, raw_fragment, timeout_ms=12000
+                        )
 
                     if fragment_ready:
-                        self._auto_scroll(page, settle_ms=150, step_px=1200, max_rounds=60, stable_rounds=3)
+                        self._auto_scroll(
+                            page,
+                            settle_ms=150,
+                            step_px=1200,
+                            max_rounds=60,
+                            stable_rounds=3,
+                        )
 
-                    section_html = self._pick_best_outerhtml(page, self.CONTENT_SELECTORS)
+                    section_html = self._pick_best_outerhtml(
+                        page, self.CONTENT_SELECTORS
+                    )
                     if not section_html:
                         try:
-                            section_html = page.evaluate("() => document.body.outerHTML")
+                            section_html = page.evaluate(
+                                "() => document.body.outerHTML"
+                            )
                         except Exception:
                             section_html = ""
 
                 section_soup = BeautifulSoup(section_html or "", "lxml")
-                self._remove_toc_elements(section_soup)  # Remove TOC/navigation before processing
+                self._remove_toc_elements(
+                    section_soup
+                )  # Remove TOC/navigation before processing
                 section_soup = self._extract_fragment_only(section_soup, raw_fragment)
                 if section_idx == 0 and title:
                     expected = normalize_text(title)
-                    section_text = normalize_text(section_soup.get_text(" ", strip=True))
+                    section_text = normalize_text(
+                        section_soup.get_text(" ", strip=True)
+                    )
                     if expected and expected not in section_text:
                         fallback_soup = BeautifulSoup(initial_content_html, "lxml")
                         self._remove_toc_elements(fallback_soup)
-                        fallback_section = self._extract_fragment_only(fallback_soup, raw_fragment)
-                        fallback_text = normalize_text(fallback_section.get_text(" ", strip=True))
+                        fallback_section = self._extract_fragment_only(
+                            fallback_soup, raw_fragment
+                        )
+                        fallback_text = normalize_text(
+                            fallback_section.get_text(" ", strip=True)
+                        )
                         if expected and expected not in fallback_text:
-                            first_card = fallback_soup.select_one(".documentSection[data-url]")
+                            first_card = fallback_soup.select_one(
+                                ".documentSection[data-url]"
+                            )
                             if first_card:
                                 alt = BeautifulSoup("", "lxml")
                                 alt.append(BeautifulSoup(str(first_card), "lxml"))
                                 fallback_section = alt
-                                fallback_text = normalize_text(fallback_section.get_text(" ", strip=True))
+                                fallback_text = normalize_text(
+                                    fallback_section.get_text(" ", strip=True)
+                                )
                         if expected and expected in fallback_text:
-                            self.log.debug("[debug] Fallback to initial content for first section")
+                            self.log.debug(
+                                "[debug] Fallback to initial content for first section"
+                            )
                             section_soup = fallback_section
                 ensure_heading_ids(section_soup)
 
@@ -1534,7 +2775,9 @@ class DocumentViewerDownloader(BaseDownloader):
                         first_card = section_soup.find(attrs={"data-url": True})
                         if first_card:
                             card_url = (first_card.get("data-url") or "").strip()
-                    if card_url and not self._fragment_matches_url(raw_fragment, card_url):
+                    if card_url and not self._fragment_matches_url(
+                        raw_fragment, card_url
+                    ):
                         card_url = None
                     if card_url:
                         if card_url in seen_card_urls:
@@ -1551,7 +2794,9 @@ class DocumentViewerDownloader(BaseDownloader):
                     if not lp.exists():
                         download_one(self.session, u, lp)
 
-                self.log.debug(f"[debug] Section assets: {len(asset_urls)} from {section_url}")
+                self.log.debug(
+                    f"[debug] Section assets: {len(asset_urls)} from {section_url}"
+                )
 
                 rewrite_asset_links_inplace(section_soup, section_url, self.out_dir)
                 strip_styles(section_soup)
@@ -1563,7 +2808,11 @@ class DocumentViewerDownloader(BaseDownloader):
                     heading = wrapper.new_tag("h2")
                     heading.string = title
                     section_tag.append(heading)
-                inner_html = section_soup.body.decode_contents() if section_soup.body else str(section_soup)
+                inner_html = (
+                    section_soup.body.decode_contents()
+                    if section_soup.body
+                    else str(section_soup)
+                )
                 inner_soup = BeautifulSoup(inner_html, "lxml")
                 container = inner_soup.body or inner_soup
                 for child in list(container.children):
@@ -1581,31 +2830,46 @@ class DocumentViewerDownloader(BaseDownloader):
         self.log.check("[check] Generating document.html")
         body_parts = []
         if title_text:
-            body_parts.append(f"<p class=\"document-title\">{escape_html(title_text)}</p>")
+            body_parts.append(
+                f'<p class="document-title">{escape_html(title_text)}</p>'
+            )
         body_parts.extend(sections_html)
-        doc_html = minimal_readable_wrapper("\n".join(body_parts), title="Documento (offline)")
+        doc_html = minimal_readable_wrapper(
+            "\n".join(body_parts), title="Documento (offline)"
+        )
         doc_soup = BeautifulSoup(doc_html, "lxml")
         ensure_heading_ids(doc_soup)
         toc_from_doc = toc_from_headings(doc_soup)
-        toc_for_output = clean_display_toc_nodes if clean_display_toc_nodes else toc_from_doc
+        toc_for_output = (
+            clean_display_toc_nodes if clean_display_toc_nodes else toc_from_doc
+        )
         (self.out_dir / "document.html").write_text(str(doc_soup), encoding="utf-8")
         self.log.check("[check] Generating toc.html")
         (self.out_dir / "toc.html").write_text(
-            build_toc_html(toc_for_output, document_filename="document.html", target_frame="doc"),
+            build_toc_html(
+                toc_for_output, document_filename="document.html", target_frame="doc"
+            ),
             encoding="utf-8",
         )
         self.log.check("[check] Generating index.html")
         (self.out_dir / "index.html").write_text(
-            build_frameset_index(toc_filename="toc.html", document_filename="document.html"),
+            build_frameset_index(
+                toc_filename="toc.html", document_filename="document.html"
+            ),
             encoding="utf-8",
         )
 
-        self.log.check(f"[check] Captured images via network: {len(recorder.saved)} (failed: {len(recorder.failed)})")
+        self.log.check(
+            f"[check] Captured images via network: {len(recorder.saved)} (failed: {len(recorder.failed)})"
+        )
+
+        self.post_process()
 
 
 # ----------------------------
 # Doxygen-export downloader
 # ----------------------------
+
 
 class DoxygenExportDownloader(BaseDownloader):
     name = "doxygen-export"
@@ -1614,12 +2878,14 @@ class DoxygenExportDownloader(BaseDownloader):
     def matches_url(cls, url: str) -> bool:
         u = urlparse(url)
         # TI export path typically contains /exports/ and ends with index.html
-        return ("/exports/" in u.path and url.lower().endswith(".html")) or ("doxygen" in u.path.lower())
+        return ("/exports/" in u.path and url.lower().endswith(".html")) or (
+            "doxygen" in u.path.lower()
+        )
 
     @classmethod
     def probe_html(cls, url: str, html: str) -> bool:
         h = html.lower()
-        return ("name=\"generator\"" in h and "doxygen" in h) or ("dynsections.js" in h)
+        return ('name="generator"' in h and "doxygen" in h) or ("dynsections.js" in h)
 
     def _scope(self) -> Tuple[str, str]:
         u = urlparse(self.from_url)
@@ -1651,10 +2917,41 @@ class DoxygenExportDownloader(BaseDownloader):
             return " ".join(h1.get_text(" ", strip=True).split())
         return "Page"
 
+    def _document_title(self, soup: BeautifulSoup) -> str:
+        title_area = soup.select_one("#titlearea")
+        if title_area:
+            text = " ".join(title_area.get_text(" ", strip=True).split())
+            if text:
+                return text
+
+        project_name = soup.select_one("#projectname")
+        project_number = soup.select_one("#projectnumber")
+        name_text = (
+            " ".join(project_name.get_text(" ", strip=True).split())
+            if project_name
+            else ""
+        )
+        number_text = (
+            " ".join(project_number.get_text(" ", strip=True).split())
+            if project_number
+            else ""
+        )
+        combined = " ".join([p for p in (name_text, number_text) if p])
+        if combined:
+            return combined
+
+        return self._page_title(soup)
+
     def _extract_main(self, soup: BeautifulSoup) -> BeautifulSoup:
         main = soup.select_one("#doc-content")
         if not main:
-            main = soup.select_one("div.contents") or soup.select_one("main") or soup.body
+            main = (
+                soup.select_one("div.contents") or soup.select_one("main") or soup.body
+            )
+
+        # Remove TOC elements from page content
+        self._remove_toc_elements(main)
+
         frag = BeautifulSoup("", "lxml")
         wrapper = frag.new_tag("div")
         wrapper["class"] = "page-content"
@@ -1662,7 +2959,30 @@ class DoxygenExportDownloader(BaseDownloader):
         frag.append(wrapper)
         return frag
 
-    def _links_to_html_pages(self, soup: BeautifulSoup, page_url: str, host: str, scope_dir_url: str) -> Set[str]:
+    def _remove_toc_elements(self, soup: BeautifulSoup) -> None:
+        """Remove TOC/navigation elements from page content to prevent duplication."""
+        if not soup:
+            return
+
+        # Remove TOC containers and navigation elements
+        toc_selectors = [
+            "#nav-tree",
+            "#nav-tree-contents",
+            ".contents .toc",
+            ".PageDoc .toc",
+            "#doc-content .toc",
+            ".navpath",
+            ".directory",
+            ".memberdecls .toc",
+        ]
+
+        for sel in toc_selectors:
+            for elem in list(soup.select(sel)):
+                elem.decompose()
+
+    def _links_to_html_pages(
+        self, soup: BeautifulSoup, page_url: str, host: str, scope_dir_url: str
+    ) -> Set[str]:
         out: Set[str] = set()
         for a in soup.find_all("a"):
             href = (a.get("href") or "").strip()
@@ -1670,9 +2990,629 @@ class DoxygenExportDownloader(BaseDownloader):
                 continue
             full = normalize_url(href, page_url)
             full, _ = urldefrag(full)
-            if full.lower().endswith(".html") and self._is_in_scope(full, host, scope_dir_url):
+            if full.lower().endswith(".html") and self._is_in_scope(
+                full, host, scope_dir_url
+            ):
                 out.add(full)
         return out
+
+    def _expand_nav_tree(self, page) -> None:
+        # Wait for the nav tree to load completely
+        page.wait_for_selector("#nav-tree-contents ul", timeout=20000)
+        page.wait_for_timeout(2000)
+
+        self.log.verbose("[verbose] Iniziando espansione TOC...")
+
+        # Scroll to make sure all content is loaded
+        page.evaluate(
+            """
+            (() => {
+                const navTree = document.querySelector('#nav-tree-contents');
+                if (navTree) {
+                    navTree.scrollTop = 0;
+                    navTree.scrollIntoView();
+                }
+            })();
+            """
+        )
+        page.wait_for_timeout(1000)
+
+        if self.limit:
+            self._expand_nav_tree_limited(page, self.limit)
+        else:
+            self._expand_nav_tree_full(page)
+
+        # Wait for final DOM stabilization
+        page.wait_for_timeout(2000)
+        self._cleanup_nav_tree_styles(page)
+
+    def _expand_nav_tree_full(self, page) -> None:
+        # Track expanded items for limit enforcement
+        expanded_count = 0
+
+        # Expand systematically by clicking on arrows multiple times
+        total_clicks = 0
+        for round_num in range(50):  # Increased rounds for deep nesting
+            clicked = page.evaluate(
+                f"""
+                ((limit, expandedCount) => {{
+                    const root = document.querySelector('#nav-tree-contents');
+                    if (!root) return {{clicks: 0, expanded: expandedCount}};
+                    let clicks = 0;
+                    let currentExpanded = expandedCount;
+
+                    // Function to check if an item is an API Reference section or inside one
+                    function isApiReferenceRelated(item) {{
+                        // Check if this item itself is API Reference
+                        const label = item.querySelector('.label');
+                        if (label) {{
+                            const labelText = label.textContent.trim();
+                            if (labelText === 'API Reference') {{
+                                console.log('Found API Reference section, skipping expansion');
+                                return true;
+                            }}
+                        }}
+
+                        // Check if we're inside an API Reference section
+                        let parent = item.parentElement;
+                        while (parent && parent !== root) {{
+                            if (parent.classList && parent.classList.contains('children_ul')) {{
+                                const parentItem = parent.previousElementSibling;
+                                if (parentItem && parentItem.classList && parentItem.classList.contains('item')) {{
+                                    const parentLabel = parentItem.querySelector('.label');
+                                    if (parentLabel && parentLabel.textContent.trim() === 'API Reference') {{
+                                        console.log('Found item inside API Reference section, skipping expansion');
+                                        return true;
+                                    }}
+                                }}
+                            }}
+                            parent = parent.parentElement;
+                        }}
+                        return false;
+                    }}
+
+                    // Get all items with arrows that might be expandable
+                    const items = Array.from(root.querySelectorAll('div.item'));
+                    for (const item of items) {{
+                        // Check limit before expanding
+                        if (limit && currentExpanded >= limit) {{
+                            console.log('Reached expansion limit:', limit);
+                            break;
+                        }}
+
+                        const arrow = item.querySelector('.arrow');
+                        if (arrow) {{
+                            const text = arrow.textContent.trim();
+                            if (text === '►' || text === '▶' || text === '+') {{
+                                const label = item.querySelector('.label');
+                                const labelText = label ? label.textContent.trim() : 'no-label';
+                                console.log('Found expandable item:', labelText);
+
+                                // Skip API Reference sections and their children
+                                if (isApiReferenceRelated(item)) {{
+                                    console.log('Skipping API Reference related item:', labelText);
+                                    continue;
+                                }}
+
+                                console.log('Expanding item:', labelText);
+                                try {{
+                                    arrow.click();
+                                    clicks++;
+                                    currentExpanded++;
+                                }} catch (e) {{
+                                    try {{
+                                        item.click();
+                                        clicks++;
+                                        currentExpanded++;
+                                    }} catch (e2) {{
+                                        // Continue to next item
+                                    }}
+                                }}
+                            }}
+                        }}
+                    }}
+
+                    return {{clicks: clicks, expanded: currentExpanded}};
+                }})({self.limit or "null"}, {expanded_count})
+                """
+            )
+
+            total_clicks += clicked.get("clicks", 0)
+            expanded_count = clicked.get("expanded", expanded_count)
+
+            if round_num % 10 == 0 or clicked.get("clicks", 0) > 0:
+                self.log.verbose(
+                    f"[verbose] Espansione TOC round {round_num + 1}: {clicked.get('clicks', 0)} click, totale {total_clicks}, espanse {expanded_count}"
+                )
+
+            # Stop if limit reached or no more clicks
+            if (self.limit and expanded_count >= self.limit) or clicked.get(
+                "clicks", 0
+            ) == 0:
+                if self.limit and expanded_count >= self.limit:
+                    self.log.verbose(
+                        f"[verbose] Limite espansione raggiunto: {expanded_count}/{self.limit}"
+                    )
+                break
+
+            # Wait for content to load after clicks
+            page.wait_for_timeout(800)
+
+        self.log.verbose(
+            f"[verbose] Espansione TOC completata: {total_clicks} click totali in {round_num + 1} round, {expanded_count} voci espanse"
+        )
+        self.log.debug(
+            f"[debug] TOC expansion: completed after {round_num + 1} rounds with {total_clicks} total clicks, {expanded_count} items expanded"
+        )
+
+        # Final pass: force expand any remaining collapsed elements, except API Reference
+        # Only if we haven't reached the limit
+        if not self.limit or expanded_count < self.limit:
+            page.evaluate(
+                """
+                (() => {
+                    const root = document.querySelector('#nav-tree-contents');
+                    if (!root) return;
+
+                    // Function to check if an item is API Reference related
+                    function isApiReferenceRelated(element) {
+                        const item = element.closest('div.item');
+                        if (!item) return false;
+
+                        // Check if this item itself is API Reference
+                        const label = item.querySelector('.label');
+                        if (label && label.textContent.trim() === 'API Reference') {
+                            return true;
+                        }
+
+                        // Check if we're inside an API Reference section
+                        let parent = item.parentElement;
+                        while (parent && parent !== root) {
+                            if (parent.classList && parent.classList.contains('children_ul')) {
+                                const parentItem = parent.previousElementSibling;
+                                if (parentItem && parentItem.classList && parentItem.classList.contains('item')) {
+                                    const parentLabel = parentItem.querySelector('.label');
+                                    if (parentLabel && parentLabel.textContent.trim() === 'API Reference') {
+                                        return true;
+                                    }
+                                }
+                            }
+                            parent = parent.parentElement;
+                        }
+                        return false;
+                    }
+
+                    // Force all arrows to expanded state, except API Reference related
+                    const arrows = root.querySelectorAll('.arrow');
+                    arrows.forEach(arrow => {
+                        if (!isApiReferenceRelated(arrow)) {
+                            const text = arrow.textContent.trim();
+                            if (text === '►' || text === '▶' || text === '+') {
+                                arrow.textContent = '▼';
+                            }
+                        }
+                    });
+
+                    // Force all ul elements to be visible, except those under API Reference
+                    // But don't set display: block, leave styles empty to match fixture
+                    const uls = root.querySelectorAll('ul');
+                    uls.forEach(ul => {
+                        if (!isApiReferenceRelated(ul)) {
+                            ul.style.visibility = 'visible';
+                            ul.style.height = 'auto';
+                            ul.style.overflow = 'visible';
+                            // Don't set display: block to match fixture expectations
+                        }
+                    });
+
+                    // Ensure API Reference section is collapsed
+                    const items = Array.from(root.querySelectorAll('div.item'));
+                    for (const item of items) {
+                        const label = item.querySelector('.label');
+                        if (label && label.textContent.trim() === 'API Reference') {
+                            const arrow = item.querySelector('.arrow');
+                            if (arrow) {
+                                arrow.textContent = '►'; // Force collapsed state
+                            }
+                            // Hide children of API Reference
+                            const childrenUl = item.parentElement.querySelector('ul.children_ul');
+                            if (childrenUl) {
+                                childrenUl.style.display = 'none';
+                            }
+                            break;
+                        }
+                    }
+                })();
+                """
+            )
+
+    def _expand_nav_tree_limited(self, page, limit: int) -> None:
+        total_clicks = 0
+
+        for round_num in range(120):
+            result = page.evaluate(
+                """
+                (limit) => {
+                    const root = document.querySelector('#nav-tree-contents > ul');
+                    if (!root) return {expanded: 0, count: 0, reached: false};
+                    let expanded = 0;
+                    let count = 0;
+
+                    function isApiReferenceRelated(item) {
+                        const label = item.querySelector('.label');
+                        if (label && label.textContent.trim() === 'API Reference') {
+                            return true;
+                        }
+                        let parent = item.parentElement;
+                        while (parent) {
+                            if (parent.classList && parent.classList.contains('children_ul')) {
+                                const parentItem = parent.previousElementSibling;
+                                if (parentItem && parentItem.classList && parentItem.classList.contains('item')) {
+                                    const parentLabel = parentItem.querySelector('.label');
+                                    if (parentLabel && parentLabel.textContent.trim() === 'API Reference') {
+                                        return true;
+                                    }
+                                }
+                            }
+                            parent = parent.parentElement;
+                        }
+                        return false;
+                    }
+
+                    function arrowState(arrow) {
+                        if (!arrow) return 'leaf';
+                        const text = arrow.textContent.trim();
+                        if (text === '▼') return 'expanded';
+                        if (text === '►' || text === '▶' || text === '+') return 'collapsed';
+                        return 'leaf';
+                    }
+
+                    function walk(ul) {
+                        const items = Array.from(ul.children).filter(el => el.tagName.toLowerCase() === 'li');
+                        for (const li of items) {
+                            if (count >= limit) return true;
+                            const item = li.querySelector(':scope > div.item');
+                            if (!item) continue;
+                            count += 1;
+                            if (count >= limit) return true;
+
+                            const arrow = item.querySelector('.arrow');
+                            const state = arrowState(arrow);
+                            let didExpand = false;
+                            if (state === 'collapsed' && !isApiReferenceRelated(item)) {
+                                try {
+                                    arrow.click();
+                                    expanded += 1;
+                                    didExpand = true;
+                                } catch (e) {
+                                    try {
+                                        item.click();
+                                        expanded += 1;
+                                        didExpand = true;
+                                    } catch (e2) {
+                                        // ignore
+                                    }
+                                }
+                            }
+
+                            const childUl = li.querySelector(':scope > ul');
+                            if (childUl && (state === 'expanded' || didExpand)) {
+                                if (walk(childUl)) return true;
+                            }
+                        }
+                        return false;
+                    }
+
+                    walk(root);
+                    return {expanded: expanded, count: count, reached: count >= limit};
+                }
+                """,
+                limit,
+            )
+
+            count = result.get("count", 0) if isinstance(result, dict) else 0
+            expanded = result.get("expanded", 0) if isinstance(result, dict) else 0
+            total_clicks += expanded
+
+            if round_num % 8 == 0 or expanded > 0:
+                self.log.verbose(
+                    f"[verbose] Espansione TOC limitata round {round_num + 1}: espanse {expanded}, conteggio {count}/{limit}"
+                )
+
+            if expanded == 0:
+                break
+
+            page.wait_for_timeout(600)
+
+        self.log.verbose(
+            f"[verbose] Espansione TOC limitata completata: {total_clicks} espansioni totali"
+        )
+
+    def _cleanup_nav_tree_styles(self, page) -> None:
+        page.evaluate(
+            """
+            (() => {
+                const root = document.querySelector('#nav-tree-contents');
+                if (!root) return;
+
+                // Remove display styles from all elements
+                const allElements = root.querySelectorAll('*');
+                allElements.forEach(el => {
+                    if (el.style.display) {
+                        el.style.display = '';
+                    }
+                });
+
+                // Special handling for ul elements - ensure they have empty style
+                const uls = root.querySelectorAll('ul');
+                uls.forEach(ul => {
+                    ul.removeAttribute('style');
+                    ul.setAttribute('style', '');
+                });
+            })();
+            """
+        )
+
+    def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]:
+        nav_html = ""
+        nav_outline = ""
+        self.log.verbose("[verbose] Avvio estrazione TOC con Playwright...")
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context_args = {}
+                ua = (
+                    self.session.headers.get("User-Agent")
+                    if hasattr(self, "session")
+                    else None
+                )
+                if ua:
+                    context_args["user_agent"] = ua
+                context = browser.new_context(**context_args)
+                page = context.new_page()
+
+                self.log.verbose("[verbose] Caricamento pagina per estrazione TOC...")
+                page.goto(self.from_url, wait_until="networkidle")
+                page.wait_for_selector("#nav-tree-contents ul", timeout=20000)
+
+                self._expand_nav_tree(page)
+
+                self.log.verbose("[verbose] Estrazione HTML della TOC espansa...")
+                nav_html = (
+                    page.evaluate(
+                        """
+                    (() => { 
+                        const el = document.querySelector('#nav-tree-contents ul'); 
+                        if (!el) return '';
+                        
+                        // Clone the element to avoid modifying the original
+                        const clone = el.cloneNode(true);
+                        
+                        // Clean up extra styles added during expansion
+                        const uls = clone.querySelectorAll('ul');
+                        uls.forEach(ul => {
+                            ul.style.visibility = '';
+                            ul.style.height = '';
+                            ul.style.overflow = '';
+                        });
+                        
+                        // Also clean up the root element itself
+                        if (clone.style) {
+                            clone.style.visibility = '';
+                            clone.style.height = '';
+                            clone.style.overflow = '';
+                        }
+                        
+                        // Remove only the expansion arrow links (those with arrow spans as siblings)
+                        // Actually, let's not remove any javascript:void(0) links for now
+                        // The fixture expects them to be preserved
+                        
+                        
+                        return clone.outerHTML;
+                    })()
+                    """
+                    )
+                    or ""
+                )
+
+                self.log.debug(
+                    f"[debug] TOC HTML extracted: {len(nav_html)} characters"
+                )
+                browser.close()
+
+        except Exception as e:
+            self.log.debug(f"[debug] TOC extraction failed: {str(e)}")
+            nav_html = ""
+
+        if nav_html:
+            nav_outline = nav_outline_from_html(nav_html)
+            self.log.verbose(
+                f"[verbose] TOC outline generato: {len(nav_outline.splitlines())} righe"
+            )
+            self.log.debug(
+                f"[debug] TOC extraction successful: HTML={len(nav_html)} chars, outline={len(nav_outline.splitlines())} lines"
+            )
+        else:
+            self.log.debug("[debug] TOC extraction failed: no HTML captured")
+
+        return nav_html, nav_outline
+
+    def _nav_link_href(self, link, base_url: str) -> str:
+        if not link:
+            return ""
+        href = (link.get("href") or "").strip()
+        if href and href.lower() != "javascript:void(0)":
+            return normalize_url(href, base_url)
+
+        for cls in link.get("class") or []:
+            if ".html" not in cls:
+                continue
+            if ":" in cls:
+                page, frag = cls.split(":", 1)
+                if page:
+                    return normalize_url(f"{page}#{frag}" if frag else page, base_url)
+            else:
+                return normalize_url(cls, base_url)
+        return ""
+
+    def _toc_nodes_from_nav_html(self, nav_html: str) -> List[TocNode]:
+        soup = BeautifulSoup(nav_html or "", "lxml")
+        root_ul = soup.find("ul")
+        if not root_ul:
+            return []
+
+        def parse_ul(ul) -> List[TocNode]:
+            items: List[TocNode] = []
+            for li in ul.find_all("li", recursive=False):
+                label = li.select_one(":scope > div .label a") or li.select_one(
+                    ":scope > span.label a"
+                )
+                if not label:
+                    continue
+                title = " ".join(label.get_text(" ", strip=True).split())
+                if not title:
+                    continue
+                href = self._nav_link_href(label, self.from_url)
+                node = TocNode(title=title, href=href)
+                child_ul = li.find("ul", recursive=False)
+                if child_ul:
+                    node.children = parse_ul(child_ul)
+                items.append(node)
+            return items
+
+        nodes = parse_ul(root_ul)
+        if len(nodes) == 1 and nodes[0].children:
+            return nodes[0].children
+        return nodes
+
+    @staticmethod
+    def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[TocNode]:
+        for n in nodes:
+            yield n
+            yield from DoxygenExportDownloader._iter_toc_nodes(n.children)
+
+    def _select_main_container(self, soup: BeautifulSoup):
+        if not soup:
+            return None
+        main = (
+            soup.select_one("div.contents div.textblock")
+            or soup.select_one("div.contents")
+            or soup.select_one("#doc-content")
+        )
+        if not main:
+            main = soup.select_one("main") or soup.body
+        if not main:
+            return None
+        self._remove_toc_elements(main)
+        return main
+
+    def _find_fragment_anchor(self, main, fragment: str):
+        frag = (fragment or "").strip()
+        if not frag or not main:
+            return None
+        target = main.find(id=frag) or main.find(attrs={"name": frag})
+        if not target:
+            return None
+        if target.name and re.match(r"^h[1-6]$", target.name):
+            return target
+        if target.name == "a":
+            parent = target.parent
+            if parent and parent.name and re.match(r"^h[1-6]$", parent.name):
+                return parent
+            next_heading = target.find_next(re.compile(r"^h[1-6]$"))
+            if next_heading and (
+                next_heading.get("id") == frag or next_heading.find(id=frag)
+            ):
+                return next_heading
+        return target
+
+    @staticmethod
+    def _normalize_heading_text(value: str) -> str:
+        return " ".join((value or "").split()).strip().lower()
+
+    def _strip_duplicate_section_title(
+        self, container, title: str, section_anchor: str
+    ) -> Optional[str]:
+        target = self._normalize_heading_text(title)
+        if not target or not container:
+            return None
+
+        heading_re = re.compile(r"^h[1-6]$")
+        preserved_id = None
+
+        matching_heading = None
+        for heading in container.find_all(heading_re):
+            if (
+                self._normalize_heading_text(heading.get_text(" ", strip=True))
+                == target
+            ):
+                matching_heading = heading
+                break
+        if matching_heading:
+            hid = (matching_heading.get("id") or "").strip()
+            if hid:
+                preserved_id = hid
+            matching_heading.decompose()
+
+        for title_el in container.select(".headertitle .title, .header .title"):
+            if (
+                self._normalize_heading_text(title_el.get_text(" ", strip=True))
+                == target
+            ):
+                title_el.decompose()
+
+        if preserved_id and preserved_id != section_anchor:
+            return preserved_id
+        return None
+
+    def _extract_section_html(
+        self, soup: BeautifulSoup, fragment: str, next_fragment: Optional[str]
+    ) -> str:
+        main = self._select_main_container(soup)
+        if not main:
+            return ""
+
+        children = [
+            child
+            for child in main.contents
+            if not (isinstance(child, str) and not child.strip())
+        ]
+        if not children:
+            return str(main)
+
+        start_el = self._find_fragment_anchor(main, fragment) if fragment else None
+        end_el = (
+            self._find_fragment_anchor(main, next_fragment) if next_fragment else None
+        )
+
+        def direct_child(el):
+            cur = el
+            while cur and cur.parent and cur.parent != main:
+                cur = cur.parent
+            return cur if cur and cur.parent == main else None
+
+        start_block = direct_child(start_el) if start_el else None
+        if not start_block:
+            start_block = children[0]
+
+        end_block = direct_child(end_el) if end_el else None
+
+        try:
+            start_idx = children.index(start_block)
+        except ValueError:
+            return str(main)
+
+        end_idx = len(children)
+        if end_block:
+            try:
+                candidate = children.index(end_block)
+                if candidate > start_idx:
+                    end_idx = candidate
+            except ValueError:
+                pass
+
+        sliced = children[start_idx:end_idx]
+        return "".join(str(child) for child in sliced)
 
     def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]:
         nodes: List[TocNode] = []
@@ -1680,15 +3620,38 @@ class DoxygenExportDownloader(BaseDownloader):
         if not container:
             return nodes
 
+        # Track content by hash to consolidate duplicates
+        content_to_anchor: Dict[str, str] = {}
+        url_to_anchor: Dict[str, str] = {}
+
         for sec in container.find_all("section", recursive=False):
-            title_el = sec.find("h1")
-            title = " ".join(title_el.get_text(" ", strip=True).split()) if title_el else "Pagina"
-            href = f"#{sec.get('id')}" if sec.get("id") else "#"
-            page_node = TocNode(title=title or "Pagina", href=href)
+            title_el = sec.find(re.compile(r"^h[1-6]$"))
+            title = (
+                " ".join(title_el.get_text(" ", strip=True).split())
+                if title_el
+                else "Pagina"
+            )
+            section_id = sec.get("id", "")
+            href = f"#{section_id}" if section_id else "#"
+
+            # Create content hash for deduplication
+            content_text = " ".join(sec.get_text(" ", strip=True).split())
+            content_hash = str(hash(content_text))
+
+            if content_hash in content_to_anchor:
+                # Duplicate content - point to existing anchor
+                existing_anchor = content_to_anchor[content_hash]
+                page_node = TocNode(title=title or "Pagina", href=f"#{existing_anchor}")
+            else:
+                # New content - use this section's anchor
+                content_to_anchor[content_hash] = section_id
+                page_node = TocNode(title=title or "Pagina", href=href)
 
             child_nodes: List[TocNode] = []
             stack: List[Tuple[int, TocNode]] = []
             for h in sec.find_all(re.compile(r"^h[2-6]$")):
+                if title_el is not None and h is title_el:
+                    continue
                 hid = h.get("id")
                 if not hid:
                     continue
@@ -1714,8 +3677,180 @@ class DoxygenExportDownloader(BaseDownloader):
         host, scope_dir_url = self._scope()
 
         index_soup = self._fetch_soup(self.from_url)
+        document_title = self._document_title(index_soup)
+
+        nav_html, nav_outline = self._fetch_nav_tree_with_playwright()
+
+        if self.toc_only:
+            if nav_html:
+                (self.out_dir / "toc_raw.html").write_text(nav_html, encoding="utf-8")
+            if nav_outline:
+                (self.out_dir / "toc_raw.txt").write_text(nav_outline, encoding="utf-8")
+            self.log.check("[check] TOC-only mode: skipped document download")
+            return
 
         self.log.debug("[debug] doxygen-export: starting crawl")
+
+        if self.limit and nav_html:
+            toc_nodes = self._toc_nodes_from_nav_html(nav_html)
+            toc_nodes = limit_toc_nodes(toc_nodes, self.limit)
+            flat_nodes = list(self._iter_toc_nodes(toc_nodes))
+            if flat_nodes:
+                self.log.verbose(
+                    f"[verbose] TOC limitata a {len(flat_nodes)} voci in ordine di lettura"
+                )
+
+                entries: List[Tuple[TocNode, str, str, str]] = []
+                page_fragments: Dict[str, List[str]] = {}
+                for node in flat_nodes:
+                    raw_href = (node.href or "").strip()
+                    full_href = (
+                        normalize_url(raw_href, self.from_url)
+                        if raw_href
+                        else self.from_url
+                    )
+                    page_url, frag = urldefrag(full_href)
+                    page_url = page_url or self.from_url
+                    frag = frag or ""
+                    entries.append((node, page_url, frag, node.title))
+                    page_fragments.setdefault(page_url, []).append(frag)
+
+                pages_by_url: Dict[str, BeautifulSoup] = {}
+                for page_url in sorted(page_fragments.keys()):
+                    try:
+                        pages_by_url[page_url] = self._fetch_soup(page_url)
+                        self.log.debug(f"[debug] Fetched TOC page: {page_url}")
+                    except Exception as e:
+                        self.log.debug(
+                            f"[debug] Failed to fetch TOC page {page_url}: {str(e)}"
+                        )
+                        pages_by_url[page_url] = BeautifulSoup("", "lxml")
+
+                doc = BeautifulSoup("", "lxml")
+                container = doc.new_tag("div")
+                container["id"] = "offline-doc"
+                doc.append(container)
+
+                content_hashes: Dict[str, str] = {}
+                duplicates_skipped = 0
+                page_positions = {url: 0 for url in page_fragments}
+
+                self.log.verbose(
+                    "[verbose] Costruzione documento unificato da TOC limitata..."
+                )
+
+                for idx, (node, page_url, frag, title) in enumerate(entries, start=1):
+                    pos = page_positions[page_url]
+                    frag_list = page_fragments[page_url]
+                    next_frag = None
+                    if pos + 1 < len(frag_list):
+                        next_frag = frag_list[pos + 1] or None
+                    page_positions[page_url] = pos + 1
+
+                    psoup = pages_by_url.get(page_url)
+                    section_html = self._extract_section_html(psoup, frag, next_frag)
+                    section_soup = BeautifulSoup(section_html, "lxml")
+                    anchor = f"page-{idx}"
+                    section_container = section_soup.body or section_soup
+                    preserved_id = self._strip_duplicate_section_title(
+                        section_container, title, anchor
+                    )
+                    section_text = " ".join(
+                        section_soup.get_text(" ", strip=True).split()
+                    )
+
+                    if section_text:
+                        content_hash = str(hash(section_text))
+                        if content_hash in content_hashes:
+                            node.href = f"#{content_hashes[content_hash]}"
+                            duplicates_skipped += 1
+                            self.log.debug(
+                                f"[debug] Duplicate TOC entry skipped at {idx}: {title}"
+                            )
+                            continue
+
+                    if section_text:
+                        content_hashes[content_hash] = anchor
+                    node.href = f"#{anchor}"
+
+                    sec = doc.new_tag("section")
+                    sec["id"] = anchor
+                    h1 = doc.new_tag("h1")
+                    h1.string = title or "Pagina"
+                    if preserved_id:
+                        h1["id"] = preserved_id
+                    sec.append(h1)
+
+                    for child in list(section_container.children):
+                        sec.append(child)
+                    container.append(sec)
+
+                self.log.verbose(
+                    f"[verbose] Documento da TOC limitata: {len(container.find_all('section'))} sezioni, {duplicates_skipped} duplicati saltati"
+                )
+
+                ensure_heading_ids(doc)
+
+                if document_title:
+                    title_tag = doc.new_tag("p")
+                    title_tag["class"] = "document-title"
+                    title_tag.string = document_title
+                    container.insert_before(title_tag)
+
+                # Download assets from the touched pages
+                asset_urls: Set[str] = set()
+                for page_url, psoup in pages_by_url.items():
+                    page_assets = iter_asset_urls(psoup, page_url)
+                    asset_urls |= page_assets
+                    self.log.debug(
+                        f"[debug] Found {len(page_assets)} assets in {page_url}"
+                    )
+
+                self.log.verbose(f"[verbose] Download di {len(asset_urls)} asset...")
+                for u in tqdm(
+                    sorted(asset_urls), desc="Downloading assets", unit="file"
+                ):
+                    lp = local_path_for_url(u, self.out_dir)
+                    if not lp.exists():
+                        success = download_one(self.session, u, lp)
+                        if not success:
+                            self.log.debug(f"[debug] Asset download failed: {u}")
+
+                self.log.verbose(
+                    f"[verbose] Asset download completato: {len(asset_urls)} file"
+                )
+                self.log.debug(
+                    f"[debug] Assets totali scaricati o riusati: {len(asset_urls)}"
+                )
+
+                rewrite_asset_links_inplace(doc, scope_dir_url, self.out_dir)
+                strip_styles(doc)
+
+                self.log.check("[check] Generating document.html")
+                doc_html = minimal_readable_wrapper(
+                    str(doc), title=document_title or "Documento (offline)"
+                )
+                (self.out_dir / "document.html").write_text(doc_html, encoding="utf-8")
+                self.log.check("[check] Generating toc.html")
+                (self.out_dir / "toc.html").write_text(
+                    build_toc_html(
+                        toc_nodes, document_filename="document.html", target_frame="doc"
+                    ),
+                    encoding="utf-8",
+                )
+                self.log.check("[check] Generating index.html")
+                (self.out_dir / "index.html").write_text(
+                    build_frameset_index(
+                        toc_filename="toc.html", document_filename="document.html"
+                    ),
+                    encoding="utf-8",
+                )
+                self.post_process()
+                return
+            else:
+                self.log.debug(
+                    "[debug] TOC limitata vuota, fallback al crawling completo"
+                )
 
         # Crawl pages
         MAX_PAGES = 250
@@ -1723,59 +3858,142 @@ class DoxygenExportDownloader(BaseDownloader):
         seen: Set[str] = set()
         pages: List[Tuple[str, BeautifulSoup]] = []
 
+        self.log.verbose("[verbose] Iniziando crawling delle pagine...")
+
         while queue and len(seen) < MAX_PAGES:
             url = queue.pop(0)
             if url in seen:
                 continue
             seen.add(url)
+
+            if len(seen) % 10 == 1 or len(seen) <= 5:
+                self.log.verbose(
+                    f"[verbose] Download pagina {len(seen)}/{MAX_PAGES}: {url}"
+                )
+
             try:
                 psoup = self._fetch_soup(url)
-            except Exception:
+                pages.append((url, psoup))
+                self.log.debug(
+                    f"[debug] Page {len(seen)} downloaded successfully: {len(str(psoup))} chars"
+                )
+            except Exception as e:
+                self.log.debug(f"[debug] Page {len(seen)} download failed: {str(e)}")
                 continue
-            pages.append((url, psoup))
-            for nxt in sorted(self._links_to_html_pages(psoup, url, host, scope_dir_url)):
+
+            for nxt in sorted(
+                self._links_to_html_pages(psoup, url, host, scope_dir_url)
+            ):
                 if nxt not in seen and (len(queue) + len(seen) < MAX_PAGES):
                     queue.append(nxt)
 
-        self.log.debug(f"[debug] doxygen-export: crawled {len(pages)} pages (limit {MAX_PAGES})")
+        self.log.verbose(
+            f"[verbose] Crawling completato: {len(pages)} pagine scaricate"
+        )
+        self.log.debug(
+            f"[debug] doxygen-export: crawled {len(pages)} pages (limit {MAX_PAGES})"
+        )
 
-        # Build unified doc with robust anchors
+        if self.limit:
+            original_count = len(pages)
+            pages = pages[: self.limit]
+            self.log.verbose(
+                f"[verbose] Applicato limite: {len(pages)}/{original_count} pagine"
+            )
+            self.log.debug(
+                f"[debug] Applied limit: kept {len(pages)} of {original_count} pages"
+            )
+
+        # Build unified doc with robust anchors and content deduplication
         doc = BeautifulSoup("", "lxml")
         container = doc.new_tag("div")
         container["id"] = "offline-doc"
         doc.append(container)
 
+        content_hashes: Dict[str, str] = {}  # content_hash -> anchor
+        duplicates_skipped = 0
+
+        self.log.verbose("[verbose] Costruzione documento unificato...")
+
         for i, (url, psoup) in enumerate(pages, start=1):
             title = self._page_title(psoup)
             anchor = f"page-{i}"
+
+            main = self._extract_main(psoup)
+            preserved_id = self._strip_duplicate_section_title(main, title, anchor)
+            content_text = " ".join(main.get_text(" ", strip=True).split())
+            content_hash = str(hash(content_text))
+
+            # Skip duplicate content
+            if content_hash in content_hashes:
+                duplicates_skipped += 1
+                self.log.debug(
+                    f"[debug] Skipped duplicate content for page {i}: {title} (hash: {content_hash[:8]}...)"
+                )
+                continue
+
+            content_hashes[content_hash] = anchor
 
             sec = doc.new_tag("section")
             sec["id"] = anchor
             h1 = doc.new_tag("h1")
             h1.string = title
+            if preserved_id:
+                h1["id"] = preserved_id
             sec.append(h1)
 
-            main = self._extract_main(psoup)
             sec.append(BeautifulSoup(str(main), "lxml"))
             container.append(sec)
 
-            self.log.verbose(f"[verbose] Aggiunta sezione {anchor} -> {title}")
+            if i % 20 == 0 or i <= 10:
+                self.log.verbose(
+                    f"[verbose] Aggiunta sezione {i}/{len(pages)}: {anchor} -> {title}"
+                )
+            self.log.debug(
+                f"[debug] Added section {anchor}: {title} ({len(content_text)} chars, hash: {content_hash[:8]}...)"
+            )
+
+        self.log.verbose(
+            f"[verbose] Documento costruito: {len(container.find_all('section'))} sezioni, {duplicates_skipped} duplicati saltati"
+        )
+        self.log.debug(
+            f"[debug] Document built: {len(container.find_all('section'))} sections, {duplicates_skipped} duplicates skipped"
+        )
 
         ensure_heading_ids(doc)
 
+        if document_title:
+            title_tag = doc.new_tag("p")
+            title_tag["class"] = "document-title"
+            title_tag.string = document_title
+            container.insert_before(title_tag)
+
         toc_nodes = self._build_toc(doc)
-        self.log.verbose(f"[verbose] TOC generata con {len(toc_nodes)} voci di primo livello")
+        toc_nodes = limit_toc_nodes(toc_nodes, self.limit)
+        self.log.verbose(
+            f"[verbose] TOC generata con {len(toc_nodes)} voci di primo livello"
+        )
+        self.log.debug(
+            f"[debug] TOC built: {len(toc_nodes)} top-level entries, limit={self.limit}"
+        )
 
         # Download assets from all pages
         asset_urls: Set[str] = set()
         for url, psoup in pages:
-            asset_urls |= iter_asset_urls(psoup, url)
+            page_assets = iter_asset_urls(psoup, url)
+            asset_urls |= page_assets
+            self.log.debug(f"[debug] Found {len(page_assets)} assets in {url}")
+
+        self.log.verbose(f"[verbose] Download di {len(asset_urls)} asset...")
 
         for u in tqdm(sorted(asset_urls), desc="Downloading assets", unit="file"):
             lp = local_path_for_url(u, self.out_dir)
             if not lp.exists():
-                download_one(self.session, u, lp)
+                success = download_one(self.session, u, lp)
+                if not success:
+                    self.log.debug(f"[debug] Asset download failed: {u}")
 
+        self.log.verbose(f"[verbose] Asset download completato: {len(asset_urls)} file")
         self.log.debug(f"[debug] Assets totali scaricati o riusati: {len(asset_urls)}")
 
         # Rewrite to local
@@ -1786,18 +4004,166 @@ class DoxygenExportDownloader(BaseDownloader):
 
         # Output
         self.log.check("[check] Generating document.html")
-        doc_html = minimal_readable_wrapper(str(doc), title="Documento (offline)")
+        doc_html = minimal_readable_wrapper(
+            str(doc), title=document_title or "Documento (offline)"
+        )
         (self.out_dir / "document.html").write_text(doc_html, encoding="utf-8")
         self.log.check("[check] Generating toc.html")
         (self.out_dir / "toc.html").write_text(
-            build_toc_html(toc_nodes, document_filename="document.html", target_frame="doc"),
+            build_toc_html(
+                toc_nodes, document_filename="document.html", target_frame="doc"
+            ),
             encoding="utf-8",
         )
         self.log.check("[check] Generating index.html")
         (self.out_dir / "index.html").write_text(
-            build_frameset_index(toc_filename="toc.html", document_filename="document.html"),
+            build_frameset_index(
+                toc_filename="toc.html", document_filename="document.html"
+            ),
             encoding="utf-8",
         )
+
+        self.post_process()
+
+
+# ----------------------------
+# Resource Explorer downloader
+# ----------------------------
+
+
+class ResourceExplorerModule:
+    name: str = "base"
+
+    def select(
+        self, url: str, html: str, soup: Optional[BeautifulSoup]
+    ) -> Optional[Dict[str, str]]:
+        return None
+
+    def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None:
+        raise NotImplementedError
+
+
+class RMModuleDoxigen(ResourceExplorerModule):
+    name = "RMModuleDoxigen"
+    _CONTAINER_SELECTOR = "div.css-1aefuid-contentContainer"
+    _BASE_URL = "https://dev.ti.com/tirex/explore/"
+
+    def select(
+        self, url: str, html: str, soup: Optional[BeautifulSoup]
+    ) -> Optional[Dict[str, str]]:
+        if not soup:
+            return None
+        iframe = soup.select_one(
+            f"{self._CONTAINER_SELECTOR} iframe[src], {self._CONTAINER_SELECTOR} frame[src]"
+        )
+        if not iframe:
+            return None
+        src = (iframe.get("src") or "").strip()
+        if not src:
+            return None
+        doxygen_url = urljoin(self._BASE_URL, src)
+        return {"doxygen_url": doxygen_url}
+
+    def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None:
+        doxygen_url = selection.get("doxygen_url") or ""
+        if not doxygen_url:
+            raise RuntimeError("Modulo RMModuleDoxigen: URL Doxygen non valida.")
+        downloader.log.info(f"[i] Resource module: {self.name}")
+        inner = DoxygenExportDownloader(
+            doxygen_url,
+            downloader.out_dir,
+            downloader.session,
+            logger=downloader.log,
+            limit=downloader.limit,
+            disable_numbering=downloader.disable_numbering,
+        )
+        inner.run()
+
+
+class ResourceExplorerDownloader(BaseDownloader):
+    name = "resource-explorer"
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.modules: List[ResourceExplorerModule] = [RMModuleDoxigen()]
+
+    @classmethod
+    def matches_url(cls, url: str) -> bool:
+        u = urlparse(url)
+        return u.netloc.endswith("dev.ti.com") and "/tirex/explore/node" in u.path.lower()
+
+    @classmethod
+    def probe_html(cls, url: str, html: str) -> bool:
+        return "css-1aefuid-contentContainer" in (html or "")
+
+    def _select_module(
+        self, html: str, soup: Optional[BeautifulSoup]
+    ) -> Optional[Tuple[ResourceExplorerModule, Dict[str, str]]]:
+        for module in self.modules:
+            selection = module.select(self.from_url, html, soup)
+            if selection:
+                return module, selection
+        return None
+
+    def _render_with_playwright(self) -> str:
+        try:
+            with sync_playwright() as p:
+                browser = p.chromium.launch(headless=True)
+                context_args = {}
+                ua = (
+                    self.session.headers.get("User-Agent")
+                    if hasattr(self, "session")
+                    else None
+                )
+                if ua:
+                    context_args["user_agent"] = ua
+                context = browser.new_context(**context_args)
+                page = context.new_page()
+                page.set_default_timeout(60_000)
+                try:
+                    page.goto(self.from_url, wait_until="networkidle")
+                except PlaywrightTimeoutError:
+                    page.goto(self.from_url, wait_until="domcontentloaded")
+                try:
+                    page.wait_for_selector(
+                        "div.css-1aefuid-contentContainer iframe[src], div.css-1aefuid-contentContainer frame[src]",
+                        timeout=20_000,
+                    )
+                except PlaywrightTimeoutError:
+                    pass
+                html = page.content()
+                browser.close()
+                return html
+        except Exception:
+            return ""
+
+    def run(self) -> None:
+        try:
+            r = self.session.get(self.from_url, timeout=30, allow_redirects=True)
+            r.raise_for_status()
+            html = r.text
+        except Exception as exc:
+            raise RuntimeError("Impossibile scaricare la pagina Resource Explorer.") from exc
+
+        soup = BeautifulSoup(html, "lxml")
+        chosen = self._select_module(html, soup)
+        if chosen:
+            module, selection = chosen
+            module.run(self, selection)
+            return
+
+        self.log.verbose(
+            "[verbose] Resource Explorer: fallback a Playwright per caricare iframe"
+        )
+        rendered_html = self._render_with_playwright()
+        rendered_soup = BeautifulSoup(rendered_html, "lxml") if rendered_html else None
+        chosen = self._select_module(rendered_html, rendered_soup)
+        if chosen:
+            module, selection = chosen
+            module.run(self, selection)
+            return
+
+        raise RuntimeError("Nessun modulo Resource Explorer compatibile trovato.")
 
 
 # ----------------------------
@@ -1807,11 +4173,36 @@ class DoxygenExportDownloader(BaseDownloader):
 
 def build_arg_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser()
+    ap.add_argument(
+        "--version",
+        "--ver",
+        action="version",
+        version=__version__,
+    )
     ap.add_argument("--from-url", required=True)
     ap.add_argument("--to-dir", required=True)
-    ap.add_argument("--user-agent", default="Mozilla/5.0 (X11; Linux x86_64) htmldownloader/1.0")
-    ap.add_argument("--verbose", action="store_true", help="Stampa avanzamento download e check")
-    ap.add_argument("--debug", action="store_true", help="Abilita log dettagliati e include il verbose")
+    ap.add_argument(
+        "--user-agent", default="Mozilla/5.0 (X11; Linux x86_64) htmldownloader/1.0"
+    )
+    ap.add_argument(
+        "--limit",
+        type=positive_int,
+        default=None,
+        help="Limita TOC e sezioni a <max> voci",
+    )
+    ap.add_argument(
+        "--verbose", action="store_true", help="Stampa avanzamento download e check"
+    )
+    ap.add_argument(
+        "--debug",
+        action="store_true",
+        help="Abilita log dettagliati e include il verbose",
+    )
+    ap.add_argument(
+        "--disable-numbering",
+        action="store_true",
+        help="Disabilita l'aggiunta del numbering in toc.html/document.html (mantiene la rimozione dei prefissi)",
+    )
     return ap
 
 
@@ -1822,6 +4213,7 @@ def main() -> int:
     from_url = args.from_url.strip()
     out_dir = Path(args.to_dir).expanduser().resolve()
     out_dir.mkdir(parents=True, exist_ok=True)
+    limit = args.limit
 
     logger = Logger(verbose=bool(args.verbose or args.debug), debug=bool(args.debug))
 
@@ -1829,11 +4221,19 @@ def main() -> int:
     session.headers.update({"User-Agent": args.user_agent})
 
     registry = DownloaderRegistry()
+    registry.register(ResourceExplorerDownloader)
     registry.register(DocumentViewerDownloader)
     registry.register(DoxygenExportDownloader)
 
     dl_cls = registry.detect(from_url, session)
-    downloader = dl_cls(from_url, out_dir, session, logger=logger)
+    downloader = dl_cls(
+        from_url,
+        out_dir,
+        session,
+        logger=logger,
+        limit=limit,
+        disable_numbering=bool(args.disable_numbering),
+    )
 
     logger.info(f"[i] Using downloader: {downloader.name}")
     downloader.run()

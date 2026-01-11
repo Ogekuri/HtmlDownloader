@@ -5,7 +5,7 @@ cosi i chiamanti possono usare `from htmldownloader import main` senza importare
 involontariamente il comportamento completo del pacchetto.
 """
 
-__version__ = "0.0.0"
+from .version import __version__
 
 from .cli import main  # riesportazione del punto di ingresso CLI
 

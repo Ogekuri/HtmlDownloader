@@ -4,7 +4,17 @@
 
 # HtmlDownloader (0.0.0)
 
-A simple CLI tool to download HTML pages from a URL to a specified directory.
+HTML downloader for offline LLM usage
+
+## Feature Highlights
+
+TODO: write this section.
+
+### Texas Instrument website support
+
+- Document-Viewer downloader: "https://www.ti.com/document-viewer/lit/html/sprz457"
+- Doxygen-Export donloader: "https://software-dl.ti.com/mcu-plus-sdk/esd/AM64X/latest/exports/docs/api_guide_am64x/index.html"
+- Resource-Explorer downloader: "https://dev.ti.com/tirex/explore/node?node=A__AD2nw6Uu4txAz2eqZdShBg__DIGITAL-POWER-SDK-AM263X__k-hvNHd__LATEST"
 
 ## Installation
 
