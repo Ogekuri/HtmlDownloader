@@ -1,8 +1,8 @@
 ---
 title: "Requisiti di HtmlDownloader"
 description: Specifica dei requisiti software
-version: "0.34"
-date: "2026-01-11"
+version: "0.36"
+date: "2026-01-14"
 author: "Ogekuri"
 scope:
   paths:
@@ -18,9 +18,9 @@ tags: ["markdown", "requirements"]
 ---
 
 # Requisiti di HtmlDownloader
-**Versione**: 0.34
+**Versione**: 0.36
 **Autore**: Ogekuri
-**Data**: 2026-01-11
+**Data**: 2026-01-14
 
 ## Indice
 - [Requisiti di HtmlDownloader](#requisiti-di-htmldownloader)
@@ -111,6 +111,7 @@ HtmlDownloader/
 - **DES-023**: Durante la generazione e/o post-processing di `document.html`, i downloader devono normalizzare tutti i collegamenti `<a href>` presenti nel documento in modo che ogni link sia: (1) un link esterno con schema esplicito (`http://`, `https://`, `ftp://`, `ftps://`, ecc.), oppure (2) un link ad anchor interno del solo tipo `#<id>` dove `<id>` esiste in `document.html`; tutti i link a documenti HTML (es: `qualcosa.html`, `document.html#...`) devono essere riscritti in `#<id>` quando risolvibili, altrimenti resi non cliccabili (rimozione di `href`).
 - **DES-024**: Il codice deve introdurre un downloader `ResourceExplorerDownloader` modulare che seleziona un modulo in base all'HTML iniziale della pagina e delega il download al modulo attivato.
 - **DES-025**: La pipeline di post-processing deve includere una funzione `_add_document_style`, eseguita dopo `_clean_document_style` e prima di `_normalize_document_links`, che aggiunge bordi alle tabelle e alle immagini in `document.html` iniettando stili CSS; le immagini che non sono contenute in una tabella devono ricevere un bordo con lo stesso spessore dei bordi delle tabelle (1px solid black).
+- **DES-026**: La pipeline di post-processing deve includere immediatamente dopo `_remove_unused_images` una funzione `_remove_unused_assets` che rimuove tutti i file presenti in `assets/` (inclusi CSS, JavaScript, immagini, font e altre risorse statiche) che non sono referenziati all'interno di `document.html`, né tramite percorso relativo né tramite solo nome file.
 
 ### 3.2 Funzioni
 - **REQ-001**: La CLI deve accettare `--from-url` e `--to-dir` obbligatori e `--user-agent` opzionale, creando la directory di destinazione se assente.
@@ -168,6 +169,8 @@ HtmlDownloader/
 ## 5. Cronologia revisioni
 | Data | Versione | Motivazione e descrizione cambiamento |
 |------|----------|---------------------------------------|
+| 2026-01-14 | 0.36 | Estesa funzione `_remove_unused_assets` per rimuovere tutti i file inutilizzati in `assets/` in base ai riferimenti presenti in `document.html`. |
+| 2026-01-14 | 0.35 | Aggiunta funzione `_remove_unused_assets` per rimuovere file .css non usati in `assets/` e aggiornamento pipeline di post-processing. |
 | 2026-01-11 | 0.34 | Aggiunto controllo non bloccante della disponibilita' di una nuova versione tramite GitHub Releases e opzione CLI `--upgrade`; aggiunti requisiti REQ-018/REQ-019/REQ-020 e test TST-025/TST-026. |
 | 2026-01-11 | 0.33 | Aggiunto comando CLI `--version`/`--ver` per stampare la versione del programma e terminare immediatamente; aggiunto requisito REQ-017 e test TST-024. |
 | 2026-01-11 | 0.32 | Consolidati i test post-link TST-020, TST-021, TST-022 nei rispettivi file di test di download, eliminando i file separati e la dipendenza dalla variabile d'ambiente RUN_POST_LINK_TESTS. |

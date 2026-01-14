@@ -37,6 +37,7 @@ from urllib.parse import urljoin, urlparse, urldefrag, unquote
 import requests
 from bs4 import BeautifulSoup
 from tqdm import tqdm
+import uuid
 
 from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
 
@@ -739,6 +740,10 @@ class BaseDownloader:
             self._clean_document_style,
             self._add_document_style,
             self._normalize_document_links,
+            self._remove_unused_images,
+            self._remove_unused_assets,
+            self._normalize_image_position,
+            self._clean_assets_tree,
             self._verify_toc_consistency,
             self._verify_toc_depth,
             self._prune_toc_and_clean_headings,
@@ -1542,6 +1547,150 @@ img:not(table img) {
         soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
         normalize_document_links_inplace(soup, self.log)
         doc_path.write_text(str(soup), encoding="utf-8")
+
+    def _remove_unused_images(self) -> None:
+        """Remove image files under assets/ that are not referenced in HTML files."""
+        assets_dir = self.out_dir / "assets"
+        if not assets_dir.exists() or not assets_dir.is_dir():
+            return
+
+        # Read HTML contents to search references
+        contents = ""
+        for fn in ("document.html", "toc.html", "index.html"):
+            p = self.out_dir / fn
+            if p.exists():
+                try:
+                    contents += p.read_text(encoding="utf-8")
+                except Exception:
+                    continue
+
+        image_suffixes = {".png", ".jpg", ".jpeg", ".gif", ".svg", ".webp", ".bmp"}
+
+        for f in sorted(assets_dir.rglob("*")):
+            if not f.is_file():
+                continue
+            if f.suffix.lower() not in image_suffixes:
+                continue
+
+            try:
+                rel = f.relative_to(self.out_dir).as_posix()
+            except Exception:
+                rel = f.name
+
+            # If neither the relative path nor the basename appear in the HTML, delete
+            if (rel not in contents) and (f.name not in contents):
+                try:
+                    f.unlink()
+                    self.log.verbose(f"[verbose] Removed unused image: {rel}")
+                except Exception as e:
+                    self.log.debug(f"[debug] Failed to remove {rel}: {e}")
+
+    def _remove_unused_assets(self) -> None:
+        """Remove asset files under assets/ that are not referenced in document.html.
+
+        The check is performed only against document.html contents and considers both
+        the relative path from the output directory and the plain filename.
+        """
+        assets_dir = self.out_dir / "assets"
+        if not assets_dir.exists() or not assets_dir.is_dir():
+            return
+
+        doc_path = self.out_dir / "document.html"
+        contents = ""
+        if doc_path.exists():
+            try:
+                contents = doc_path.read_text(encoding="utf-8")
+            except Exception:
+                contents = ""
+
+        for f in sorted(assets_dir.rglob("*")):
+            if not f.is_file():
+                continue
+            try:
+                rel = f.relative_to(self.out_dir).as_posix()
+            except Exception:
+                rel = f.name
+
+            # If neither the relative path nor the basename appear in document.html, delete
+            if (rel not in contents) and (f.name not in contents):
+                try:
+                    f.unlink()
+                    self.log.verbose(f"[verbose] Removed unused asset: {rel}")
+                except Exception as e:
+                    self.log.debug(f"[debug] Failed to remove {rel}: {e}")
+
+    def _normalize_image_position(self) -> None:
+        """Move images from nested asset subdirs to the root of `assets/` adding a uuid suffix and update HTML refs."""
+        assets_dir = self.out_dir / "assets"
+        if not assets_dir.exists() or not assets_dir.is_dir():
+            return
+
+        doc_files = []
+        for fn in ("document.html", "toc.html", "index.html"):
+            p = self.out_dir / fn
+            if p.exists():
+                doc_files.append(p)
+
+        # Collect image files under assets recursively
+        for f in sorted(assets_dir.rglob("*")):
+            if not f.is_file():
+                continue
+            # skip files already in the root of assets
+            try:
+                if f.parent.resolve() == assets_dir.resolve():
+                    continue
+            except Exception:
+                pass
+
+            stem = f.stem
+            suf = f.suffix
+            new_name = f"{stem}_{uuid.uuid4().hex}{suf}"
+            target = assets_dir / new_name
+            # ensure unique
+            while target.exists():
+                new_name = f"{stem}_{uuid.uuid4().hex}{suf}"
+                target = assets_dir / new_name
+
+            old_rel = f.relative_to(self.out_dir).as_posix()
+            new_rel = target.relative_to(self.out_dir).as_posix()
+
+            try:
+                target.parent.mkdir(parents=True, exist_ok=True)
+                f.replace(target)
+                self.log.verbose(f"[verbose] Moved image {old_rel} -> {new_rel}")
+            except Exception as e:
+                self.log.debug(f"[debug] Failed to move image {old_rel}: {e}")
+                continue
+
+            # Update references in HTML files
+            for p in doc_files:
+                try:
+                    txt = p.read_text(encoding="utf-8")
+                    if old_rel in txt or f.name in txt:
+                        txt = txt.replace(old_rel, new_rel)
+                        txt = txt.replace(f.name, new_name)
+                        p.write_text(txt, encoding="utf-8")
+                        self.log.debug(f"[debug] Updated refs in {p.name}: {old_rel} -> {new_rel}")
+                except Exception:
+                    continue
+
+    def _clean_assets_tree(self) -> None:
+        """Remove empty directories under assets/ starting from leaves."""
+        assets_dir = self.out_dir / "assets"
+        if not assets_dir.exists() or not assets_dir.is_dir():
+            return
+
+        # Walk directories bottom-up and try to remove empty ones
+        # Use sorted(reverse=True) to attempt children before parents
+        dirs = [d for d in assets_dir.rglob("*") if d.is_dir()]
+        for d in sorted(dirs, key=lambda p: len(str(p)), reverse=True):
+            try:
+                # rmdir only if empty
+                d.rmdir()
+                self.log.verbose(f"[verbose] Removed empty dir: {d.relative_to(self.out_dir).as_posix()}")
+            except Exception:
+                # not empty or cannot remove, ignore
+                continue
 
 
 class DownloaderRegistry:
@@ -4264,7 +4413,7 @@ class ResourceExplorerDownloader(BaseDownloader):
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser()
+    ap = argparse.ArgumentParser(prog="htmldownloader")
     ap.add_argument(
         "--version",
         "--ver",

@@ -106,3 +106,76 @@ def test_fix_heading_numbering_disable_numbering_only_removes(tmp_path: Path) ->
 
     assert " ".join(doc_soup.find("h1", id="a").get_text(" ", strip=True).split()) == "Intro"
     assert " ".join(doc_soup.find("h2", id="b").get_text(" ", strip=True).split()) == "Sub"
+
+
+def test_remove_unused_assets_keeps_only_referenced_assets(tmp_path: Path) -> None:
+    assets_dir = tmp_path / "assets"
+    (assets_dir / "css").mkdir(parents=True, exist_ok=True)
+    (assets_dir / "js").mkdir(parents=True, exist_ok=True)
+    (assets_dir / "img").mkdir(parents=True, exist_ok=True)
+
+    used_css = assets_dir / "css" / "used.css"
+    unused_css = assets_dir / "css" / "unused.css"
+    used_js = assets_dir / "js" / "used.js"
+    unused_js = assets_dir / "js" / "unused.js"
+    used_img = assets_dir / "img" / "used.png"
+    unused_img = assets_dir / "img" / "unused.png"
+
+    for p in (used_css, unused_css, used_js, unused_js, used_img, unused_img):
+        p.write_text("x", encoding="utf-8")
+
+    doc_html = """
+    <html><body>
+      <link rel="stylesheet" href="assets/css/used.css" />
+      <script src="assets/js/used.js"></script>
+      <img src="assets/img/used.png" />
+    </body></html>
+    """.strip()
+
+    (tmp_path / "document.html").write_text(doc_html, encoding="utf-8")
+
+    dl = DummyDownloader(
+        from_url="https://example.invalid",
+        out_dir=tmp_path,
+        session=requests.Session(),
+        logger=Logger(verbose=False, debug=False),
+        disable_numbering=False,
+    )
+
+    dl._remove_unused_assets()
+
+    assert used_css.exists()
+    assert used_js.exists()
+    assert used_img.exists()
+    assert not unused_css.exists()
+    assert not unused_js.exists()
+    assert not unused_img.exists()
+
+
+def test_remove_unused_assets_matches_by_basename(tmp_path: Path) -> None:
+    assets_dir = tmp_path / "assets"
+    (assets_dir / "img").mkdir(parents=True, exist_ok=True)
+
+    logo = assets_dir / "img" / "logo.png"
+    logo.write_text("x", encoding="utf-8")
+
+    # document.html refers only to the basename, not the full relative path
+    doc_html = """
+    <html><body>
+      <img src="logo.png" />
+    </body></html>
+    """.strip()
+
+    (tmp_path / "document.html").write_text(doc_html, encoding="utf-8")
+
+    dl = DummyDownloader(
+        from_url="https://example.invalid",
+        out_dir=tmp_path,
+        session=requests.Session(),
+        logger=Logger(verbose=False, debug=False),
+        disable_numbering=False,
+    )
+
+    dl._remove_unused_assets()
+
+    assert logo.exists()
