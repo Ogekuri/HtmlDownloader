@@ -4,6 +4,6 @@ Keep this module lightweight so it can be imported without pulling heavy runtime
 dependencies.
 """
 
-__version__ = "0.0.2"
+__version__ = "0.0.3"
 
 __all__ = ["__version__"]
