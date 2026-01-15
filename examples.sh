@@ -2,6 +2,11 @@
 # VERSION: 0.0.3
 # AUTHORS: Ogekuri
 
+set -euo pipefail
+
+rm -f examples.log
+
+
 rm -rf temp/
 mkdir temp/
 
@@ -54,8 +59,11 @@ urls=(
 
 for url in "${urls[@]}"; do
     last="$(make_last "$url")"
-    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug
-    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug
+    echo "============================================================" | tee -a examples.log
+    echo "[INFO] Input url:  $url"  | tee -a examples.log
+    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug | tee -a examples.log
+    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
 
 # AM64x MCU+ SDK  11.02.00
@@ -84,8 +92,11 @@ urls=(
 
 for url in "${urls[@]}"; do
     last="$(make_last "$url")"
-    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30
-    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30
+    echo "============================================================" | tee -a examples.log
+    echo "[INFO] Input url:  $url"  | tee -a examples.log
+    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 | tee -a examples.log
+    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
 
 # AM263x Digital Power SDK  09.01.00
@@ -97,8 +108,11 @@ urls=(
 
 for url in "${urls[@]}"; do
     last="$(make_last "$url")"
-    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30
-    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30
+    echo "============================================================" | tee -a examples.log
+    echo "[INFO] Input url:  $url"  | tee -a examples.log
+    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 | tee -a examples.log
+    ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
 
 

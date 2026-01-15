@@ -1,8 +1,8 @@
 ---
 title: "Requisiti di HtmlDownloader"
 description: Specifica dei requisiti software
-version: "0.36"
-date: "2026-01-14"
+version: "0.38"
+date: "2026-01-16"
 author: "Ogekuri"
 scope:
   paths:
@@ -18,9 +18,9 @@ tags: ["markdown", "requirements"]
 ---
 
 # Requisiti di HtmlDownloader
-**Versione**: 0.36
+**Versione**: 0.38
 **Autore**: Ogekuri
-**Data**: 2026-01-14
+**Data**: 2026-01-16
 
 ## Indice
 - [Requisiti di HtmlDownloader](#requisiti-di-htmldownloader)
@@ -112,6 +112,7 @@ HtmlDownloader/
 - **DES-024**: Il codice deve introdurre un downloader `ResourceExplorerDownloader` modulare che seleziona un modulo in base all'HTML iniziale della pagina e delega il download al modulo attivato.
 - **DES-025**: La pipeline di post-processing deve includere una funzione `_add_document_style`, eseguita dopo `_clean_document_style` e prima di `_normalize_document_links`, che aggiunge bordi alle tabelle e alle immagini in `document.html` iniettando stili CSS; le immagini che non sono contenute in una tabella devono ricevere un bordo con lo stesso spessore dei bordi delle tabelle (1px solid black).
 - **DES-026**: La pipeline di post-processing deve includere immediatamente dopo `_remove_unused_images` una funzione `_remove_unused_assets` che rimuove tutti i file presenti in `assets/` (inclusi CSS, JavaScript, immagini, font e altre risorse statiche) che non sono referenziati all'interno di `document.html`, né tramite percorso relativo né tramite solo nome file.
+- **DES-027**: La pipeline di post-processing deve includere una funzione `_deduplicate_toc_entries` eseguita prima di `fix_heading_numbering` che garantisca che non esistano voci multiple nella TOC che puntino allo stesso anchor/fragment in `document.html`. La funzione deve processare la TOC in ordine di lettura (pre-order), rimuovere ogni voce che punta a un fragment già incontrato e promuovere eventuali figli della voce rimossa al livello del genitore mantenendone ordine e posizionamento.
 
 ### 3.2 Funzioni
 - **REQ-001**: La CLI deve accettare `--from-url` e `--to-dir` obbligatori e `--user-agent` opzionale, creando la directory di destinazione se assente.
@@ -132,6 +133,7 @@ HtmlDownloader/
 - **REQ-018**: La CLI, dopo aver validato gli input e prima di eseguire qualsiasi altra operazione, deve verificare la disponibilita' di una nuova versione tramite chiamata HTTP GET all'endpoint `https://api.github.com/repos/Ogekuri/HtmlDownloader/releases/latest` con timeout di 1 secondo; se la chiamata fallisce o la versione non e' determinabile deve procedere senza segnalare nulla.
 - **REQ-019**: Se la chiamata di verifica versione ha successo e la versione disponibile e' maggiore di quella corrente, la CLI deve stampare su stdout un messaggio nel formato: `A new version of <program> is available: current <current>, latest <latest>. To upgrade, run: <program> --upgrade`.
 - **REQ-020**: La CLI deve esporre l'opzione `--upgrade` che aggiorna il pacchetto `htmldownloader` e termina immediatamente l'esecuzione (exit code 0 se l'upgrade ha successo, non-zero se fallisce), senza richiedere `--from-url`/`--to-dir`.
+- **REQ-021**: Il modulo `tests/test_examples_downloads.py` non deve essere eseguito automaticamente da `pytest`; la sua esecuzione deve essere attivata esplicitamente impostando `RUN_EXAMPLES_DOWNLOADS=1` o invocando direttamente quel file.
 
 ### 3.3 Output del documento
 - **REQ-010**: Il crawler `doxygen-export` deve inserire all'inizio di `document.html` una riga di titolo con il nome del documento ottenuto dall'intestazione superiore della pagina (`#titlearea`/`#projectname`/`#projectnumber` quando presenti); il titolo deve precedere tutte le sezioni scaricate.
@@ -165,10 +167,15 @@ HtmlDownloader/
 | **TST-024** | **REQ-017** | Eseguire il parser della CLI con `--version` e con `--ver` e verificare che: (1) la CLI termini immediatamente con exit code 0; (2) stdout contenga esclusivamente la stringa della versione seguita da newline (`<versione>\n`), senza altri messaggi. |
 | **TST-025** | **REQ-018**, **REQ-019** | Mockare la chiamata HTTP a GitHub (`requests.get`) e verificare che: (1) in caso di errore/timeout o risposta senza versione valida, non venga stampato alcun messaggio; (2) in caso di risposta valida con `tag_name` maggiore della versione corrente, venga stampato il messaggio di aggiornamento con versione corrente, versione latest e istruzione `--upgrade`. |
 | **TST-026** | **REQ-020** | Mockare l'esecuzione del comando di upgrade (`subprocess.run`) e verificare che l'opzione `--upgrade` termini immediatamente con exit code coerente e invochi `python -m pip install --upgrade htmldownloader` senza richiedere altri parametri. |
+| **TST-027** | **DES-027** | Creare una TOC di test in `toc.html` contenente voci duplicate che puntano allo stesso fragment (es: `#a`), eseguire `_deduplicate_toc_entries` e verificare che al termine non esistano più fragment duplicati: le voci duplicate devono essere rimosse e i loro figli promossi al livello corretto preservando l'ordine di lettura. |
+| **TST-028** | **DES-015**, **DES-019**, **REQ-007**, **REQ-009** | Eseguire la CLI per tutti gli URL presenti in `examples.sh`, rispettando i limiti definiti nello script. Per ogni output verificare: (1) ogni fragment in `toc.html` e' univoco (nessuna TOC duplicata); (2) ogni fragment della TOC punta a un heading `h1..h6` in `document.html`; (3) ogni heading `h1..h6` in `document.html` e' referenziato dalla TOC; (4) il testo della voce TOC corrisponde al testo dell'heading referenziato; (5) se e' impostato `--limit`, il numero di voci/heading non supera il limite. |
+| **TST-029** | **REQ-021** | Eseguire `pytest` senza variabili d'ambiente addizionali e verificare che `tests/test_examples_downloads.py` venga saltato (pytest deve indicare lo skip) e che la sua esecuzione si attivi solo impostando `RUN_EXAMPLES_DOWNLOADS=1` oppure invocando direttamente `python -m pytest tests/test_examples_downloads.py`. |
 
 ## 5. Cronologia revisioni
 | Data | Versione | Motivazione e descrizione cambiamento |
 |------|----------|---------------------------------------|
+| 2026-01-16 | 0.38 | Reso opzionale l'esecuzione di `tests/test_examples_downloads.py` aggiungendo TST-029 che verifica lo skip di default e la possibilità di lanciarlo esplicitamente. |
+| 2026-01-15 | 0.37 | Aggiunto test per il download dei progetti in examples.sh e verifiche generiche TOC<->heading. |
 | 2026-01-14 | 0.36 | Estesa funzione `_remove_unused_assets` per rimuovere tutti i file inutilizzati in `assets/` in base ai riferimenti presenti in `document.html`. |
 | 2026-01-14 | 0.35 | Aggiunta funzione `_remove_unused_assets` per rimuovere file .css non usati in `assets/` e aggiornamento pipeline di post-processing. |
 | 2026-01-11 | 0.34 | Aggiunto controllo non bloccante della disponibilita' di una nuova versione tramite GitHub Releases e opzione CLI `--upgrade`; aggiunti requisiti REQ-018/REQ-019/REQ-020 e test TST-025/TST-026. |

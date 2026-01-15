@@ -751,6 +751,8 @@ class BaseDownloader:
             self._test_toc_headings,
             self.fix_heading_ref_position,
             self._enforce_toc_headings,
+            self._deduplicate_toc_entries,
+            self._enforce_toc_headings,
             self.fix_heading_numbering,
             self._test_toc_headings,
         ]
@@ -766,6 +768,9 @@ class BaseDownloader:
     def run(self) -> None:
         raise NotImplementedError
 
+    def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]:
+        return toc_from_nav_html(toc_html, self.from_url)
+
     def post_process(self) -> None:
         """Execute post-processing pipeline to verify generated files."""
         for func in self.post_process_pipeline:
@@ -773,6 +778,8 @@ class BaseDownloader:
                 func()
             except Exception as e:
                 self.log.debug(f"[debug] Post-process {func.__name__} failed: {e}")
+                if func.__name__ == "_test_toc_headings":
+                    raise
 
     def _verify_toc_consistency(self) -> None:
         """Verify that each link in toc.html points to an existing anchor in document.html
@@ -791,9 +798,12 @@ class BaseDownloader:
 
         for link in toc_links:
             href = link.get("href", "").strip()
-            if not href.startswith("#"):
+            if not href:
                 continue
-            anchor_id = href[1:]
+            _, frag = urldefrag(href)
+            anchor_id = (frag or "").strip()
+            if not anchor_id:
+                continue
             link_text = " ".join(link.get_text(" ", strip=True).split())
 
             # Find corresponding element in document.html
@@ -936,6 +946,65 @@ class BaseDownloader:
                         h.replace_with(new_tag)
 
             doc_path.write_text(str(doc_soup), encoding="utf-8")
+
+    def _deduplicate_toc_entries(self) -> None:
+        """Remove TOC entries that point to an anchor already referenced earlier.
+
+        The function processes `toc.html` in reading (pre-order) order. When an
+        entry is found that references a fragment already seen, the entry is
+        removed and any child <li> elements (if present) are promoted to the
+        current parent list at the same position, preserving order. Processing
+        continues at the promoted child (or next sibling) as described in the
+        requirement.
+        """
+        toc_path = self.out_dir / "toc.html"
+        if not toc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+
+        def href_fragment_id(href: str) -> str:
+            href = (href or "").strip()
+            if not href:
+                return ""
+            _, frag = urldefrag(href)
+            return (frag or "").strip().lower()
+
+        root_ul = toc_soup.find("ul")
+        if not root_ul:
+            return
+
+        # Use TocNode representation for safer manipulation: parse TOC to TocNode
+        # objects, process them in reading order and rebuild HTML from nodes.
+        def process_nodes(nodes: List[TocNode], seen: Set[str]) -> List[TocNode]:
+            out: List[TocNode] = []
+            for n in nodes:
+                href = (n.href or "").strip()
+                _, frag = urldefrag(href)
+                frag_norm = (frag or "").strip().lower()
+
+                if frag_norm and frag_norm in seen:
+                    # promote children: process children and extend at this level
+                    promoted = process_nodes(n.children, seen)
+                    out.extend(promoted)
+                    continue
+
+                if frag_norm:
+                    seen.add(frag_norm)
+
+                # process children recursively
+                n.children = process_nodes(n.children, seen)
+                out.append(n)
+
+            return out
+
+        # Build TocNode list from the captured TOC HTML and process with the
+        # TocNode-based algorithm, then rebuild the TOC HTML deterministically.
+        toc_html_orig = str(toc_soup)
+        toc_nodes = self._toc_tree_from_html(toc_html_orig)
+        processed_nodes = process_nodes(toc_nodes, set())
+        new_toc_html = build_toc_html(processed_nodes)
+        toc_path.write_text(new_toc_html, encoding="utf-8")
 
     def _enforce_toc_headings(self) -> None:
         """Convert to bold uppercase the headings (h1-h6) that are NOT referenced by toc.html.
@@ -3695,6 +3764,9 @@ class DoxygenExportDownloader(BaseDownloader):
             else:
                 return normalize_url(cls, base_url)
         return ""
+
+    def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]:
+        return toc_from_nav_html(toc_html, "document.html")
 
     def _toc_nodes_from_nav_html(self, nav_html: str) -> List[TocNode]:
         soup = BeautifulSoup(nav_html or "", "lxml")
