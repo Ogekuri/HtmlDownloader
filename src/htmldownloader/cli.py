@@ -416,6 +416,31 @@ class UpgradeAction(argparse.Action):
             parser.exit(1, f"Upgrade failed: {exc}\n")
 
 
+class VersionedArgumentParser(argparse.ArgumentParser):
+    """ArgumentParser that appends the program version to the usage line.
+
+    The version string is appended to the first line of the usage output in the
+    form: " (<major>.<minor>.<patch>)".
+    """
+
+    def __init__(self, *args, version: str = "", **kwargs):
+        super().__init__(*args, **kwargs)
+        self._usage_version = (version or "").strip()
+
+    def format_usage(self) -> str:
+        s = super().format_usage()
+        if not s or not self._usage_version:
+            return s
+        # Append version to the first line of the usage (preserve trailing parts)
+        parts = s.splitlines(True)
+        if not parts:
+            return s
+        first = parts[0].rstrip("\r\n")
+        rest = "".join(parts[1:])
+        first = f"{first} ({self._usage_version})\n"
+        return first + rest
+
+
 def iter_asset_urls(soup: BeautifulSoup, page_url: str) -> Set[str]:
     urls: Set[str] = set()
 
@@ -744,6 +769,7 @@ class BaseDownloader:
             self._remove_unused_assets,
             self._normalize_image_position,
             self._clean_assets_tree,
+            self._remove_empty_assets_root,
             self._verify_toc_consistency,
             self._verify_toc_depth,
             self._prune_toc_and_clean_headings,
@@ -1761,6 +1787,45 @@ img:not(table img) {
                 # not empty or cannot remove, ignore
                 continue
 
+    def _remove_empty_assets_root(self) -> None:
+        """Remove the top-level `assets/` directory if it is empty.
+
+        This runs after `_clean_assets_tree` and will delete the `assets`
+        directory only if there are no files and no non-empty subdirectories
+        remaining. Logs a verbose message when removed and a debug message
+        if removal fails.
+        """
+        assets_dir = self.out_dir / "assets"
+        if not assets_dir.exists() or not assets_dir.is_dir():
+            return
+
+        # Check for any files or non-empty directories under assets/
+        has_any = False
+        for p in assets_dir.rglob("*"):
+            # if any file exists, or any directory that contains something, mark
+            # as non-empty
+            if p.is_file():
+                has_any = True
+                break
+            if p.is_dir():
+                try:
+                    # if dir contains any children, it's non-empty
+                    if any(p.iterdir()):
+                        has_any = True
+                        break
+                except Exception:
+                    has_any = True
+                    break
+
+        if has_any:
+            return
+
+        try:
+            assets_dir.rmdir()
+            self.log.verbose(f"[verbose] Removed empty assets dir: {assets_dir.relative_to(self.out_dir).as_posix()}")
+        except Exception as e:
+            self.log.debug(f"[debug] Failed to remove assets dir {assets_dir}: {e}")
+
 
 class DownloaderRegistry:
     def __init__(self):
@@ -2567,6 +2632,78 @@ class DocumentViewerDownloader(BaseDownloader):
             for elem in list(soup.select(sel)):
                 elem.decompose()
 
+    def _convert_doxygen_definition_lists(self, soup: BeautifulSoup) -> None:
+        """
+        Convert Doxygen-style definition lists and textual "term / : description"
+        pairs into inline bold uppercase labels followed by the description.
+
+        Examples:
+        <dl><dt>Attention</dt><dd>Please be aware...</dd></dl>
+        -> <p><strong>ATTENTION:</strong> Please be aware...</p>
+
+        <p>Attention</p>
+        <p>:   Please be aware...</p>
+        -> <p><strong>ATTENTION:</strong> Please be aware...</p>
+        """
+        try:
+            # Handle <dl><dt>/<dd> pairs first
+            for dl in list(soup.find_all("dl")):
+                parts: List[str] = []
+                for dt in dl.find_all("dt"):
+                    dd = dt.find_next_sibling("dd")
+                    if not dd:
+                        continue
+                    label = (dt.get_text(" ", strip=True) or "").upper()
+                    desc_html = dd.decode_contents() or ""
+                    parts.append(f"<p><strong>{escape_html(label)}:</strong> {desc_html}</p>")
+                if parts:
+                    frag = BeautifulSoup("\n".join(parts), "lxml")
+                    dl.replace_with(frag)
+
+            # Handle adjacent paragraph style variations:
+            # 1) <p>Label</p> + <p>: description</p>
+            # 2) <p>Label</p> + <p>:</p> + <p>description</p>
+            for p in list(soup.find_all("p")):
+                nxt = p.find_next_sibling()
+                if not nxt or nxt.name != "p":
+                    continue
+                left_text = (p.get_text(" ", strip=True) or "").strip()
+                right_text = (nxt.get_text("\n", strip=True) or "")
+                if not left_text or right_text is None:
+                    continue
+
+                # Case A: right paragraph starts with a colon followed by text
+                if re.match(r"^\s*:\s*\S+", right_text):
+                    desc_html = re.sub(r"^\s*:\s*", "", nxt.decode_contents(), count=1)
+                    label = left_text.upper()
+                    new_frag = BeautifulSoup(
+                        f"<p><strong>{escape_html(label)}:</strong> {desc_html}</p>",
+                        "lxml",
+                    )
+                    p.replace_with(new_frag)
+                    nxt.decompose()
+                    continue
+
+                # Case B: right paragraph is just a colon (possibly with spaces)
+                if re.match(r"^\s*:\s*$", right_text):
+                    desc_node = nxt.find_next_sibling()
+                    if desc_node and desc_node.name == "p":
+                        desc_html = desc_node.decode_contents() or ""
+                        label = left_text.upper()
+                        new_frag = BeautifulSoup(
+                            f"<p><strong>{escape_html(label)}:</strong> {desc_html}</p>",
+                            "lxml",
+                        )
+                        p.replace_with(new_frag)
+                        # remove the marker and the description nodes
+                        nxt.decompose()
+                        desc_node.decompose()
+                        continue
+                # Otherwise, not a definition-style pair
+        except Exception:
+            # Non-fatal: if conversion fails, leave document unchanged
+            return
+
     def _extract_fragment_only(
         self, soup: BeautifulSoup, fragment: str
     ) -> BeautifulSoup:
@@ -3149,6 +3286,9 @@ class DocumentViewerDownloader(BaseDownloader):
         )
         doc_soup = BeautifulSoup(doc_html, "lxml")
         ensure_heading_ids(doc_soup)
+        # Convert Doxygen-style definition lists and textual definition
+        # pairs into inline bold uppercase labels to improve text retrieval
+        self._convert_doxygen_definition_lists(doc_soup)
         toc_from_doc = toc_from_headings(doc_soup)
         toc_for_output = (
             clean_display_toc_nodes if clean_display_toc_nodes else toc_from_doc
@@ -4485,7 +4625,7 @@ class ResourceExplorerDownloader(BaseDownloader):
 
 
 def build_arg_parser() -> argparse.ArgumentParser:
-    ap = argparse.ArgumentParser(prog="htmldownloader")
+    ap = VersionedArgumentParser(prog="htmldownloader", version=__version__)
     ap.add_argument(
         "--version",
         "--ver",
@@ -4525,8 +4665,60 @@ def build_arg_parser() -> argparse.ArgumentParser:
     return ap
 
 
+def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None:
+    """Print the strict help block required by REQ-024.
+
+    The function prints a fixed header and usage/example blocks and then
+    generates the full list of implemented options from the parser.
+    """
+    # Header
+    print(f"{program} ({version})")
+    print()
+
+    # Usage
+    print("Usage:")
+    print(f"  {program} [--help] [--version|--ver] [--verbose] [--debug]")
+    print()
+
+    # Example(s)
+    print("Example/Examples:")
+    print(f"  {program} --from-url http://foo.bar --to-dir foo-bar/ --verbose")
+    print()
+
+    # Fixed core options block
+    print("Options:")
+    print("  -h, --help            Show this help message and exit")
+    print("  --version, --ver      Print the program version and exit")
+    print("  --verbose             Verbose progress logs")
+    print("  --debug               Debug logs + extra artifacts")
+
+    # Generate full list of options from parser._actions (avoid duplicates)
+    seen_opts: Set[str] = set(["-h", "--help", "--version", "--ver", "--verbose", "--debug"])
+    # Collect actions in insertion order
+    actions = [a for a in getattr(parser, "_actions", [])]
+    for a in actions:
+        # Skip the help/version that we've already printed
+        opt_strings = [s for s in a.option_strings if s not in seen_opts]
+        if not opt_strings:
+            continue
+        seen_opts.update(opt_strings)
+        opt_display = ", ".join(opt_strings)
+        # show metavar for positional/optional arguments where appropriate
+        metavar = ""
+        if a.dest and a.nargs not in (0, None) and not a.option_strings:
+            metavar = f" <{a.dest}>"
+        help_text = (a.help or "").strip()
+        # Align to match typical formatting
+        print(f"  {opt_display.ljust(22)} {help_text}")
+
+
 def main() -> int:
     ap = build_arg_parser()
+    # If executed with no parameters or with -h/--help, print strict help and exit 0
+    if len(sys.argv) == 1 or any(s in ("-h", "--help") for s in sys.argv[1:]):
+        print_strict_help(ap.prog, __version__, ap)
+        return 0
+
     args = ap.parse_args()
 
     check_for_new_version(ap.prog, __version__)

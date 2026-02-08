@@ -61,7 +61,7 @@ for url in "${urls[@]}"; do
     last="$(make_last "$url")"
     echo "============================================================" | tee -a examples.log
     echo "[INFO] Input url:  $url"  | tee -a examples.log
-    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo "[INFO] Output dir: temp/out_${last}" | tee -a examples.log
     echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug | tee -a examples.log
     ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
@@ -94,7 +94,7 @@ for url in "${urls[@]}"; do
     last="$(make_last "$url")"
     echo "============================================================" | tee -a examples.log
     echo "[INFO] Input url:  $url"  | tee -a examples.log
-    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo "[INFO] Output dir: temp/out_${last}" | tee -a examples.log
     echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 | tee -a examples.log
     ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
@@ -110,7 +110,7 @@ for url in "${urls[@]}"; do
     last="$(make_last "$url")"
     echo "============================================================" | tee -a examples.log
     echo "[INFO] Input url:  $url"  | tee -a examples.log
-    echo "[INFO] Output dir: out_${last}" | tee -a examples.log
+    echo "[INFO] Output dir: temp/out_${last}" | tee -a examples.log
     echo ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 | tee -a examples.log
     ./htmldownloader.sh --from-url "${url}" --to-dir ./temp/out_${last} --verbose --debug --limit 30 >>examples.log 2>&1 && echo "[OK] on path out_${last}" | tee -a examples.log || { rc=$?; echo "[ERROR] (rc=$rc) on path out_${last}" | tee -a examples.log; continue; }
 done
