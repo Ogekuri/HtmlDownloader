@@ -1,64 +1,123 @@
-# HtmlDownloader Execution Workflow
+# Software Workflow Analysis
 
-Updated walkthrough of the runtime flow based on the current implementation in `src/htmldownloader/cli.py`.
+## 1. Core Workflow
+This section outlines the high-level execution flow initiated by the user.
 
-### Common Initial Stages
-- Help/version fast-exit: no args, `-h` or `--help` print the strict help block and exit 0; `--version`/`--ver` print only the version and exit 0; `--upgrade` runs `pip install --upgrade htmldownloader` and exits with its code.
-- Argument parsing: required `--from-url`, `--to-dir`; optional `--user-agent`, `--limit`, `--verbose`, `--debug`, `--disable-numbering`.
-- Version check: `check_for_new_version` hits GitHub releases with 1s timeout (non-blocking).
-- Output/log setup: create destination dir, build logger (verbose/debug), initialize `requests.Session` with User-Agent.
-- Downloader detection: register `resource-explorer`, `document-viewer`, `doxygen-export`; detect by URL/HTML probe, instantiate and run.
-- Final logging: print selected downloader and saved paths for `toc.html`, `index.html`, `document.html`, `assets/`.
+*   **Entry Point Execution**
+    *   `htmldownloader.__main__`: Entry point script. [<src/htmldownloader/__main__.py>, lines 1-7]
+    *   `cli.main()`: Main execution logic. [<src/htmldownloader/cli.py>, lines 4715-4759]
+        *   description: Parses arguments, initializes environment, detects downloader, and executes the download process.
+        *   input: `sys.argv` (command line arguments)
+        *   output: Exit code (0 for success, non-zero for error)
+        *   calls:
+            *   `build_arg_parser()`: configures argument parser.
+            *   `check_for_new_version()`: checks GitHub for updates.
+            *   `Logger()`: initializes logging.
+            *   `requests.Session()`: initializes HTTP session.
+            *   `DownloaderRegistry()`: initializes downloader registry.
+            *   `DownloaderRegistry.register()`: registers `ResourceExplorerDownloader`, `DocumentViewerDownloader`, `DoxygenExportDownloader`.
+            *   `DownloaderRegistry.detect()`: identifies appropriate downloader for the URL.
+            *   `downloader.run()`: executes the selected downloader strategy.
 
----
+## 2. Downloader Detection
+*   **Registry & Detection**
+    *   `DownloaderRegistry`: Registry class for managing downloader strategies. [<src/htmldownloader/cli.py>, lines 1830-1850]
+    *   `detect()`: Selects the correct downloader class. [<src/htmldownloader/cli.py>, lines 1837-1850]
+        *   description: Checks registered downloaders against the URL; if ambiguous, fetches the page content to probe.
+        *   input: `url`, `session`
+        *   output: `type[BaseDownloader]` subclass
+        *   calls:
+            *   `matches_url()`: on each registered class.
+            *   `session.get()`: fetches page content if URL matching is insufficient.
+            *   `probe_html()`: on each registered class using fetched content.
 
-### 1. DocumentViewerDownloader (TI document-viewer)
-- Playwright boot: launch headless Chromium, attach `NetworkImageRecorder` to capture image responses.
-- TOC capture: expand nav repeatedly (`_expand_full_toc`) and scroll containers (`_scroll_toc_container`), pick best nav HTML; fallback to headings-derived TOC if absent; prepend doc-lister title when found.
-- TOC trimming & limits: build TOC tree, select section slice from first title starting with "1 " through last "IMPORTANT NOTICE"; display TOC trimmed to start at first numeric and drop trailing Important Notice; apply `--limit` in reading order (pre-order), pruning display TOC accordingly; deduplicate TOC hrefs at display time.
-- Section planning: map each TOC entry to a stable local anchor, reuse anchors for duplicate URLs/fragments; prepare section plan respecting limit slice and dedup.
-- Card cache: optionally collect pre-loaded `.documentSection[data-url]` cards from the scroll container to avoid extra navigation; reuse cached sections when fragments match.
-- Section fetch: for each planned entry, try TOC click + fragment wait, else navigate; auto-scroll for lazy assets; extract fragment-only content; strip TOC/nav elements; ensure heading ids; download referenced assets and rewrite to local paths; strip styles.
-- Important Notice handling: drop trailing IMPORTANT NOTICE section if present, else strip TI disclaimer block from the last section.
-- Document assembly: wrap sections in `<section id=...>` (inject heading if missing), prepend title from TOC/first section, merge to `document.html`; convert Doxygen-style definition lists and "label : description" paragraphs to bold uppercase labels inline.
-- TOC/index generation: derive TOC from cleaned display nodes (or headings fallback), write `toc.html` (frame targets set) and `index.html` frameset.
+## 3. Texas Instruments Document Viewer Workflow
+This workflow handles dynamic JavaScript-heavy documentation pages (e.g., TI datasheets).
 
-### 2. DoxygenExportDownloader (Doxygen/static exports)
-- Scope setup: compute host/scope dir; fetch index; derive document title from `#titlearea`, `#projectname/#projectnumber`, or fallback title.
-- TOC via Playwright: load page, expand nav tree (skipping API Reference), optionally limited by `--limit`; clean inline styles; output nav HTML + outline. In `toc_only` mode, write `toc_raw.html`/`toc_raw.txt` and exit.
-- Limited path (when nav HTML present and limit set):
-    - Build TOC nodes from nav HTML, truncate to limit in reading order; group fragments per page; fetch only referenced pages; extract section slices between fragments; strip duplicate section titles while preserving ids when needed.
-    - Deduplicate identical content by hash, re-pointing TOC hrefs; assemble `<section id=page-N>` with `h1` titles; insert document title paragraph before container.
-    - Collect all assets from touched pages, download, rewrite links, strip styles; emit `document.html`, `toc.html`, `index.html` then post-process.
-- Full crawl path (fallback):
-    - BFS crawl up to 250 HTML pages in scope; optional `--limit` truncates pages list.
-    - For each page: extract main content (drop TOC/nav elements), strip duplicate top titles, ensure heading ids, deduplicate sections by content hash, build `<section id=page-N>` with `h1` titles; insert document title paragraph.
-    - Build TOC from assembled document, apply `--limit`, download all discovered assets, rewrite links, strip styles; emit `document.html`, `toc.html`, `index.html` then post-process.
+*   **Initialization & Setup**
+    *   `DocumentViewerDownloader`: Handler for TI document viewer pages. [<src/htmldownloader/cli.py>, lines 1925-3320]
+    *   `run()`: Orchestrates the scraping process using Playwright. [<src/htmldownloader/cli.py>, lines 2872-3320]
+        *   description: Launches browser, captures TOC, iterates sections, and saves content.
+        *   calls:
+            *   `NetworkImageRecorder()`: initializes network asset interceptor.
+            *   `sync_playwright()`: starts Playwright session.
+            *   `page.goto()`: navigates to the target URL.
+            *   `_expand_full_toc()`: expands sidebar navigation to reveal all links.
+            *   `_scroll_toc_container()`: ensures lazy-loaded TOC items are visible.
+            *   `_pick_best_outerhtml()`: captures the Table of Contents HTML.
+            *   `_toc_tree_from_html()`: parses TOC HTML into `TocNode` structure.
 
-### 3. ResourceExplorerDownloader (wrapper)
-- Fetch Resource Explorer shell; try modules in order. `RMModuleDoxigen` activates when an iframe under `div.css-1aefuid-contentContainer` is found; builds Doxygen URL relative to `https://dev.ti.com/tirex/explore/` and delegates to `DoxygenExportDownloader` with inherited options (`limit`, `user-agent`, `verbose`, `debug`, `disable-numbering`).
-- If initial HTML fails module selection, render with Playwright to locate the iframe and retry; otherwise error.
+*   **Content Extraction Loop**
+    *   `DocumentViewerDownloader.run()` (continued loop over `section_plan`)
+        *   description: Iterates through each section identified in the TOC to capture content.
+        *   calls:
+            *   `_best_card_for_fragment()`: checks if content is already cached in "cards".
+            *   `_click_toc_link()`: simulates click on sidebar to load content.
+            *   `_wait_for_fragment()`: waits for the specific section content to load.
+            *   `page.goto()`: direct navigation if clicking fails.
+            *   `_auto_scroll()`: scrolls page to trigger lazy-loading of images.
+            *   `_pick_best_outerhtml()`: captures the section's HTML content.
+            *   `_remove_toc_elements()`: cleans up navigation elements from captured HTML.
+            *   `_extract_fragment_only()`: isolates the target section content.
 
----
+*   **Output Generation**
+    *   `DocumentViewerDownloader` (finalization)
+        *   calls:
+            *   `build_toc_html()`: Generates `toc.html`. [<src/htmldownloader/cli.py>, line 652]
+            *   `build_frameset_index()`: Generates `index.html` frameset. [<src/htmldownloader/cli.py>, line 699]
+            *   `post_process()`: Runs cleaning pipeline. [<src/htmldownloader/cli.py>, line 800]
 
-### Post-Processing Pipeline (exact order)
-Executed after writing `document.html`, `toc.html`, `index.html`:
-1) `_clean_document_style` — remove external stylesheets, style tags, inline `style`/`class` attrs from document and TOC.
-2) `_add_document_style` — inject minimal CSS adding borders to tables and standalone images.
-3) `_normalize_document_links` — allow only external links with schemes or in-doc anchors that exist; rewrite resolvable fragments; drop others (verbose/debug stats).
-4) `_remove_unused_images` — delete unreferenced images under assets/ based on HTML refs (path or filename).
-5) `_remove_unused_assets` — delete any asset file not referenced in `document.html` (path or filename).
-6) `_normalize_image_position` — move images into assets/ root with UUID suffix, update HTML refs.
-7) `_clean_assets_tree` — prune empty asset subdirectories.
-8) `_remove_empty_assets_root` — remove top-level assets/ if entirely empty (verbose log on success).
-9) `_verify_toc_consistency` — check TOC links point to existing anchors and text matches heading.
-10) `_verify_toc_depth` — warn if depth > 6.
-11) `_prune_toc_and_clean_headings` — drop TOC entries at depth ≥7, strip numeric prefixes from TOC text and headings; convert pruned-heading targets to bold text.
-12) `_enforce_toc_headings` — convert unreferenced headings to bold text; align heading levels to TOC depth (id or container-based).
-13) `_test_toc_headings` — verify TOC↔heading coherence (ids/containers, depth match, full coverage); raises on failure.
-14) `fix_heading_ref_position` — move referenced ids from containers to first heading inside; ensure TOC fragments point to headings.
-15) `_enforce_toc_headings` — re-apply enforcement after id moves.
-16) `_deduplicate_toc_entries` — remove duplicate TOC fragments, promoting children.
-17) `_enforce_toc_headings` — re-apply enforcement after dedup.
-18) `fix_heading_numbering` — strip existing numbering in TOC/headings; if numbering enabled, add hierarchical numbers from TOC structure.
-19) `_test_toc_headings` — final TOC↔heading validation with logging.
+## 4. Doxygen Export Workflow
+This workflow handles static Doxygen-generated sites.
+
+*   **Initialization & Navigation**
+    *   `DoxygenExportDownloader`: Handler for Doxygen documentation. [<src/htmldownloader/cli.py>, lines 3324-4485]
+    *   `run()`: Orchestrates the crawling process. [<src/htmldownloader/cli.py>, lines 4129-4485]
+        *   description: Crawls Doxygen site structure and downloads pages/assets.
+        *   calls:
+            *   `_scope()`: determines crawl scope (host and base directory).
+            *   `_fetch_soup()`: downloads and parses the index page.
+            *   `_fetch_nav_tree_with_playwright()`: captures the navigation structure (uses Playwright to handle JS tree).
+            *   `_toc_nodes_from_nav_html()`: parses navigation HTML into `TocNode` structure.
+
+*   **Page Processing Loop**
+    *   `DoxygenExportDownloader.run()` (loop over `flat_nodes`)
+        *   description: Iterates through all pages found in the navigation tree.
+        *   calls:
+            *   `_fetch_soup()`: downloads HTML content for each page.
+            *   `_extract_main()`: isolates the main content area.
+            *   `rewrite_asset_links_inplace()`: updates links to point to local assets. [<src/htmldownloader/cli.py>, line 476]
+            *   `download_one()`: downloads linked assets (images, css) to local disk. [<src/htmldownloader/cli.py>, line 176]
+            *   `iter_asset_urls()`: finds all assets in the page. [<src/htmldownloader/cli.py>, line 444]
+
+*   **Output Generation**
+    *   `DoxygenExportDownloader` (finalization)
+        *   calls:
+            *   `build_toc_html()`: Generates `toc.html`.
+            *   `build_frameset_index()`: Generates `index.html`.
+            *   `post_process()`: Runs cleaning pipeline.
+
+## 5. Resource Explorer Workflow
+This workflow handles TI Resource Explorer wrapper pages.
+
+*   **Module Selection & Delegation**
+    *   `ResourceExplorerDownloader`: Wrapper detection for Resource Explorer. [<src/htmldownloader/cli.py>, lines 4536-4625]
+    *   `run()`: Detects inner content type and delegates. [<src/htmldownloader/cli.py>, lines 4593-4620]
+        *   description: Handles initial wrapper page, often finding an iframe with the real content.
+        *   calls:
+            *   `_select_module()`: attempts to find a supported module (e.g., Doxygen) in static HTML.
+            *   `_render_with_playwright()`: renders page if static check fails.
+            *   `RMModuleDoxigen.run()`: Delegates execution if Doxygen module is found. [<src/htmldownloader/cli.py>, lines 4520-4530]
+                *   calls: `DoxygenExportDownloader(...).run()`: Instantiates and runs the Doxygen downloader.
+
+## 6. Post-Processing Pipeline
+Shared cleaning and validation steps for all downloaders.
+
+*   **Pipeline Execution**
+    *   `BaseDownloader.post_process()`: Executes list of cleanup functions. [<src/htmldownloader/cli.py>, lines 800-809]
+    *   `BaseDownloader` methods (examples):
+        *   `_clean_document_style()`: removes unwanted CSS/style tags.
+        *   `_normalize_document_links()`: ensures internal links point to correct anchors.
+        *   `_remove_unused_images()`: deletes downloaded images not referenced in HTML.
+        *   `_verify_toc_consistency()`: checks if TOC links match document anchors.
+        *   `fix_heading_numbering()`: normalizes section numbering.
