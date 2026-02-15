@@ -1,7 +1,7 @@
 """
 @file version.py
-@brief Module implementation for HtmlDownloader runtime.
-@details Contains executable logic and internal helpers used by the CLI workflow.
+@brief HtmlDownloader package entry module.
+@details Exposes package-level symbols used by CLI entrypoints and version reporting.
 @module_symbols functions=0 classes=0 variables=2
 @variables __version__, __all__
 """

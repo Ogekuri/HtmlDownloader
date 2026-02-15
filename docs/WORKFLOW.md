@@ -11,7 +11,7 @@
 - ignored_paths:
   - `src/tests/*` (test fixtures)
 - maintenance_update:
-  - `2026-02-15`: Doxygen-style structured documentation regenerated for module/class/function/variable components in `src/htmldownloader/*.py`; runtime call graph unchanged.
+- `2026-02-15`: Documentazione Doxygen in `src/htmldownloader/*.py` normalizzata e verificata con audit di conformita' automatico; runtime call graph invariato.
 
 ## Requirements Alignment Matrix (code-evidenced)
 - `REQ-001`, `REQ-009`, `REQ-013`, `REQ-017`, `REQ-020`, `REQ-023`, `REQ-024` -> CLI parser + help/version/upgrade + validation (`src/htmldownloader/cli.py:4627-4759`, `395-416`, `4668-4712`).

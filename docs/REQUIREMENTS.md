@@ -1,7 +1,7 @@
 ---
 title: "Requisiti di HtmlDownloader"
 description: Specifica dei requisiti software
-version: "0.42"
+version: "0.43"
 date: "2026-02-15"
 author: "Ogekuri"
 scope:
@@ -18,7 +18,7 @@ tags: ["markdown", "requirements"]
 ---
 
 # Requisiti di HtmlDownloader
-**Versione**: 0.42
+**Versione**: 0.43
 **Autore**: Ogekuri
 **Data**: 2026-02-15
 
@@ -208,7 +208,7 @@ HtmlDownloader/
 ## 5. Cronologia revisioni
 | Data | Versione | Motivazione e descrizione cambiamento |
 |------|----------|---------------------------------------|
-| 2026-02-15 | 0.42 | Aggiornata la documentazione tecnica del codice sorgente in stile Doxygen senza modifiche funzionali ai requisiti. |
+| 2026-02-15 | 0.43 | Rimossi dai requisiti i riferimenti a modalita' di inserimento commenti/documentazione nel codice sorgente. |
 | 2026-01-16 | 0.39 | Aggiunto requisito DES-029: rimozione della directory `assets/` se vuota al termine del post-processing dopo la scrittura di `document.html`, `toc.html` e `index.html`. |
 | 2026-01-16 | 0.38 | Reso opzionale l'esecuzione di `tests/test_examples_downloads.py` aggiungendo TST-029 che verifica lo skip di default e la possibilità di lanciarlo esplicitamente. |
 | 2026-01-15 | 0.37 | Aggiunto test per il download dei progetti in examples.sh e verifiche generiche TOC<->heading. |
