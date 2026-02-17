@@ -2,6 +2,7 @@
 
 ## Scope
 - analyzed_paths:
+  - `doxygen.sh`
   - `src/htmldownloader/__main__.py`
   - `src/htmldownloader/__init__.py`
   - `src/htmldownloader/version.py`
@@ -13,6 +14,7 @@
 - maintenance_update:
 - `2026-02-15`: Documentazione Doxygen in `src/htmldownloader/*.py` normalizzata e verificata con audit di conformita' automatico; runtime call graph invariato.
 - `2026-02-17`: Rieseguito audit su `src/` per copertura Doxygen (moduli/classi/funzioni/variabili esportate) e verifica assenza riferimenti pdoc; call graph runtime invariato.
+- `2026-02-17`: Aggiunto workflow `doxygen.sh` per generazione documentazione multi-formato (`html`, `pdf`, `markdown`) da `src/` con output in `doxygen/`.
 
 ## Requirements Alignment Matrix (code-evidenced)
 - `REQ-001`, `REQ-009`, `REQ-013`, `REQ-017`, `REQ-020`, `REQ-023`, `REQ-024` -> CLI parser + help/version/upgrade + validation (`src/htmldownloader/cli.py:4627-4759`, `395-416`, `4668-4712`).
@@ -24,6 +26,7 @@
 - `REQ-012`, `DES-014..027` -> shared post-process pipeline and TOC/document consistency normalization (`src/htmldownloader/cli.py:747-808`, `810-1827`).
 - `REQ-015`, `REQ-016`, `DES-024` -> Resource Explorer module dispatch to Doxygen downloader (`src/htmldownloader/cli.py:4499-4619`).
 - `REQ-018`, `REQ-019` -> GitHub latest release check (`src/htmldownloader/cli.py:50-111`).
+- `REQ-026`, `DES-031` -> script root-level Doxygen generation pipeline (`doxygen.sh:1-146`).
 
 ## Technical Call Tree
 
@@ -195,14 +198,31 @@
     - process: `build-release` job executes tag-triggered packaging and release publishing [` .github/workflows/release-uvx.yml:1-48`]
       - description: on tag push (`v*`), checks out code, installs Python 3.11 + uv, installs build dependencies from `requirements.txt`, builds distributions, attests provenance, and publishes GitHub release assets from `dist/*`.
 
+- Feature: Root-level Doxygen documentation build
+  - Module: `doxygen.sh`
+    - `main()`: orchestrates full documentation generation lifecycle [`doxygen.sh:109-139`]
+      - description: validates required tooling (`doxygen`, `make`, `pdflatex`), resets `doxygen/`, writes temporary Doxygen configuration, executes documentation generation, compiles PDF artifact, derives markdown artifacts from generated HTML, removes temporary LaTeX build folder, prints final output directories.
+      - `require_command()`: enforces command-level prerequisites [`doxygen.sh:23-31`]
+        - description: resolves each executable with `command -v` and raises explicit error/exit on missing dependency.
+      - `write_doxyfile()`: emits best-practice Doxygen configuration [`doxygen.sh:33-87`]
+        - description: configures recursive source scan on `src/`, full symbol extraction, graph generation, source browser, and output drivers for HTML + LaTeX under `doxygen/`.
+      - `generate_markdown_from_html()`: creates markdown projection from Doxygen HTML output [`doxygen.sh:89-107`]
+        - description: converts each generated HTML file to deterministic markdown by stripping scripts/styles/tags, preserving decoded textual content, and writing one `.md` file per HTML source in `doxygen/markdown`.
+      - `cleanup()`: removes temporary Doxygen config artifact [`doxygen.sh:17-21`]
+        - description: deletes `mktemp`-allocated Doxyfile via EXIT trap to prevent stale config leakage.
+
 ## I/O Boundary Inventory
 - Filesystem read/write operations (evidenced)
+  - script output tree reset/generation: `rm -rf doxygen` + directory creation + file writes (`doxygen.sh:117-139`).
+  - temporary Doxyfile lifecycle: `mktemp /tmp/...` + `cat >` + trap cleanup (`doxygen.sh:15-21`, `33-87`).
+  - markdown artifact generation: HTML reads and `.md` writes under `doxygen/markdown` (`doxygen.sh:89-107`).
   - output_dir creation: `Path(args.to_dir).expanduser().resolve(); mkdir(parents=True, exist_ok=True)` (`src/htmldownloader/cli.py:4727-4728`).
   - asset writes: streamed binary write in `download_one()` (`src/htmldownloader/cli.py:181-186`) and Playwright response capture in `NetworkImageRecorder.attach()` (`src/htmldownloader/cli.py:1893-1915`).
   - generated artifacts: `document.html`, `toc.html`, `index.html`, optional `toc_raw.html`/`toc_raw.txt` (`src/htmldownloader/cli.py:3296-3310`, `4137-4142`, `4286-4300`, `4463-4477`).
   - post-process mutations/deletions: rewrites HTML files and prunes asset files/directories (`src/htmldownloader/cli.py:1570-1827`).
 
 - External API/network calls
+  - none_detected_for_doxygen_script: workflow uses local tooling only (`doxygen.sh:109-139`).
   - GitHub Releases API: `requests.get("https://api.github.com/repos/Ogekuri/HtmlDownloader/releases/latest", timeout=1)` (`src/htmldownloader/cli.py:75-83`).
   - runtime content/asset HTTP: `session.get(...)` in downloader detection, page fetch, and asset streaming (`src/htmldownloader/cli.py:1844-1846`, `3348-3350`, `181-182`, `4595-4597`).
   - browser automation network: Playwright Chromium page loads for TI viewer / Doxygen nav / Resource Explorer rendering (`src/htmldownloader/cli.py:2917-2927`, `3811-3828`, `4563-4587`).
