@@ -1,8 +1,8 @@
 ---
 title: "Requisiti di HtmlDownloader"
 description: Specifica dei requisiti software
-version: "0.43"
-date: "2026-02-15"
+version: "0.44"
+date: "2026-02-17"
 author: "Ogekuri"
 scope:
   paths:
@@ -18,9 +18,9 @@ tags: ["markdown", "requirements"]
 ---
 
 # Requisiti di HtmlDownloader
-**Versione**: 0.43
+**Versione**: 0.44
 **Autore**: Ogekuri
-**Data**: 2026-02-15
+**Data**: 2026-02-17
 
 ## Indice
 - [Requisiti di HtmlDownloader](#requisiti-di-htmldownloader)
@@ -119,6 +119,7 @@ HtmlDownloader/
 - **DES-028.1**: Il convertitore dei definition-list deve supportare anche la forma testuale in cui il marcatore `:` è presente in un paragrafo a sé stante, seguito da un paragrafo contenente la descrizione; il risultato deve essere equivalente alla conversione inline `LABEL: description` con `LABEL` in maiuscolo e in grassetto.
 
 - **DES-029**: Al termine dell'intero processo di conversione, subito dopo la scrittura di `document.html`, `toc.html` e `index.html` e dopo le operazioni di pulizia degli asset (`_clean_assets_tree`), se la directory `assets/` nella directory di output esiste ma è vuota (non contiene file né sottodirectory non vuote), deve essere rimossa (cancellata). Questa rimozione deve essere non distruttiva rispetto ai casi in cui `assets/` contenga file o sottodirectory non vuote e deve essere registrata tramite log `--verbose`.
+- **DES-030**: Tutti i componenti implementati nei file Python sotto `src/` (moduli, classi, funzioni e variabili di modulo esportate) devono mantenere documentazione Doxygen in formato strutturato machine-readable conforme allo standard definito in `.req/docs/Document_Source_Code_in_Doxygen_Style.md`, includendo i tag obbligatori previsti dal profilo applicabile al componente.
 
 ### 3.2 Funzioni
 - **REQ-001**: La CLI deve accettare `--from-url` e `--to-dir` obbligatori e `--user-agent` opzionale, creando la directory di destinazione se assente.
@@ -168,6 +169,7 @@ HtmlDownloader/
   I test devono verificare che l'esecuzione senza argomenti stampi esattamente il blocco sopra (con il `<program name>` e la versione corretti) e termini con exit code 0; che `-h` e `--help` stampino lo stesso blocco e terminino con exit code 0; e che `--version`/`--ver` stampino esclusivamente la versione corrente (`<major>.<minor>.<patch>\n`) e terminino con exit code 0.
 
 - **REQ-023**: Se il programma viene eseguito senza parametri, la CLI deve stampare su stdout il testo di aiuto equivalente all'esecuzione con `--help` e terminare immediatamente con exit code 0.
+- **REQ-025**: Le implementazioni Python sotto `src/` devono mantenere copertura documentale Doxygen per ogni simbolo esportabile (modulo, classe, funzione, variabile di modulo) con sintassi atomica orientata a parser e LLM Agent, coerente con `.req/docs/Document_Source_Code_in_Doxygen_Style.md`.
 
 ### 3.3 Output del documento
 - **REQ-010**: Il crawler `doxygen-export` deve inserire all'inizio di `document.html` una riga di titolo con il nome del documento ottenuto dall'intestazione superiore della pagina (`#titlearea`/`#projectname`/`#projectnumber` quando presenti); il titolo deve precedere tutte le sezioni scaricate.
@@ -204,10 +206,12 @@ HtmlDownloader/
 | **TST-027** | **DES-027** | Creare una TOC di test in `toc.html` contenente voci duplicate che puntano allo stesso fragment (es: `#a`), eseguire `_deduplicate_toc_entries` e verificare che al termine non esistano più fragment duplicati: le voci duplicate devono essere rimosse e i loro figli promossi al livello corretto preservando l'ordine di lettura. |
 | **TST-028** | **DES-015**, **DES-019**, **REQ-007**, **REQ-009** | Eseguire la CLI per tutti gli URL presenti in `examples.sh`, rispettando i limiti definiti nello script. Per ogni output verificare: (1) ogni fragment in `toc.html` e' univoco (nessuna TOC duplicata); (2) ogni fragment della TOC punta a un heading `h1..h6` in `document.html`; (3) ogni heading `h1..h6` in `document.html` e' referenziato dalla TOC; (4) il testo della voce TOC corrisponde al testo dell'heading referenziato; (5) se e' impostato `--limit`, il numero di voci/heading non supera il limite. |
 | **TST-029** | **REQ-021** | Eseguire `pytest` senza variabili d'ambiente addizionali e verificare che `tests/test_examples_downloads.py` venga saltato (pytest deve indicare lo skip) e che la sua esecuzione si attivi solo impostando `RUN_EXAMPLES_DOWNLOADS=1` oppure invocando direttamente `python -m pytest tests/test_examples_downloads.py`. |
+| **TST-030** | **DES-030**, **REQ-025** | Eseguire un audit statico sui file Python in `src/` e verificare che ogni modulo, classe, funzione e variabile di modulo esportata abbia documentazione Doxygen conforme allo standard `.req/docs/Document_Source_Code_in_Doxygen_Style.md`, includendo i tag obbligatori applicabili al tipo di componente. |
 
 ## 5. Cronologia revisioni
 | Data | Versione | Motivazione e descrizione cambiamento |
 |------|----------|---------------------------------------|
+| 2026-02-17 | 0.44 | Aggiunti DES-030/REQ-025/TST-030 per imporre copertura documentale Doxygen sui sorgenti in `src/`; verificata assenza di riferimenti operativi a pdoc nei requisiti. |
 | 2026-02-15 | 0.43 | Rimossi dai requisiti i riferimenti a modalita' di inserimento commenti/documentazione nel codice sorgente. |
 | 2026-01-16 | 0.39 | Aggiunto requisito DES-029: rimozione della directory `assets/` se vuota al termine del post-processing dopo la scrittura di `document.html`, `toc.html` e `index.html`. |
 | 2026-01-16 | 0.38 | Reso opzionale l'esecuzione di `tests/test_examples_downloads.py` aggiungendo TST-029 che verifica lo skip di default e la possibilità di lanciarlo esplicitamente. |

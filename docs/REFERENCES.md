@@ -11,7 +11,6 @@
 
 # __init__.py | Python | 14L | 0 symbols | 2 imports | 2 comments
 > Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/__init__.py`
-> @file __init__.py @brief HtmlDownloader package entry module. @details Exposes package-level symbols used by CLI entrypoints and version reporting. ...
 
 ## Imports
 ```
@@ -19,15 +18,11 @@ from .version import __version__
 from .cli import main
 ```
 
-## Comments
-- L13: : @var __all__ @brief Module-level variable `__all__`.
-
 
 ---
 
 # __main__.py | Python | 12L | 0 symbols | 2 imports | 1 comments
 > Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/__main__.py`
-> @file __main__.py @brief HtmlDownloader package entry module. @details Exposes package-level symbols used by CLI entrypoints and version reporting. ...
 
 ## Imports
 ```
@@ -40,7 +35,6 @@ import sys
 
 # cli.py | Python | 5812L | 184 symbols | 21 imports | 339 comments
 > Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/cli.py`
-> @file cli.py @brief Module implementation for HtmlDownloader runtime. @details Contains executable logic and internal helpers used by the CLI workflow. ...
 
 ## Imports
 ```
@@ -69,560 +63,550 @@ from bs4 import NavigableString
 
 ## Definitions
 
-- var `GITHUB_API_TIMEOUT_S = 1` (L37) — : @var GITHUB_API_TIMEOUT_S @brief Module-level variable `GITHUB_API_TIMEOUT_S`.
+- var `GITHUB_API_TIMEOUT_S = 1` (L37)
+- Brief: Module-level variable `GITHUB_API_TIMEOUT_S`.
 ### fn `def _parse_version_tuple(v: str) -> Optional[Tuple[int, ...]]` `priv` (L40-59)
-L41-46> @brief Execute `_parse_version_tuple`. @details Implements deterministic control flow as defined by module runtime semantics. @param v Input argument for `_parse_version_tuple`. @return Optional[Tuple[int, ...]] Return value of `_parse_version_tuple`.
-L49> `return None`
-L53> `return None`
-L55> `return tuple(int(p) for p in v.split("."))`
-L57> `return None`
+- Brief: Execute `_parse_version_tuple`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: v Input argument for `_parse_version_tuple`.
+- Return: Optional[Tuple[int, ...]] Return value of `_parse_version_tuple`.
 
 ### fn `def _is_version_newer(latest: str, current: str) -> bool` `priv` (L60-77)
-L61-67> @brief Execute `_is_version_newer`. @details Implements deterministic control flow as defined by module runtime semantics. @param latest Input argument for `_is_version_newer`. @param current Input argument for `_is_version_newer`. @return bool Return value of `_is_version_newer`.
-L71> `return False`
-L75> `return latest_t > current_t`
+- Brief: Execute `_is_version_newer`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: latest Input argument for `_is_version_newer`. current Input argument for `_is_version_newer`.
+- Return: bool Return value of `_is_version_newer`.
 
 ### fn `def _get_latest_version_from_github(owner: str, repo: str) -> Optional[str]` `priv` (L78-107)
-L79-85> @brief Execute `_get_latest_version_from_github`. @details Implements deterministic control flow as defined by module runtime semantics. @param owner Input argument for `_get_latest_version_from_github`. @param repo Input argument for `_get_latest_version_from_github`. @return Optional[str] Return value of `_get_latest_version_from_github`.
-L96> `return None`
-L99> `return None`
-L103> `return tag if _parse_version_tuple(tag) else None`
-L105> `return None`
+- Brief: Execute `_get_latest_version_from_github`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: owner Input argument for `_get_latest_version_from_github`. repo Input argument for `_get_latest_version_from_github`.
+- Return: Optional[str] Return value of `_get_latest_version_from_github`.
 
 ### fn `def check_for_new_version(program: str, current_version: str) -> None` (L108-126)
-L109-115> @brief Execute `check_for_new_version`. @details Implements deterministic control flow as defined by module runtime semantics. @param program Input argument for `check_for_new_version`. @param current_version Input argument for `check_for_new_version`. @return None Return value of `check_for_new_version`.
-L119> `return`
+- Brief: Execute `check_for_new_version`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: program Input argument for `check_for_new_version`. current_version Input argument for `check_for_new_version`.
+- Return: None Return value of `check_for_new_version`.
 
 ### fn `def safe_filename(path: str) -> str` (L132-144)
-L129> ----------------------------
-L133-138> @brief Execute `safe_filename`. @details Implements deterministic control flow as defined by module runtime semantics. @param path Input argument for `safe_filename`. @return str Return value of `safe_filename`.
-L142> `return path`
+- Brief: Execute `safe_filename`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: path Input argument for `safe_filename`.
+- Return: str Return value of `safe_filename`.
 
 ### fn `def positive_int(value: str) -> int` (L145-160)
-L146-151> @brief Execute `positive_int`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument for `positive_int`. @return int Return value of `positive_int`.
-L155> `raise argparse.ArgumentTypeError("deve essere un intero") from exc`
-L157> `raise argparse.ArgumentTypeError("deve essere un intero positivo")`
-L158> `return parsed`
+- Brief: Execute `positive_int`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: value Input argument for `positive_int`.
+- Return: int Return value of `positive_int`.
 
 ### fn `def is_http_url(s: str) -> bool` (L161-174)
-L162-167> @brief Execute `is_http_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param s Input argument for `is_http_url`. @return bool Return value of `is_http_url`.
-L170> `return u.scheme in ("http", "https")`
-L172> `return False`
+- Brief: Execute `is_http_url`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: s Input argument for `is_http_url`.
+- Return: bool Return value of `is_http_url`.
 
 ### fn `def normalize_url(u: str, base: str) -> str` (L175-190)
-L176-182> @brief Execute `normalize_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param u Input argument for `normalize_url`. @param base Input argument for `normalize_url`. @return str Return value of `normalize_url`.
-L185> `return u`
-L187> `return u`
-L188> `return urljoin(base, u)`
+- Brief: Execute `normalize_url`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: u Input argument for `normalize_url`. base Input argument for `normalize_url`.
+- Return: str Return value of `normalize_url`.
 
 ### fn `def ensure_parent(p: Path) -> None` (L191-200)
-L192-197> @brief Execute `ensure_parent`. @details Implements deterministic control flow as defined by module runtime semantics. @param p Input argument for `ensure_parent`. @return None Return value of `ensure_parent`.
+- Brief: Execute `ensure_parent`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: p Input argument for `ensure_parent`.
+- Return: None Return value of `ensure_parent`.
 
 ### fn `def local_path_for_url(asset_url: str, out_dir: Path) -> Path` (L201-223)
-L202-208> @brief Execute `local_path_for_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param asset_url Input argument for `local_path_for_url`. @param out_dir Input argument for `local_path_for_url`. @return Path Return value of `local_path_for_url`.
-L221> `return out_dir / "assets" / host / p`
+- Brief: Execute `local_path_for_url`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: asset_url Input argument for `local_path_for_url`. out_dir Input argument for `local_path_for_url`.
+- Return: Path Return value of `local_path_for_url`.
 
 ### fn `def download_one(` (L224-225)
 
 ### fn `def escape_html(s: str) -> str` (L249-264)
-L250-255> @brief Execute `escape_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param s Input argument for `escape_html`. @return str Return value of `escape_html`.
-L256> `return (`
+- Brief: Execute `escape_html`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: s Input argument for `escape_html`.
+- Return: str Return value of `escape_html`.
 
 ### class `class TocNode` `@dataclass` (L266-275)
-L267-270> @brief Define class `TocNode`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
+- Brief: Define class `TocNode`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
 
 ### fn `def limit_toc_nodes(nodes: List[TocNode], max_entries: Optional[int]) -> List[TocNode]` (L276-308)
-L277-283> @brief Execute `limit_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `limit_toc_nodes`. @param max_entries Input argument for `limit_toc_nodes`. @return List[TocNode] Return value of `limit_toc_nodes`.
-L285> `return nodes`
-L290-295> @brief Execute `trim_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `trim_list`. @return List[TocNode] Return value of `trim_list`.
-L304> `return out`
-L306> `return trim_list(nodes)`
+- Brief: Execute `limit_toc_nodes`. Execute `trim_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `limit_toc_nodes`. max_entries Input argument for `limit_toc_nodes`. items Input argument for `trim_list`.
+- Return: List[TocNode] Return value of `limit_toc_nodes`. List[TocNode] Return value of `trim_list`.
 
 ### fn `def trim_list(items: List[TocNode]) -> List[TocNode]` (L289-305)
-L290-295> @brief Execute `trim_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `trim_list`. @return List[TocNode] Return value of `trim_list`.
-L304> `return out`
+- Brief: Execute `trim_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: items Input argument for `trim_list`.
+- Return: List[TocNode] Return value of `trim_list`.
 
 ### fn `def ensure_heading_ids(soup: BeautifulSoup) -> None` (L309-333)
-L310-315> @brief Execute `ensure_heading_ids`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument for `ensure_heading_ids`. @return None Return value of `ensure_heading_ids`.
+- Brief: Execute `ensure_heading_ids`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `ensure_heading_ids`.
+- Return: None Return value of `ensure_heading_ids`.
 
 ### fn `def strip_styles(soup: BeautifulSoup) -> None` (L334-351)
-L335-340> @brief Execute `strip_styles`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument for `strip_styles`. @return None Return value of `strip_styles`.
+- Brief: Execute `strip_styles`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `strip_styles`.
+- Return: None Return value of `strip_styles`.
 
 ### fn `def toc_from_headings(soup: BeautifulSoup) -> List[TocNode]` (L352-379)
-L353-358> @brief Execute `toc_from_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument for `toc_from_headings`. @return List[TocNode] Return value of `toc_from_headings`.
-L377> `return nodes`
+- Brief: Execute `toc_from_headings`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `toc_from_headings`.
+- Return: List[TocNode] Return value of `toc_from_headings`.
 
 ### fn `def toc_from_nav_html(toc_html: str, base_url: str) -> List[TocNode]` (L380-430)
-L381-387> @brief Execute `toc_from_nav_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param toc_html Input argument for `toc_from_nav_html`. @param base_url Input argument for `toc_from_nav_html`. @return List[TocNode] Return value of `toc_from_nav_html`.
-L391-396> @brief Execute `parse_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param list_el Input argument for `parse_list`. @return List[TocNode] Return value of `parse_list`.
-L401> Check for title-only elements (e.g., <li class="toc-title">)
-L405> Create a node without href (will be rendered as plain text)
-L418> `return items`
-L422> fallback: attempt with any list if no top-level found
-L426> Process only the first list to avoid duplicates from multiple nav structures
-L428> `return out`
+- Brief: Execute `toc_from_nav_html`. Execute `parse_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: toc_html Input argument for `toc_from_nav_html`. base_url Input argument for `toc_from_nav_html`. list_el Input argument for `parse_list`.
+- Return: List[TocNode] Return value of `toc_from_nav_html`. List[TocNode] Return value of `parse_list`.
 
 ### fn `def parse_list(list_el) -> List[TocNode]` (L390-419)
-L381> @brief Execute `toc_from_nav_html`.
-L382> @details Implements deterministic control flow as defined by module runtime semantics.
-L383> @param toc_html Input argument for `toc_from_nav_html`.
-L384> ...
-L391-396> @brief Execute `parse_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param list_el Input argument for `parse_list`. @return List[TocNode] Return value of `parse_list`.
-L401> Check for title-only elements (e.g., <li class="toc-title">)
-L405> Create a node without href (will be rendered as plain text)
-L418> `return items`
+- Brief: Execute `parse_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: list_el Input argument for `parse_list`.
+- Return: List[TocNode] Return value of `parse_list`.
 
 ### fn `def nav_outline_from_html(nav_html: str) -> str` (L431-494)
-L432-437> @brief Execute `nav_outline_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param nav_html Input argument for `nav_outline_from_html`. @return str Return value of `nav_outline_from_html`.
-L443-448> @brief Execute `norm_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param t Input argument for `norm_text`. @return str Return value of `norm_text`.
-L450> `return clean.replace(" ", "_")`
-L453-458> @brief Execute `bullet`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `bullet`. @return str Return value of `bullet`.
-L460> `return "*"`
-L462> `return "o"`
-L463> `return "#"`
-L466-472> @brief Execute `walk_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `walk_ul`. @param depth Input argument for `walk_ul`. @return None Return value of `walk_ul`.
-L492> `return "\n".join(lines)`
+- Brief: Execute `nav_outline_from_html`. Execute `norm_text`. Execute `bullet`. Execute `walk_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: nav_html Input argument for `nav_outline_from_html`. t Input argument for `norm_text`. depth Input argument for `bullet`. ul Input argument for `walk_ul`. depth Input argument for `walk_ul`.
+- Return: str Return value of `nav_outline_from_html`. str Return value of `norm_text`. str Return value of `bullet`. None Return value of `walk_ul`.
 
 ### fn `def norm_text(t: str) -> str` (L442-451)
-L443-448> @brief Execute `norm_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param t Input argument for `norm_text`. @return str Return value of `norm_text`.
-L450> `return clean.replace(" ", "_")`
+- Brief: Execute `norm_text`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: t Input argument for `norm_text`.
+- Return: str Return value of `norm_text`.
 
 ### fn `def bullet(depth: int) -> str` (L452-464)
-L453-458> @brief Execute `bullet`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `bullet`. @return str Return value of `bullet`.
-L460> `return "*"`
-L462> `return "o"`
-L463> `return "#"`
+- Brief: Execute `bullet`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: depth Input argument for `bullet`.
+- Return: str Return value of `bullet`.
 
 ### fn `def walk_ul(ul, depth: int) -> None` (L465-488)
-L466-472> @brief Execute `walk_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `walk_ul`. @param depth Input argument for `walk_ul`. @return None Return value of `walk_ul`.
+- Brief: Execute `walk_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: ul Input argument for `walk_ul`. depth Input argument for `walk_ul`.
+- Return: None Return value of `walk_ul`.
 
-- var `ASSET_ATTRS = [` (L496) — : @var ASSET_ATTRS @brief Module-level variable `ASSET_ATTRS`.
-- var `HEADING_TAG_RE = re.compile(r"^h[1-6]$")` (L504) — : @var HEADING_TAG_RE @brief Module-level variable `HEADING_TAG_RE`.
+- var `ASSET_ATTRS = [` (L496)
+- Brief: Module-level variable `ASSET_ATTRS`.
+- var `HEADING_TAG_RE = re.compile(r"^h[1-6]$")` (L504)
+- Brief: Module-level variable `HEADING_TAG_RE`.
 ### class `class Logger` (L507-568)
-- fn `def __init__(self, verbose: bool = False, debug: bool = False)` `priv` (L513-524) L508> @brief Define class `Logger`. @details Encapsulates behavior used by downloader orchestration and...
-  L514-521> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @param verbose Input argument for `__init__`. @param debug Input argument for `__init__`. @return Any Return value of `__init__`.
+- Brief: Define class `Logger`. Execute `__init__`. Execute `info`. Execute `verbose`. Execute `debug`. Execute `check`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. verbose Input argument for `__init__`. debug Input argument for `__init__`. self Input argument for `info`. msg Input argument for `info`. self Input argument for `verbose`. msg Input argument for `verbose`. self Input argument for `debug`. msg Input argument for `debug`. self Input argument for `check`. msg Input argument for `check`.
+- Return: Any Return value of `__init__`. None Return value of `info`. None Return value of `verbose`. None Return value of `debug`. None Return value of `check`.
+- fn `def __init__(self, verbose: bool = False, debug: bool = False)` `priv` (L513-524)
+  - Brief: Define class `Logger`. Execute `__init__`.
+  - Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `__init__`. verbose Input argument for `__init__`. debug Input argument for `__init__`.
+  - Return: Any Return value of `__init__`.
 - fn `def info(self, msg: str) -> None` (L525-534)
-  L526-532> @brief Execute `info`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `info`. @param msg Input argument for `info`. @return None Return value of `info`.
-- fn `def verbose(self, msg: str) -> None` (L535-545) L526> @brief Execute `info`. @details Implements deterministic control flow as defined by module runtim...
-  L536-542> @brief Execute `verbose`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `verbose`. @param msg Input argument for `verbose`. @return None Return value of `verbose`.
+  - Brief: Execute `info`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `info`. msg Input argument for `info`.
+  - Return: None Return value of `info`.
+- fn `def verbose(self, msg: str) -> None` (L535-545)
+  - Brief: Execute `verbose`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `verbose`. msg Input argument for `verbose`.
+  - Return: None Return value of `verbose`.
 - fn `def debug(self, msg: str) -> None` (L546-556)
-  L547-553> @brief Execute `debug`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `debug`. @param msg Input argument for `debug`. @return None Return value of `debug`.
+  - Brief: Execute `debug`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `debug`. msg Input argument for `debug`.
+  - Return: None Return value of `debug`.
 - fn `def check(self, msg: str) -> None` (L557-568)
-  L558-564> @brief Execute `check`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `check`. @param msg Input argument for `check`. @return None Return value of `check`.
+  - Brief: Execute `check`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `check`. msg Input argument for `check`.
+  - Return: None Return value of `check`.
 
 ### class `class UpgradeAction(argparse.Action)` : argparse.Action (L569-606)
-L581-590> @brief Execute `__call__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__call__`. @param parser Input argument for `__call__`. @param namespace Input argument for `__call__`. @param values Input argument for `__call__`. @param option_string Input argument for `__call__`. @return None Return value of `__call__`.
-- fn `def __call__(` `priv` (L574-579) L570> @brief Define class `UpgradeAction`. @details Encapsulates behavior used by downloader orchestrat...
+- Brief: Define class `UpgradeAction`. Execute `__call__`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__call__`. parser Input argument for `__call__`. namespace Input argument for `__call__`. values Input argument for `__call__`. option_string Input argument for `__call__`.
+- Return: None Return value of `__call__`.
+- fn `def __call__(` `priv` (L574-579)
+  - Brief: Define class `UpgradeAction`.
+  - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
 
 ### class `class VersionedArgumentParser(argparse.ArgumentParser)` : argparse.ArgumentParser (L607-645)
-- fn `def __init__(self, *args, version: str = "", **kwargs)` `priv` (L613-625) L608> @brief Define class `VersionedArgumentParser`. @details Encapsulates behavior used by downloader ...
-  L614-622> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @param version Input argument for `__init__`. @param *args Input argument for `__init__`. @param **kwargs Input argument for `__init__`. @return Any Return value of `__init__`.
+- Brief: Define class `VersionedArgumentParser`. Execute `__init__`. Execute `format_usage`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. version Input argument for `__init__`. *args Input argument for `__init__`. **kwargs Input argument for `__init__`. self Input argument for `format_usage`.
+- Return: Any Return value of `__init__`. str Return value of `format_usage`.
+- fn `def __init__(self, *args, version: str = "", **kwargs)` `priv` (L613-625)
+  - Brief: Define class `VersionedArgumentParser`. Execute `__init__`.
+  - Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `__init__`. version Input argument for `__init__`. *args Input argument for `__init__`. **kwargs Input argument for `__init__`.
+  - Return: Any Return value of `__init__`.
 - fn `def format_usage(self) -> str` (L626-645)
-  L627-632> @brief Execute `format_usage`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `format_usage`. @return str Return value of `format_usage`.
-  L635> `return s`
-  L636> Append version to the first line of the usage (preserve trailing parts)
-  L639> `return s`
-  L643> `return first + rest`
+  - Brief: Execute `format_usage`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `format_usage`.
+  - Return: str Return value of `format_usage`.
 
 ### fn `def iter_asset_urls(soup: BeautifulSoup, page_url: str) -> Set[str]` (L646-684)
-L647-653> @brief Execute `iter_asset_urls`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument for `iter_asset_urls`. @param page_url Input argument for `iter_asset_urls`. @return Set[str] Return value of `iter_asset_urls`.
-L672> inline background-image url(...)
-L682> `return urls`
+- Brief: Execute `iter_asset_urls`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `iter_asset_urls`. page_url Input argument for `iter_asset_urls`.
+- Return: Set[str] Return value of `iter_asset_urls`.
 
 ### fn `def rewrite_asset_links_inplace(` (L685-686)
 
 ### fn `def to_rel(u: str) -> str` (L696-708)
-L688> @brief Execute `rewrite_asset_links_inplace`.
-L689> @details Implements deterministic control flow as defined by module runtime semantics.
-L690> @param soup Input argument for `rewrite_asset_links_inplace`.
-L691> ...
-L697-702> @brief Execute `to_rel`. @details Implements deterministic control flow as defined by module runtime semantics. @param u Input argument for `to_rel`. @return str Return value of `to_rel`.
-L705> `return u`
-L707> `return lp.relative_to(out_dir).as_posix()`
+- Brief: Execute `rewrite_asset_links_inplace`. Execute `to_rel`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `rewrite_asset_links_inplace`.
+... u Input argument for `to_rel`.
+- Return: str Return value of `to_rel`.
 
 ### fn `def repl(m)` (L732-741)
-L733-738> @brief Execute `repl`. @details Implements deterministic control flow as defined by module runtime semantics. @param m Input argument for `repl`. @return Any Return value of `repl`.
-L740> `return f"url('{to_rel(raw)}')"`
+- Brief: Execute `repl`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: m Input argument for `repl`.
+- Return: Any Return value of `repl`.
 
-- var `ALLOWED_EXTERNAL_LINK_SCHEMES = {` (L746) — : @var ALLOWED_EXTERNAL_LINK_SCHEMES @brief Module-level variable `ALLOWED_EXTERNAL_LINK_SCHEMES`.
+- var `ALLOWED_EXTERNAL_LINK_SCHEMES = {` (L746)
+- Brief: Module-level variable `ALLOWED_EXTERNAL_LINK_SCHEMES`.
 ### fn `def normalize_document_links_inplace(soup: BeautifulSoup, logger: Optional[Logger]) -> None` (L754-879)
-L755-761> @brief Execute `normalize_document_links_inplace`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument for `normalize_document_links_inplace`. @param logger Input argument for `normalize_document_links_inplace`. @return None Return value of `normalize_document_links_inplace`.
-L764> `return`
-L766> Index document ids case-insensitively
-L798> Direct in-document anchor
-L812> Normalize casing
-L822> Unknown fragment → drop href
-L835> External link with explicit scheme
-L840> Attempt to rewrite any URL-with-fragment to a local in-doc anchor
-L860> No fragment and not an allowed external scheme → drop href
+- Brief: Execute `normalize_document_links_inplace`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: soup Input argument for `normalize_document_links_inplace`. logger Input argument for `normalize_document_links_inplace`.
+- Return: None Return value of `normalize_document_links_inplace`.
 
 ### fn `def build_toc_html(` (L880-883)
 
 ### fn `def resolved_href(href: str) -> str` (L893-907)
-L885> @brief Execute `build_toc_html`.
-L886> @details Implements deterministic control flow as defined by module runtime semantics.
-L887> @param toc_items Input argument for `build_toc_html`.
-L888> ...
-L894-899> @brief Execute `resolved_href`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `resolved_href`. @return str Return value of `resolved_href`.
-L903> `return f"{document_filename}#{frag}"`
-L905> `return f"{document_filename}{href}"`
-L906> `return document_filename`
+- Brief: Execute `build_toc_html`. Execute `resolved_href`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: toc_items Input argument for `build_toc_html`.
+... href Input argument for `resolved_href`.
+- Return: str Return value of `resolved_href`.
 
 ### fn `def render_nodes(nodes: List[TocNode]) -> str` (L908-925)
-L909-914> @brief Execute `render_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `render_nodes`. @return str Return value of `render_nodes`.
-L916> `return ""`
-L924> `return f"<ul>{''.join(items)}</ul>"`
+- Brief: Execute `render_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `render_nodes`.
+- Return: str Return value of `render_nodes`.
 
 ### fn `def build_frameset_index(` (L947-948)
-L928> return f"""<!doctype html>
-L929> <html lang="it">
-L930> <head>
-L931> <meta charset="utf-8"/>
-L932> ...
 
 ### fn `def minimal_readable_wrapper(` (L977-978)
-L957> return f"""<!doctype html>
-L958> <html lang="it">
-L959> <head>
-L960> <meta charset="utf-8"/>
-L961> ...
 
 ### class `class BaseDownloader` (L1006-1205)
-L1003> ----------------------------
-L1023-1035> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @param from_url Input argument for `__init__`. @param out_dir Input argument for `__init__`. @param session Input argument for `__init__`. @param logger Input argument for `__init__`. @param limit Input argument for `__init__`. @param toc_only Input argument for `__init__`. @param disable_numbering Input argument for `__init__`. @return Any Return value of `__init__`.
-L1175-1180> @brief Execute `_verify_toc_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_verify_toc_depth`. @return None Return value of `_verify_toc_depth`.
-L1183> `return`
-- fn `def __init__(` `priv` (L1013-1021) L1007> @brief Define class `BaseDownloader`. @details Encapsulates behavior used by downloader orchestra...
+- Brief: Define class `BaseDownloader`. Execute `__init__`. Execute `matches_url`. Execute `probe_html`. Execute `run`. Execute `_toc_tree_from_html`. Execute `post_process`. Execute `_verify_toc_consistency`. Execute `_verify_toc_depth`. Execute `get_max_depth`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. from_url Input argument for `__init__`. out_dir Input argument for `__init__`. session Input argument for `__init__`. logger Input argument for `__init__`. limit Input argument for `__init__`. toc_only Input argument for `__init__`. disable_numbering Input argument for `__init__`. cls Input argument for `matches_url`. url Input argument for `matches_url`. cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`. self Input argument for `run`. self Input argument for `_toc_tree_from_html`. toc_html Input argument for `_toc_tree_from_html`. self Input argument for `post_process`. self Input argument for `_verify_toc_consistency`. self Input argument for `_verify_toc_depth`. ul Input argument for `get_max_depth`. current_depth Input argument for `get_max_depth`.
+- Return: Any Return value of `__init__`. bool Return value of `matches_url`. bool Return value of `probe_html`. None Return value of `run`. List[TocNode] Return value of `_toc_tree_from_html`. None Return value of `post_process`. None Return value of `_verify_toc_consistency`. None Return value of `_verify_toc_depth`. Any Return value of `get_max_depth`.
+- fn `def __init__(` `priv` (L1013-1021)
 - fn `def matches_url(cls, url: str) -> bool` (L1066-1075)
-  L1067-1073> @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `matches_url`. @param url Input argument for `matches_url`. @return bool Return value of `matches_url`.
-  L1074> `return False`
+  - Brief: Execute `matches_url`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `matches_url`. url Input argument for `matches_url`.
+  - Return: bool Return value of `matches_url`.
 - fn `def probe_html(cls, url: str, html: str) -> bool` (L1077-1087)
-  L1078-1085> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `probe_html`. @param url Input argument for `probe_html`. @param html Input argument for `probe_html`. @return bool Return value of `probe_html`.
-  L1086> `return False`
-- fn `def run(self) -> None` (L1088-1096) L1078> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module ...
-  L1089-1094> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @return None Return value of `run`.
-  L1095> `raise NotImplementedError`
-- fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L1097-1106) L1089> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime...
-  L1098-1104> @brief Execute `_toc_tree_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_toc_tree_from_html`. @param toc_html Input argument for `_toc_tree_from_html`. @return List[TocNode] Return value of `_toc_tree_from_html`.
-  L1105> `return toc_from_nav_html(toc_html, self.from_url)`
-- fn `def post_process(self) -> None` (L1107-1121) L1098> @brief Execute `_toc_tree_from_html`. @details Implements deterministic control flow as defined b...
-  L1108-1113> @brief Execute `post_process`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `post_process`. @return None Return value of `post_process`.
-  L1120> `raise`
+  - Brief: Execute `probe_html`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`.
+  - Return: bool Return value of `probe_html`.
+- fn `def run(self) -> None` (L1088-1096)
+  - Brief: Execute `run`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `run`.
+  - Return: None Return value of `run`.
+- fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L1097-1106)
+  - Brief: Execute `_toc_tree_from_html`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_toc_tree_from_html`. toc_html Input argument for `_toc_tree_from_html`.
+  - Return: List[TocNode] Return value of `_toc_tree_from_html`.
+- fn `def post_process(self) -> None` (L1107-1121)
+  - Brief: Execute `post_process`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `post_process`.
+  - Return: None Return value of `post_process`.
 - fn `def _verify_toc_consistency(self) -> None` `priv` (L1122-1173)
-  L1123-1128> @brief Execute `_verify_toc_consistency`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_verify_toc_consistency`. @return None Return value of `_verify_toc_consistency`.
-  L1132> `return`
-  L1137> Find all links in TOC
-  L1151> Find corresponding element in document.html
-  L1159> Check if it's a heading and text matches
+  - Brief: Execute `_verify_toc_consistency`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_verify_toc_consistency`.
+  - Return: None Return value of `_verify_toc_consistency`.
 - fn `def get_max_depth(ul, current_depth=0)` (L1187-1203)
-  L1188-1194> @brief Execute `get_max_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `get_max_depth`. @param current_depth Input argument for `get_max_depth`. @return Any Return value of `get_max_depth`.
-  L1196> `return current_depth`
-  L1202> `return max_d`
+  - Brief: Execute `get_max_depth`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: ul Input argument for `get_max_depth`. current_depth Input argument for `get_max_depth`.
+  - Return: Any Return value of `get_max_depth`.
 
 ### fn `def _verify_toc_depth(self) -> None` `priv` (L1174-1213)
-L1175-1180> @brief Execute `_verify_toc_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_verify_toc_depth`. @return None Return value of `_verify_toc_depth`.
-L1183> `return`
-L1188-1194> @brief Execute `get_max_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `get_max_depth`. @param current_depth Input argument for `get_max_depth`. @return Any Return value of `get_max_depth`.
-L1196> `return current_depth`
-L1202> `return max_d`
+- Brief: Execute `_verify_toc_depth`. Execute `get_max_depth`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_verify_toc_depth`. ul Input argument for `get_max_depth`. current_depth Input argument for `get_max_depth`.
+- Return: None Return value of `_verify_toc_depth`. Any Return value of `get_max_depth`.
 
 ### fn `def _prune_toc_and_clean_headings(self) -> None` `priv` (L1214-1321)
-L1215-1220> @brief Execute `_prune_toc_and_clean_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_prune_toc_and_clean_headings`. @return None Return value of `_prune_toc_and_clean_headings`.
-L1226-1231> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1234> `return ""`
-L1236> `return (frag or "").strip()`
-L1238> Process toc.html
-L1245> Prune TOC at depth >=7
-L1250-1256> @brief Execute `prune_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `prune_ul`. @param depth Input argument for `prune_ul`. @return Any Return value of `prune_ul`.
-L1270> root ul depth 1, li depth 2
-L1272> Clean heading prefixes from TOC links
-L1279> Process document.html
-L1284> Clean heading prefixes from headings
-L1289> If we pruned deep TOC entries, demote their corresponding headings in document.html.
-L1290> A heading is associated to a pruned TOC entry if:
-L1291> - the heading id is referenced by a pruned TOC href, OR
-L1292> - the heading is contained in a div/section whose id is referenced by a pruned TOC href.
+- Brief: Execute `_prune_toc_and_clean_headings`. Execute `href_fragment_id`. Execute `prune_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_prune_toc_and_clean_headings`. href Input argument for `href_fragment_id`. ul Input argument for `prune_ul`. depth Input argument for `prune_ul`.
+- Return: None Return value of `_prune_toc_and_clean_headings`. str Return value of `href_fragment_id`. Any Return value of `prune_ul`.
 
 ### fn `def href_fragment_id(href: str) -> str` (L1225-1237)
-L1226-1231> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1234> `return ""`
-L1236> `return (frag or "").strip()`
+- Brief: Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: href Input argument for `href_fragment_id`.
+- Return: str Return value of `href_fragment_id`.
 
 ### fn `def prune_ul(ul, depth)` (L1249-1269)
-L1250-1256> @brief Execute `prune_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `prune_ul`. @param depth Input argument for `prune_ul`. @return Any Return value of `prune_ul`.
+- Brief: Execute `prune_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: ul Input argument for `prune_ul`. depth Input argument for `prune_ul`.
+- Return: Any Return value of `prune_ul`.
 
 ### fn `def _deduplicate_toc_entries(self) -> None` `priv` (L1322-1390)
-L1323-1328> @brief Execute `_deduplicate_toc_entries`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_deduplicate_toc_entries`. @return None Return value of `_deduplicate_toc_entries`.
-L1331> `return`
-L1336-1341> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1344> `return ""`
-L1346> `return (frag or "").strip().lower()`
-L1350> `return`
-L1352> Use TocNode representation for safer manipulation: parse TOC to TocNode
-L1353> objects, process them in reading order and rebuild HTML from nodes.
-L1355-1361> @brief Execute `process_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `process_nodes`. @param seen Input argument for `process_nodes`. @return List[TocNode] Return value of `process_nodes`.
-L1369> promote children: process children and extend at this level
-L1377> process children recursively
-L1381> `return out`
-L1383> Build TocNode list from the captured TOC HTML and process with the
-L1384> TocNode-based algorithm, then rebuild the TOC HTML deterministically.
+- Brief: Execute `_deduplicate_toc_entries`. Execute `href_fragment_id`. Execute `process_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_deduplicate_toc_entries`. href Input argument for `href_fragment_id`. nodes Input argument for `process_nodes`. seen Input argument for `process_nodes`.
+- Return: None Return value of `_deduplicate_toc_entries`. str Return value of `href_fragment_id`. List[TocNode] Return value of `process_nodes`.
 
 ### fn `def href_fragment_id(href: str) -> str` (L1335-1347)
-L1336-1341> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1344> `return ""`
-L1346> `return (frag or "").strip().lower()`
+- Brief: Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: href Input argument for `href_fragment_id`.
+- Return: str Return value of `href_fragment_id`.
 
 ### fn `def process_nodes(nodes: List[TocNode], seen: Set[str]) -> List[TocNode]` (L1354-1382)
-L1352> Use TocNode representation for safer manipulation: parse TOC to TocNode
-L1355-1361> @brief Execute `process_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `process_nodes`. @param seen Input argument for `process_nodes`. @return List[TocNode] Return value of `process_nodes`.
-L1369> promote children: process children and extend at this level
-L1377> process children recursively
-L1381> `return out`
+- Brief: Execute `process_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `process_nodes`. seen Input argument for `process_nodes`.
+- Return: List[TocNode] Return value of `process_nodes`.
 
 ### fn `def _enforce_toc_headings(self) -> None` `priv` (L1391-1509)
-L1392-1397> @brief Execute `_enforce_toc_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_enforce_toc_headings`. @return None Return value of `_enforce_toc_headings`.
-L1401> `return`
-L1407-1412> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1415> `return ""`
-L1417> `return (frag or "").strip()`
-L1419> Map fragment id -> toc depth (depth = number of UL ancestors)
-L1431-1436> @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `clamp_heading_level`. @return int Return value of `clamp_heading_level`.
-L1442> `return 1`
-L1444> `return 6`
-L1445> `return depth_i`
-L1448-1453> @brief Execute `find_referenced_container_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param h Input argument for `find_referenced_container_id`. @return str Return value of `find_referenced_container_id`.
-L1462> `return pid_l`
-L1463> `return ""`
-L1465> Process headings in document.html
-L1483> Not referenced: convert to bold uppercase non-heading
-L1492> Referenced: correct heading level based on TOC depth.
-L1493> For container-based references, correct only the first heading inside that container
-L1494> to avoid flattening internal structure.
-L1507> Write back document.html
+- Brief: Execute `_enforce_toc_headings`. Execute `href_fragment_id`. Execute `clamp_heading_level`. Execute `find_referenced_container_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_enforce_toc_headings`. href Input argument for `href_fragment_id`. depth Input argument for `clamp_heading_level`. h Input argument for `find_referenced_container_id`.
+- Return: None Return value of `_enforce_toc_headings`. str Return value of `href_fragment_id`. int Return value of `clamp_heading_level`. str Return value of `find_referenced_container_id`.
 
 ### fn `def href_fragment_id(href: str) -> str` (L1406-1418)
-L1407-1412> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1415> `return ""`
-L1417> `return (frag or "").strip()`
+- Brief: Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: href Input argument for `href_fragment_id`.
+- Return: str Return value of `href_fragment_id`.
 
 ### fn `def clamp_heading_level(depth: int) -> int` (L1430-1446)
-L1431-1436> @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `clamp_heading_level`. @return int Return value of `clamp_heading_level`.
-L1442> `return 1`
-L1444> `return 6`
-L1445> `return depth_i`
+- Brief: Execute `clamp_heading_level`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: depth Input argument for `clamp_heading_level`.
+- Return: int Return value of `clamp_heading_level`.
 
 ### fn `def find_referenced_container_id(h) -> str` (L1447-1464)
-L1448-1453> @brief Execute `find_referenced_container_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param h Input argument for `find_referenced_container_id`. @return str Return value of `find_referenced_container_id`.
-L1462> `return pid_l`
-L1463> `return ""`
+- Brief: Execute `find_referenced_container_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: h Input argument for `find_referenced_container_id`.
+- Return: str Return value of `find_referenced_container_id`.
 
 ### fn `def _test_toc_headings(self) -> None` `priv` (L1510-1705)
-L1507> Write back document.html
-L1511-1516> @brief Execute `_test_toc_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_test_toc_headings`. @return None Return value of `_test_toc_headings`.
-L1520> `return`
-L1527-1532> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1535> `return ""`
-L1537> `return (frag or "").strip()`
-L1540-1545> @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `clamp_heading_level`. @return int Return value of `clamp_heading_level`.
-L1550> `return max(1, min(6, value))`
-L1566> `return`
-L1670-1675> @brief Execute `summarize`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `summarize`. @return str Return value of `summarize`.
-L1677> `return ""`
-L1681> `return preview`
-L1702> `raise ValueError("test_toc_headings: " + "; ".join(issues))`
+- Brief: Execute `_test_toc_headings`. Execute `href_fragment_id`. Execute `clamp_heading_level`. Execute `summarize`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_test_toc_headings`. href Input argument for `href_fragment_id`. depth Input argument for `clamp_heading_level`. items Input argument for `summarize`.
+- Return: None Return value of `_test_toc_headings`. str Return value of `href_fragment_id`. int Return value of `clamp_heading_level`. str Return value of `summarize`.
 
 ### fn `def href_fragment_id(href: str) -> str` (L1526-1538)
-L1527-1532> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1535> `return ""`
-L1537> `return (frag or "").strip()`
+- Brief: Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: href Input argument for `href_fragment_id`.
+- Return: str Return value of `href_fragment_id`.
 
 ### fn `def clamp_heading_level(depth: int) -> int` (L1539-1551)
-L1540-1545> @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `clamp_heading_level`. @return int Return value of `clamp_heading_level`.
-L1550> `return max(1, min(6, value))`
+- Brief: Execute `clamp_heading_level`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: depth Input argument for `clamp_heading_level`.
+- Return: int Return value of `clamp_heading_level`.
 
 ### fn `def summarize(items: List[str]) -> str` (L1669-1682)
-L1670-1675> @brief Execute `summarize`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `summarize`. @return str Return value of `summarize`.
-L1677> `return ""`
-L1681> `return preview`
+- Brief: Execute `summarize`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: items Input argument for `summarize`.
+- Return: str Return value of `summarize`.
 
 ### fn `def fix_heading_ref_position(self) -> None` (L1706-1846)
-L1707-1712> @brief Execute `fix_heading_ref_position`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `fix_heading_ref_position`. @return None Return value of `fix_heading_ref_position`.
-L1717> `return`
-L1740> `return`
-L1742> Build an index of ids in the document (case-insensitive).
-L1786> Remove id from the container and assign the TOC fragment id to the heading.
-L1794> Try to preserve the old heading id by moving it to the container,
-L1795> but only if it does not collide with another element.
-L1806> Re-index after modifications and ensure all TOC href fragments point to headings.
-L1843> `raise ValueError("fix_heading_ref_position: " + "; ".join(issues))`
+- Brief: Execute `fix_heading_ref_position`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `fix_heading_ref_position`.
+- Return: None Return value of `fix_heading_ref_position`.
 
 ### fn `def fix_heading_numbering(self) -> None` (L1847-1985)
-L1848-1853> @brief Execute `fix_heading_numbering`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `fix_heading_numbering`. @return None Return value of `fix_heading_numbering`.
-L1861> `return`
-L1863> Matches: "1 ", "1.", "1.2 ", "1.2.", "1.2.3 ", "1.2.3.", ...
-L1867-1872> @brief Execute `normalize_ws`. @details Implements deterministic control flow as defined by module runtime semantics. @param text Input argument for `normalize_ws`. @return str Return value of `normalize_ws`.
-L1873> `return " ".join((text or "").split())`
-L1876-1881> @brief Execute `strip_numbering_prefix`. @details Implements deterministic control flow as defined by module runtime semantics. @param text Input argument for `strip_numbering_prefix`. @return str Return value of `strip_numbering_prefix`.
-L1882> `return normalize_ws(numbering_prefix_re.sub("", normalize_ws(text)))`
-L1885-1891> @brief Execute `set_flat_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param tag Input argument for `set_flat_text`. @param text Input argument for `set_flat_text`. @return None Return value of `set_flat_text`.
-L1898> Phase 1: remove existing numbering from all TOC link texts
-L1904> Phase 1: remove existing numbering from all headings in the document
-L1913> `return`
-L1915> Build numbering from TOC structure (depth inferred from UL nesting)
-L1917-1922> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1925> `return ""`
-L1927> `return (frag or "").strip()`
-L1941> Maintain counters per depth
-L1960> Apply numbering to corresponding headings (by fragment id)
+- Brief: Execute `fix_heading_numbering`. Execute `normalize_ws`. Execute `strip_numbering_prefix`. Execute `set_flat_text`. Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `fix_heading_numbering`. text Input argument for `normalize_ws`. text Input argument for `strip_numbering_prefix`. tag Input argument for `set_flat_text`. text Input argument for `set_flat_text`. href Input argument for `href_fragment_id`.
+- Return: None Return value of `fix_heading_numbering`. str Return value of `normalize_ws`. str Return value of `strip_numbering_prefix`. None Return value of `set_flat_text`. str Return value of `href_fragment_id`.
 
 ### fn `def normalize_ws(text: str) -> str` (L1866-1874)
-L1863> Matches: "1 ", "1.", "1.2 ", "1.2.", "1.2.3 ", "1.2.3.", ...
-L1867-1872> @brief Execute `normalize_ws`. @details Implements deterministic control flow as defined by module runtime semantics. @param text Input argument for `normalize_ws`. @return str Return value of `normalize_ws`.
-L1873> `return " ".join((text or "").split())`
+- Brief: Execute `normalize_ws`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: text Input argument for `normalize_ws`.
+- Return: str Return value of `normalize_ws`.
 
 ### fn `def strip_numbering_prefix(text: str) -> str` (L1875-1883)
-L1867> @brief Execute `normalize_ws`.
-L1868> @details Implements deterministic control flow as defined by module runtime semantics.
-L1869> @param text Input argument for `normalize_ws`.
-L1870> ...
-L1876-1881> @brief Execute `strip_numbering_prefix`. @details Implements deterministic control flow as defined by module runtime semantics. @param text Input argument for `strip_numbering_prefix`. @return str Return value of `strip_numbering_prefix`.
-L1882> `return normalize_ws(numbering_prefix_re.sub("", normalize_ws(text)))`
+- Brief: Execute `strip_numbering_prefix`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: text Input argument for `strip_numbering_prefix`.
+- Return: str Return value of `strip_numbering_prefix`.
 
 ### fn `def set_flat_text(tag, text: str) -> None` (L1884-1894)
-L1876> @brief Execute `strip_numbering_prefix`.
-L1877> @details Implements deterministic control flow as defined by module runtime semantics.
-L1878> @param text Input argument for `strip_numbering_prefix`.
-L1879> ...
-L1885-1891> @brief Execute `set_flat_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param tag Input argument for `set_flat_text`. @param text Input argument for `set_flat_text`. @return None Return value of `set_flat_text`.
+- Brief: Execute `set_flat_text`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: tag Input argument for `set_flat_text`. text Input argument for `set_flat_text`.
+- Return: None Return value of `set_flat_text`.
 
 ### fn `def href_fragment_id(href: str) -> str` (L1916-1928)
-L1915> Build numbering from TOC structure (depth inferred from UL nesting)
-L1917-1922> @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument for `href_fragment_id`. @return str Return value of `href_fragment_id`.
-L1925> `return ""`
-L1927> `return (frag or "").strip()`
+- Brief: Execute `href_fragment_id`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: href Input argument for `href_fragment_id`.
+- Return: str Return value of `href_fragment_id`.
 
 ### fn `def _clean_document_style(self) -> None` `priv` (L1986-2006)
-L1987-1992> @brief Execute `_clean_document_style`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_clean_document_style`. @return None Return value of `_clean_document_style`.
-L1993> Process document.html
-L2000> Process toc.html
+- Brief: Execute `_clean_document_style`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_clean_document_style`.
+- Return: None Return value of `_clean_document_style`.
 
 ### fn `def _add_document_style(self) -> None` `priv` (L2007-2038)
-L2008-2013> @brief Execute `_add_document_style`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_add_document_style`. @return None Return value of `_add_document_style`.
-L2016> `return`
-L2020> Check if there are any tables or images in the document
-L2024> `return`
-L2026> Create or find the head element
-L2034> `return`
-L2036> Create style tag with table border CSS and image border CSS
+- Brief: Execute `_add_document_style`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_add_document_style`.
+- Return: None Return value of `_add_document_style`.
 
 ### fn `def _normalize_document_links(self) -> None` `priv` (L2053-2067)
-L2054-2059> @brief Execute `_normalize_document_links`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_normalize_document_links`. @return None Return value of `_normalize_document_links`.
-L2062> `return`
+- Brief: Execute `_normalize_document_links`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_normalize_document_links`.
+- Return: None Return value of `_normalize_document_links`.
 
 ### fn `def _remove_unused_images(self) -> None` `priv` (L2068-2109)
-L2069-2074> @brief Execute `_remove_unused_images`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_remove_unused_images`. @return None Return value of `_remove_unused_images`.
-L2077> `return`
-L2079> Read HTML contents to search references
-L2102> If neither the relative path nor the basename appear in the HTML, delete
+- Brief: Execute `_remove_unused_images`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_remove_unused_images`.
+- Return: None Return value of `_remove_unused_images`.
 
 ### fn `def _remove_unused_assets(self) -> None` `priv` (L2110-2144)
-L2111-2116> @brief Execute `_remove_unused_assets`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_remove_unused_assets`. @return None Return value of `_remove_unused_assets`.
-L2119> `return`
-L2137> If neither the relative path nor the basename appear in document.html, delete
+- Brief: Execute `_remove_unused_assets`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_remove_unused_assets`.
+- Return: None Return value of `_remove_unused_assets`.
 
 ### fn `def _normalize_image_position(self) -> None` `priv` (L2145-2204)
-L2146-2151> @brief Execute `_normalize_image_position`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_normalize_image_position`. @return None Return value of `_normalize_image_position`.
-L2154> `return`
-L2162> Collect image files under assets recursively
-L2166> skip files already in the root of assets
-L2177> ensure unique
-L2193> Update references in HTML files
+- Brief: Execute `_normalize_image_position`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_normalize_image_position`.
+- Return: None Return value of `_normalize_image_position`.
 
 ### fn `def _clean_assets_tree(self) -> None` `priv` (L2205-2227)
-L2206-2211> @brief Execute `_clean_assets_tree`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_clean_assets_tree`. @return None Return value of `_clean_assets_tree`.
-L2214> `return`
-L2216> Walk directories bottom-up and try to remove empty ones
-L2217> Use sorted(reverse=True) to attempt children before parents
-L2221> rmdir only if empty
-L2225> not empty or cannot remove, ignore
+- Brief: Execute `_clean_assets_tree`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_clean_assets_tree`.
+- Return: None Return value of `_clean_assets_tree`.
 
 ### fn `def _remove_empty_assets_root(self) -> None` `priv` (L2228-2266)
-L2225> not empty or cannot remove, ignore
-L2229-2234> @brief Execute `_remove_empty_assets_root`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_remove_empty_assets_root`. @return None Return value of `_remove_empty_assets_root`.
-L2237> `return`
-L2239> Check for any files or non-empty directories under assets
-L2242> if any file exists, or any directory that contains something, mark
-L2243> as non-empty
-L2249> if dir contains any children, it's non-empty
-L2258> `return`
+- Brief: Execute `_remove_empty_assets_root`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_remove_empty_assets_root`.
+- Return: None Return value of `_remove_empty_assets_root`.
 
 ### class `class DownloaderRegistry` (L2267-2324)
-- fn `def __init__(self)` `priv` (L2272-2280) L2268> @brief Define class `DownloaderRegistry`. @details Encapsulates behavior used by downloader orche...
-  L2273-2278> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @return Any Return value of `__init__`.
-- fn `def register(self, downloader_cls: type[BaseDownloader]) -> None` (L2281-2290) L2273> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module ru...
-  L2282-2288> @brief Execute `register`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `register`. @param downloader_cls Input argument for `register`. @return None Return value of `register`.
-- fn `def detect(self, url: str, session: requests.Session) -> type[BaseDownloader]` (L2291-2324) L2282> @brief Execute `register`. @details Implements deterministic control flow as defined by module ru...
-  L2292-2299> @brief Execute `detect`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `detect`. @param url Input argument for `detect`. @param session Input argument for `detect`. @return type[BaseDownloader] Return value of `detect`.
-  L2302> `return url_matches[0]`
-  L2314> `return html_matches[0]`
-  L2317> `return html_matches[0]`
-  L2319> `return url_matches[0]`
-  L2320> `raise RuntimeError(`
+- Brief: Define class `DownloaderRegistry`. Execute `__init__`. Execute `register`. Execute `detect`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. self Input argument for `register`. downloader_cls Input argument for `register`. self Input argument for `detect`. url Input argument for `detect`. session Input argument for `detect`.
+- Return: Any Return value of `__init__`. None Return value of `register`. type[BaseDownloader] Return value of `detect`.
+- fn `def __init__(self)` `priv` (L2272-2280)
+  - Brief: Define class `DownloaderRegistry`. Execute `__init__`.
+  - Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `__init__`.
+  - Return: Any Return value of `__init__`.
+- fn `def register(self, downloader_cls: type[BaseDownloader]) -> None` (L2281-2290)
+  - Brief: Execute `register`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `register`. downloader_cls Input argument for `register`.
+  - Return: None Return value of `register`.
+- fn `def detect(self, url: str, session: requests.Session) -> type[BaseDownloader]` (L2291-2324)
+  - Brief: Execute `detect`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `detect`. url Input argument for `detect`. session Input argument for `detect`.
+  - Return: type[BaseDownloader] Return value of `detect`.
 
 ### fn `def guess_ext_from_content_type(ct: str) -> str` (L2330-2349)
-L2327> ----------------------------
-L2331-2336> @brief Execute `guess_ext_from_content_type`. @details Implements deterministic control flow as defined by module runtime semantics. @param ct Input argument for `guess_ext_from_content_type`. @return str Return value of `guess_ext_from_content_type`.
-L2339> `return ""`
-L2342> `return ".js"`
-L2344> `return ".css"`
-L2346> `return "." + ct.split("/", 1)[1]`
-L2347> `return ext`
+- Brief: Execute `guess_ext_from_content_type`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: ct Input argument for `guess_ext_from_content_type`.
+- Return: str Return value of `guess_ext_from_content_type`.
 
 ### class `class NetworkImageRecorder` (L2350-2412)
-- fn `def __init__(self, out_dir: Path)` `priv` (L2356-2367) L2351> @brief Define class `NetworkImageRecorder`. @details Encapsulates behavior used by downloader orc...
-  L2357-2363> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @param out_dir Input argument for `__init__`. @return Any Return value of `__init__`.
+- Brief: Define class `NetworkImageRecorder`. Execute `__init__`. Execute `attach`. Execute `on_response`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. out_dir Input argument for `__init__`. self Input argument for `attach`. page Input argument for `attach`. resp Input argument for `on_response`.
+- Return: Any Return value of `__init__`. Any Return value of `attach`. Any Return value of `on_response`.
+- fn `def __init__(self, out_dir: Path)` `priv` (L2356-2367)
+  - Brief: Define class `NetworkImageRecorder`. Execute `__init__`.
+  - Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `__init__`. out_dir Input argument for `__init__`.
+  - Return: Any Return value of `__init__`.
 - fn `def attach(self, page)` (L2368-2412)
-  L2369-2375> @brief Execute `attach`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `attach`. @param page Input argument for `attach`. @return Any Return value of `attach`.
-  L2377-2382> @brief Execute `on_response`. @details Implements deterministic control flow as defined by module runtime semantics. @param resp Input argument for `on_response`. @return Any Return value of `on_response`.
-  L2386> `return`
-  L2389> `return`
-  L2391> `return`
-- fn `def on_response(resp)` (L2376-2409) L2369> @brief Execute `attach`. @details Implements deterministic control flow as defined by module runt...
-  L2377-2382> @brief Execute `on_response`. @details Implements deterministic control flow as defined by module runtime semantics. @param resp Input argument for `on_response`. @return Any Return value of `on_response`.
-  L2386> `return`
-  L2389> `return`
-  L2391> `return`
+  - Brief: Execute `attach`. Execute `on_response`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `attach`. page Input argument for `attach`. resp Input argument for `on_response`.
+  - Return: Any Return value of `attach`. Any Return value of `on_response`.
+- fn `def on_response(resp)` (L2376-2409)
+  - Brief: Execute `attach`. Execute `on_response`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `attach`.
+... resp Input argument for `on_response`.
+  - Return: Any Return value of `on_response`.
 
 ### class `class DocumentViewerDownloader(BaseDownloader)` : BaseDownloader (L2413-2612)
-L2430> TI's actual content area component
-L2431> Content area class
-L2432> Alternative content class
-L2433> TI's content loading area
-L2434> Card wrapper containing document sections
-L2510-2518> @brief Execute `_expand_full_toc`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_expand_full_toc`. @param page Input argument for `_expand_full_toc`. @param max_rounds Input argument for `_expand_full_toc`. @param settle_ms Input argument for `_expand_full_toc`. @return None Return value of `_expand_full_toc`.
-L2571-2580> @brief Execute `_scroll_toc_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_scroll_toc_container`. @param page Input argument for `_scroll_toc_container`. @param step_px Input argument for `_scroll_toc_container`. @param max_rounds Input argument for `_scroll_toc_container`. @param settle_ms Input argument for `_scroll_toc_container`. @return None Return value of `_scroll_toc_container`.
-- var `TOC_SELECTORS = [` (L2420) L2414> @brief Define class `DocumentViewerDownloader`. @details Encapsulates behavior used by downloader...
+- Brief: Define class `DocumentViewerDownloader`. Execute `matches_url`. Execute `probe_html`. Execute `_pick_best_outerhtml`. Execute `_expand_full_toc`. Execute `_scroll_toc_container`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: cls Input argument for `matches_url`. url Input argument for `matches_url`. cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`. self Input argument for `_pick_best_outerhtml`. page Input argument for `_pick_best_outerhtml`. selectors Input argument for `_pick_best_outerhtml`. self Input argument for `_expand_full_toc`. page Input argument for `_expand_full_toc`. max_rounds Input argument for `_expand_full_toc`. settle_ms Input argument for `_expand_full_toc`. self Input argument for `_scroll_toc_container`. page Input argument for `_scroll_toc_container`. step_px Input argument for `_scroll_toc_container`. max_rounds Input argument for `_scroll_toc_container`. settle_ms Input argument for `_scroll_toc_container`.
+- Return: bool Return value of `matches_url`. bool Return value of `probe_html`. Optional[str] Return value of `_pick_best_outerhtml`. None Return value of `_expand_full_toc`. None Return value of `_scroll_toc_container`.
+- var `TOC_SELECTORS = [` (L2420)
 - var `CONTENT_SELECTORS = [` (L2429)
 - var `TOC_SCROLL_SELECTORS = [` (L2442)
 - fn `def matches_url(cls, url: str) -> bool` (L2451-2461)
-  L2452-2458> @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `matches_url`. @param url Input argument for `matches_url`. @return bool Return value of `matches_url`.
-  L2460> `return ("ti.com" in u.netloc) and ("/document-viewer/" in u.path)`
+  - Brief: Execute `matches_url`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `matches_url`. url Input argument for `matches_url`.
+  - Return: bool Return value of `matches_url`.
 - fn `def probe_html(cls, url: str, html: str) -> bool` (L2463-2474)
-  L2464-2471> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `probe_html`. @param url Input argument for `probe_html`. @param html Input argument for `probe_html`. @return bool Return value of `probe_html`.
-  L2473> `return "document-viewer" in h`
+  - Brief: Execute `probe_html`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`.
+  - Return: bool Return value of `probe_html`.
 - fn `def _pick_best_outerhtml(self, page, selectors: List[str]) -> Optional[str]` `priv` (L2475-2506)
-  L2476-2483> @brief Execute `_pick_best_outerhtml`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_pick_best_outerhtml`. @param page Input argument for `_pick_best_outerhtml`. @param selectors Input argument for `_pick_best_outerhtml`. @return Optional[str] Return value of `_pick_best_outerhtml`.
-  L2501> `return None`
-  L2503> `return best.evaluate("el => el.outerHTML")`
-  L2505> `return None`
+  - Brief: Execute `_pick_best_outerhtml`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_pick_best_outerhtml`. page Input argument for `_pick_best_outerhtml`. selectors Input argument for `_pick_best_outerhtml`.
+  - Return: Optional[str] Return value of `_pick_best_outerhtml`.
 - fn `def _expand_full_toc(` `priv` (L2507-2508)
 - fn `def _scroll_toc_container(` `priv` (L2568-2569)
 
 ### fn `def _find_scroll_container(self, page)` `priv` (L2626-2691)
-L2627-2633> @brief Execute `_find_scroll_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_find_scroll_container`. @param page Input argument for `_find_scroll_container`. @return Any Return value of `_find_scroll_container`.
-L2667> `return best`
-L2688> `return element`
-L2690> `return None`
+- Brief: Execute `_find_scroll_container`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_find_scroll_container`. page Input argument for `_find_scroll_container`.
+- Return: Any Return value of `_find_scroll_container`.
 
 ### fn `def _auto_scroll_element(` `priv` (L2692-2700)
 
@@ -633,37 +617,40 @@ L2690> `return None`
 ### fn `def _best_card_for_fragment(` `priv` (L2934-2935)
 
 ### fn `def score_value(val: str) -> int` (L2954-2974)
-L2955-2960> @brief Execute `score_value`. @details Implements deterministic control flow as defined by module runtime semantics. @param val Input argument for `score_value`. @return int Return value of `score_value`.
-L2962> `return 0`
-L2965> `return 100`
-L2967> `return 80`
-L2970> `return 70`
-L2972> `return 40`
-L2973> `return 0`
+- Brief: Execute `score_value`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: val Input argument for `score_value`.
+- Return: int Return value of `score_value`.
 
 ### fn `def _fragment_matches_url(self, fragment: str, data_url: str) -> bool` `priv` (L2991-3010)
-L2992-2999> @brief Execute `_fragment_matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_fragment_matches_url`. @param fragment Input argument for `_fragment_matches_url`. @param data_url Input argument for `_fragment_matches_url`. @return bool Return value of `_fragment_matches_url`.
-L3002> `return False`
-L3009> `return all(part in target for part in parts)`
+- Brief: Execute `_fragment_matches_url`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_fragment_matches_url`. fragment Input argument for `_fragment_matches_url`. data_url Input argument for `_fragment_matches_url`.
+- Return: bool Return value of `_fragment_matches_url`.
 
 ### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L3011-3020)
-L3012-3018> @brief Execute `_toc_tree_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_toc_tree_from_html`. @param toc_html Input argument for `_toc_tree_from_html`. @return List[TocNode] Return value of `_toc_tree_from_html`.
-L3019> `return toc_from_nav_html(toc_html, self.from_url)`
+- Brief: Execute `_toc_tree_from_html`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_toc_tree_from_html`. toc_html Input argument for `_toc_tree_from_html`.
+- Return: List[TocNode] Return value of `_toc_tree_from_html`.
 
 ### fn `def _iter_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L3022-3032)
-L3023-3028> @brief Execute `_iter_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_iter_nodes`. @return Iterable[TocNode] Return value of `_iter_nodes`.
-L3030> `yield n`
-L3031> `yield from DocumentViewerDownloader._iter_nodes(n.children)`
+- Brief: Execute `_iter_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_iter_nodes`.
+- Return: Iterable[TocNode] Return value of `_iter_nodes`.
 
 ### fn `def _first_numeric_index(nodes: List[TocNode]) -> Optional[int]` `priv` `@staticmethod` (L3034-3046)
-L3035-3040> @brief Execute `_first_numeric_index`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_first_numeric_index`. @return Optional[int] Return value of `_first_numeric_index`.
-L3044> `return i`
-L3045> `return None`
+- Brief: Execute `_first_numeric_index`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_first_numeric_index`.
+- Return: Optional[int] Return value of `_first_numeric_index`.
 
 ### fn `def _trim_toc_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3048-3069)
-L3049-3054> @brief Execute `_trim_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_trim_toc_nodes`. @return List[TocNode] Return value of `_trim_toc_nodes`.
-L3056> `return []`
-L3068> `return trimmed if trimmed else list(nodes)`
+- Brief: Execute `_trim_toc_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_trim_toc_nodes`.
+- Return: List[TocNode] Return value of `_trim_toc_nodes`.
 
 ### fn `def _limit_toc_nodes(` `priv` `@staticmethod` (L3071-3072)
 
@@ -672,635 +659,340 @@ L3068> `return trimmed if trimmed else list(nodes)`
 ### fn `def _prune_toc_to_allowed(` `priv` `@staticmethod` (L3123-3124)
 
 ### fn `def _first_toc_entry_title(nodes: List[TocNode]) -> Optional[str]` `priv` `@staticmethod` (L3147-3159)
-L3148-3153> @brief Execute `_first_toc_entry_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_first_toc_entry_title`. @return Optional[str] Return value of `_first_toc_entry_title`.
-L3157> `return title`
-L3158> `return None`
+- Brief: Execute `_first_toc_entry_title`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_first_toc_entry_title`.
+- Return: Optional[str] Return value of `_first_toc_entry_title`.
 
 ### fn `def _is_important_notice_label(title: Optional[str]) -> bool` `priv` `@staticmethod` (L3161-3170)
-L3162-3167> @brief Execute `_is_important_notice_label`. @details Implements deterministic control flow as defined by module runtime semantics. @param title Input argument for `_is_important_notice_label`. @return bool Return value of `_is_important_notice_label`.
-L3169> `return text.startswith("important notice")`
+- Brief: Execute `_is_important_notice_label`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: title Input argument for `_is_important_notice_label`.
+- Return: bool Return value of `_is_important_notice_label`.
 
 ### fn `def _is_important_notice_section(section_html: str) -> bool` `priv` `@staticmethod` (L3172-3187)
-L3173-3178> @brief Execute `_is_important_notice_section`. @details Implements deterministic control flow as defined by module runtime semantics. @param section_html Input argument for `_is_important_notice_section`. @return bool Return value of `_is_important_notice_section`.
-L3184> `return True`
-L3186> `return "important notice and disclaimer" in flat_text`
+- Brief: Execute `_is_important_notice_section`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: section_html Input argument for `_is_important_notice_section`.
+- Return: bool Return value of `_is_important_notice_section`.
 
 ### fn `def _select_section_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3189-3214)
-L3190-3195> @brief Execute `_select_section_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_select_section_nodes`. @return List[TocNode] Return value of `_select_section_nodes`.
-L3198> `return []`
-L3213> `return flat[start_idx : end_idx + 1]`
+- Brief: Execute `_select_section_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_select_section_nodes`.
+- Return: List[TocNode] Return value of `_select_section_nodes`.
 
 ### fn `def _dedup_toc_nodes_by_href(self, nodes: List[TocNode]) -> List[TocNode]` `priv` (L3215-3253)
-L3216-3222> @brief Execute `_dedup_toc_nodes_by_href`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_dedup_toc_nodes_by_href`. @param nodes Input argument for `_dedup_toc_nodes_by_href`. @return List[TocNode] Return value of `_dedup_toc_nodes_by_href`.
-L3225-3230> @brief Execute `dedup_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `dedup_list`. @return List[TocNode] Return value of `dedup_list`.
-L3231> Scope seen to this level only
-L3235> Recursively deduplicate children first
-L3240> Merge children and prefer the more descriptive/structured title
-L3250> `return out`
-L3252> `return dedup_list(nodes)`
+- Brief: Execute `_dedup_toc_nodes_by_href`. Execute `dedup_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_dedup_toc_nodes_by_href`. nodes Input argument for `_dedup_toc_nodes_by_href`. items Input argument for `dedup_list`.
+- Return: List[TocNode] Return value of `_dedup_toc_nodes_by_href`. List[TocNode] Return value of `dedup_list`.
 
 ### fn `def dedup_list(items: List[TocNode]) -> List[TocNode]` (L3224-3251)
-L3216> @brief Execute `_dedup_toc_nodes_by_href`.
-L3217> @details Implements deterministic control flow as defined by module runtime semantics.
-L3218> @param self Input argument for `_dedup_toc_nodes_by_href`.
-L3219> ...
-L3225-3230> @brief Execute `dedup_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for `dedup_list`. @return List[TocNode] Return value of `dedup_list`.
-L3231> Scope seen to this level only
-L3235> Recursively deduplicate children first
-L3240> Merge children and prefer the more descriptive/structured title
-L3250> `return out`
+- Brief: Execute `_dedup_toc_nodes_by_href`. Execute `dedup_list`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_dedup_toc_nodes_by_href`.
+... items Input argument for `dedup_list`.
+- Return: List[TocNode] Return value of `dedup_list`.
 
 ### fn `def _is_section_scrollable(self, page, viewport_multiplier: float = 2.0) -> bool` `priv` (L3254-3276)
-L3255-3262> @brief Execute `_is_section_scrollable`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_is_section_scrollable`. @param page Input argument for `_is_section_scrollable`. @param viewport_multiplier Input argument for `_is_section_scrollable`. @return bool Return value of `_is_section_scrollable`.
-L3273> `return bool(result)`
-L3275> `return False`
+- Brief: Execute `_is_section_scrollable`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_is_section_scrollable`. page Input argument for `_is_section_scrollable`. viewport_multiplier Input argument for `_is_section_scrollable`.
+- Return: bool Return value of `_is_section_scrollable`.
 
 ### fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L3277-3313)
-L3278-3284> @brief Execute `_remove_toc_elements`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_remove_toc_elements`. @param soup Input argument for `_remove_toc_elements`. @return None Return value of `_remove_toc_elements`.
-L3285> Remove by tag name (TI custom components)
-L3295> Remove by selector
-L3297> Main navigation tree
-L3298> Sidebar container
-L3299> TOC contents section
-L3300> Tab bar
-L3301> Tab slider navigation
-L3302> Document lister title (captured separately)
-L3303> TOC hierarchy container
-L3304> Mini navigation controls
-L3305> TOC by data attribute
-L3306> Tab bar by data attribute
-L3307> TOC by data attribute
-L3308> Command bar
+- Brief: Execute `_remove_toc_elements`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_remove_toc_elements`. soup Input argument for `_remove_toc_elements`.
+- Return: None Return value of `_remove_toc_elements`.
 
 ### fn `def _convert_doxygen_definition_lists(self, soup: BeautifulSoup) -> None` `priv` (L3314-3380)
-L3315-3321> @brief Execute `_convert_doxygen_definition_lists`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_convert_doxygen_definition_lists`. @param soup Input argument for `_convert_doxygen_definition_lists`. @return None Return value of `_convert_doxygen_definition_lists`.
-L3323> Handle <dl><dt>/<dd> pairs first
-L3337> Handle adjacent paragraph style variations:
-L3338> 1) <p>Label</p> + <p>: description</p>
-L3339> 2) <p>Label</p> + <p>:</p> + <p>description</p>
-L3349> Case A: right paragraph starts with a colon followed by text
-L3361> Case B: right paragraph is just a colon (possibly with spaces)
-L3372> remove the marker and the description nodes
-L3376> Otherwise, not a definition-style pair
-L3378> Non-fatal: if conversion fails, leave document unchanged
-L3379> `return`
+- Brief: Execute `_convert_doxygen_definition_lists`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_convert_doxygen_definition_lists`. soup Input argument for `_convert_doxygen_definition_lists`.
+- Return: None Return value of `_convert_doxygen_definition_lists`.
 
 ### fn `def _extract_fragment_only(` `priv` (L3381-3382)
-L3378> Non-fatal: if conversion fails, leave document unchanged
 
 ### fn `def score_value(val: str) -> int` (L3401-3424)
-L3402-3407> @brief Execute `score_value`. @details Implements deterministic control flow as defined by module runtime semantics. @param val Input argument for `score_value`. @return int Return value of `score_value`.
-L3409> `return 0`
-L3412> `return 100`
-L3414> `return 80`
-L3423> `return score`
+- Brief: Execute `score_value`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: val Input argument for `score_value`.
+- Return: int Return value of `score_value`.
 
 ### fn `def pick_best_section(elements)` (L3425-3448)
-L3426-3431> @brief Execute `pick_best_section`. @details Implements deterministic control flow as defined by module runtime semantics. @param elements Input argument for `pick_best_section`. @return Any Return value of `pick_best_section`.
-L3447> `return best`
+- Brief: Execute `pick_best_section`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: elements Input argument for `pick_best_section`.
+- Return: Any Return value of `pick_best_section`.
 
 ### fn `def matches_fragment(el) -> bool` (L3459-3478)
-L3460-3465> @brief Execute `matches_fragment`. @details Implements deterministic control flow as defined by module runtime semantics. @param el Input argument for `matches_fragment`. @return bool Return value of `matches_fragment`.
-L3467> `return False`
-L3470> `return True`
-L3473> `return True`
-L3476> `return True`
-L3477> `return False`
+- Brief: Execute `matches_fragment`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: el Input argument for `matches_fragment`.
+- Return: bool Return value of `matches_fragment`.
 
 ### fn `def _wait_for_fragment(self, page, fragment: str, timeout_ms: int = 8000) -> bool` `priv` (L3506-3558)
-L3507-3515> @brief Execute `_wait_for_fragment`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_wait_for_fragment`. @param page Input argument for `_wait_for_fragment`. @param fragment Input argument for `_wait_for_fragment`. @param timeout_ms Input argument for `_wait_for_fragment`. @return bool Return value of `_wait_for_fragment`.
-L3518> `return True`
-L3553> `return True`
-L3555> `return False`
-L3557> `return False`
+- Brief: Execute `_wait_for_fragment`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_wait_for_fragment`. page Input argument for `_wait_for_fragment`. fragment Input argument for `_wait_for_fragment`. timeout_ms Input argument for `_wait_for_fragment`.
+- Return: bool Return value of `_wait_for_fragment`.
 
 ### fn `def _click_toc_link(self, page, fragment: str) -> bool` `priv` (L3559-3587)
-L3560-3567> @brief Execute `_click_toc_link`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_click_toc_link`. @param page Input argument for `_click_toc_link`. @param fragment Input argument for `_click_toc_link`. @return bool Return value of `_click_toc_link`.
-L3570> `return False`
-L3572> `return bool(`
-L3586> `return False`
+- Brief: Execute `_click_toc_link`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_click_toc_link`. page Input argument for `_click_toc_link`. fragment Input argument for `_click_toc_link`.
+- Return: bool Return value of `_click_toc_link`.
 
 ### fn `def run(self) -> None` (L3588-3787)
-L3589-3594> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @return None Return value of `run`.
-L3599-3606> @brief Execute `make_anchor`. @details Implements deterministic control flow as defined by module runtime semantics. @param raw_fragment Input argument for `make_anchor`. @param title Input argument for `make_anchor`. @param used Input argument for `make_anchor`. @return str Return value of `make_anchor`.
-L3615> `return cand`
-L3618-3623> @brief Execute `normalize_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument for `normalize_text`. @return str Return value of `normalize_text`.
-L3626> `return value.lower()`
-L3629-3634> @brief Execute `strip_ti_disclaimer`. @details Implements deterministic control flow as defined by module runtime semantics. @param section_html Input argument for `strip_ti_disclaimer`. @return str Return value of `strip_ti_disclaimer`.
-L3638> `return section_html`
-L3652> `return section_html`
-L3657> `return str(section)`
-L3673> Expand navigation tree (with repeated passes and scroll in TOC) to capture full TOC
-L3695> Also capture doc-lister title if present (TI pages have this as a separate element)
-L3716> Prepend doc title if captured separately
-L3733> Apply reading-order limit: take the first <limit> entries across all levels
-L3762> (full_url_with_fragment, anchor, title, fragment)
-L3765> Map section index to TOC node
-L3768> Map section URL -> anchor kept in document
-L3771> Map normalized fragment -> chosen anchor
-L3786> Choose/reuse anchor for this fragment (regardless of whether it will be downloaded)
+- Brief: Execute `run`. Execute `make_anchor`. Execute `normalize_text`. Execute `strip_ti_disclaimer`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `run`. raw_fragment Input argument for `make_anchor`. title Input argument for `make_anchor`. used Input argument for `make_anchor`. value Input argument for `normalize_text`. section_html Input argument for `strip_ti_disclaimer`.
+- Return: None Return value of `run`. str Return value of `make_anchor`. str Return value of `normalize_text`. str Return value of `strip_ti_disclaimer`.
 
 ### fn `def make_anchor(raw_fragment: str, title: str, used: Set[str]) -> str` (L3598-3616)
-L3599-3606> @brief Execute `make_anchor`. @details Implements deterministic control flow as defined by module runtime semantics. @param raw_fragment Input argument for `make_anchor`. @param title Input argument for `make_anchor`. @param used Input argument for `make_anchor`. @return str Return value of `make_anchor`.
-L3615> `return cand`
+- Brief: Execute `make_anchor`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: raw_fragment Input argument for `make_anchor`. title Input argument for `make_anchor`. used Input argument for `make_anchor`.
+- Return: str Return value of `make_anchor`.
 
 ### fn `def normalize_text(value: str) -> str` (L3617-3627)
-L3618-3623> @brief Execute `normalize_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument for `normalize_text`. @return str Return value of `normalize_text`.
-L3626> `return value.lower()`
+- Brief: Execute `normalize_text`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: value Input argument for `normalize_text`.
+- Return: str Return value of `normalize_text`.
 
 ### fn `def strip_ti_disclaimer(section_html: str) -> str` (L3628-3658)
-L3629-3634> @brief Execute `strip_ti_disclaimer`. @details Implements deterministic control flow as defined by module runtime semantics. @param section_html Input argument for `strip_ti_disclaimer`. @return str Return value of `strip_ti_disclaimer`.
-L3638> `return section_html`
-L3652> `return section_html`
-L3657> `return str(section)`
+- Brief: Execute `strip_ti_disclaimer`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: section_html Input argument for `strip_ti_disclaimer`.
+- Return: str Return value of `strip_ti_disclaimer`.
 
 ### class `class DoxygenExportDownloader(BaseDownloader)` : BaseDownloader (L4066-4265)
-L4063> ----------------------------
-L4067-4070> @brief Define class `DoxygenExportDownloader`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
-L4246-4255> @brief Execute `_links_to_html_pages`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_links_to_html_pages`. @param soup Input argument for `_links_to_html_pages`. @param page_url Input argument for `_links_to_html_pages`. @param host Input argument for `_links_to_html_pages`. @param scope_dir_url Input argument for `_links_to_html_pages`. @return Set[str] Return value of `_links_to_html_pages`.
+- Brief: Define class `DoxygenExportDownloader`. Execute `matches_url`. Execute `probe_html`. Execute `_scope`. Execute `_fetch_soup`. Execute `_is_in_scope`. Execute `_page_title`. Execute `_document_title`. Execute `_extract_main`. Execute `_remove_toc_elements`. Execute `_links_to_html_pages`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: cls Input argument for `matches_url`. url Input argument for `matches_url`. cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`. self Input argument for `_scope`. self Input argument for `_fetch_soup`. url Input argument for `_fetch_soup`. self Input argument for `_is_in_scope`. url Input argument for `_is_in_scope`. host Input argument for `_is_in_scope`. scope_dir_url Input argument for `_is_in_scope`. self Input argument for `_page_title`. soup Input argument for `_page_title`. self Input argument for `_document_title`. soup Input argument for `_document_title`. self Input argument for `_extract_main`. soup Input argument for `_extract_main`. self Input argument for `_remove_toc_elements`. soup Input argument for `_remove_toc_elements`. self Input argument for `_links_to_html_pages`. soup Input argument for `_links_to_html_pages`. page_url Input argument for `_links_to_html_pages`. host Input argument for `_links_to_html_pages`. scope_dir_url Input argument for `_links_to_html_pages`.
+- Return: bool Return value of `matches_url`. bool Return value of `probe_html`. Tuple[str, str] Return value of `_scope`. BeautifulSoup Return value of `_fetch_soup`. bool Return value of `_is_in_scope`. str Return value of `_page_title`. str Return value of `_document_title`. BeautifulSoup Return value of `_extract_main`. None Return value of `_remove_toc_elements`. Set[str] Return value of `_links_to_html_pages`.
 - fn `def matches_url(cls, url: str) -> bool` (L4074-4087)
-  L4075-4081> @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `matches_url`. @param url Input argument for `matches_url`. @return bool Return value of `matches_url`.
-  L4083> TI export path typically contains /exports/ and ends with index.html
-  L4084> `return ("/exports/" in u.path and url.lower().endswith(".html")) or (`
+  - Brief: Execute `matches_url`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `matches_url`. url Input argument for `matches_url`.
+  - Return: bool Return value of `matches_url`.
 - fn `def probe_html(cls, url: str, html: str) -> bool` (L4089-4100)
-  L4090-4097> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `probe_html`. @param url Input argument for `probe_html`. @param html Input argument for `probe_html`. @return bool Return value of `probe_html`.
-  L4099> `return ('name="generator"' in h and "doxygen" in h) or ("dynsections.js" in h)`
+  - Brief: Execute `probe_html`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`.
+  - Return: bool Return value of `probe_html`.
 - fn `def _scope(self) -> Tuple[str, str]` `priv` (L4101-4114)
-  L4102-4107> @brief Execute `_scope`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_scope`. @return Tuple[str, str] Return value of `_scope`.
-  L4113> `return host, scope_dir_url`
+  - Brief: Execute `_scope`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_scope`.
+  - Return: Tuple[str, str] Return value of `_scope`.
 - fn `def _fetch_soup(self, url: str) -> BeautifulSoup` `priv` (L4115-4126)
-  L4116-4122> @brief Execute `_fetch_soup`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_fetch_soup`. @param url Input argument for `_fetch_soup`. @return BeautifulSoup Return value of `_fetch_soup`.
-  L4125> `return BeautifulSoup(r.text, "lxml")`
+  - Brief: Execute `_fetch_soup`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_fetch_soup`. url Input argument for `_fetch_soup`.
+  - Return: BeautifulSoup Return value of `_fetch_soup`.
 - fn `def _is_in_scope(self, url: str, host: str, scope_dir_url: str) -> bool` `priv` (L4127-4143)
-  L4128-4136> @brief Execute `_is_in_scope`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_is_in_scope`. @param url Input argument for `_is_in_scope`. @param host Input argument for `_is_in_scope`. @param scope_dir_url Input argument for `_is_in_scope`. @return bool Return value of `_is_in_scope`.
-  L4138> `return False`
-  L4141> `return False`
-  L4142> `return url.startswith(scope_dir_url)`
+  - Brief: Execute `_is_in_scope`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_is_in_scope`. url Input argument for `_is_in_scope`. host Input argument for `_is_in_scope`. scope_dir_url Input argument for `_is_in_scope`.
+  - Return: bool Return value of `_is_in_scope`.
 - fn `def _page_title(self, soup: BeautifulSoup) -> str` `priv` (L4144-4159)
-  L4145-4151> @brief Execute `_page_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_page_title`. @param soup Input argument for `_page_title`. @return str Return value of `_page_title`.
-  L4154> `return t.get_text(strip=True)`
-  L4157> `return " ".join(h1.get_text(" ", strip=True).split())`
-  L4158> `return "Page"`
+  - Brief: Execute `_page_title`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_page_title`. soup Input argument for `_page_title`.
+  - Return: str Return value of `_page_title`.
 - fn `def _document_title(self, soup: BeautifulSoup) -> str` `priv` (L4160-4191)
-  L4161-4167> @brief Execute `_document_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_document_title`. @param soup Input argument for `_document_title`. @return str Return value of `_document_title`.
-  L4172> `return text`
-  L4188> `return combined`
-  L4190> `return self._page_title(soup)`
+  - Brief: Execute `_document_title`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_document_title`. soup Input argument for `_document_title`.
+  - Return: str Return value of `_document_title`.
 - fn `def _extract_main(self, soup: BeautifulSoup) -> BeautifulSoup` `priv` (L4192-4215)
-  L4193-4199> @brief Execute `_extract_main`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_extract_main`. @param soup Input argument for `_extract_main`. @return BeautifulSoup Return value of `_extract_main`.
-  L4206> Remove TOC elements from page content
-  L4214> `return frag`
+  - Brief: Execute `_extract_main`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_extract_main`. soup Input argument for `_extract_main`.
+  - Return: BeautifulSoup Return value of `_extract_main`.
 - fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L4216-4242)
-  L4217-4223> @brief Execute `_remove_toc_elements`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_remove_toc_elements`. @param soup Input argument for `_remove_toc_elements`. @return None Return value of `_remove_toc_elements`.
-  L4225> `return`
-  L4227> Remove TOC containers and navigation elements
+  - Brief: Execute `_remove_toc_elements`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_remove_toc_elements`. soup Input argument for `_remove_toc_elements`.
+  - Return: None Return value of `_remove_toc_elements`.
 - fn `def _links_to_html_pages(` `priv` (L4243-4244)
 
 ### fn `def _expand_nav_tree(self, page) -> None` `priv` (L4269-4305)
-L4270> Wait for the nav tree to load completely
-L4271-4277> @brief Execute `_expand_nav_tree`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_expand_nav_tree`. @param page Input argument for `_expand_nav_tree`. @return None Return value of `_expand_nav_tree`.
-L4283> Scroll to make sure all content is loaded
-L4285-4293> (() => { const navTree = document.querySelector('#nav-tree-contents'); if (navTree) { navTree.scrollTop = 0; navTree.scrollIntoView(); } })();
-L4302> Wait for final DOM stabilization
+- Brief: Execute `_expand_nav_tree`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_expand_nav_tree`. page Input argument for `_expand_nav_tree`.
+- Return: None Return value of `_expand_nav_tree`.
 
 ### fn `def _expand_nav_tree_full(self, page) -> None` `priv` (L4306-4505)
-L4307> Track expanded items for limit enforcement
-L4308-4314> @brief Execute `_expand_nav_tree_full`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_expand_nav_tree_full`. @param page Input argument for `_expand_nav_tree_full`. @return None Return value of `_expand_nav_tree_full`.
-L4317> Expand systematically by clicking on arrows multiple times
-L4319> Increased rounds for deep nesting
-L4321-4401> f ((limit, expandedCount) => {{ const root = document.querySelector('#nav-tree-contents'); if (!root) return {{clicks: 0, expanded: expandedCount}}; let clicks = 0; let currentExpanded = expandedCount; Function to check if an item is an API Reference section or inside one function isApiReferenceRelated(item) {{ Check if this item itself is API Reference const label = item.querySelector('.label'); if (label) {{ const labelText = label.textContent.trim(); if (labelText === 'API Reference') {{ console.log('Found API Reference section, skipping expansion'); return true; }} }} Check if we're inside an API Reference section let parent = item.parentElement; while (parent && parent !== root) {{ if (parent.classList && parent.classList.contains('children_ul')) {{ const parentItem = parent.previousElementSibling; if (parentItem && parentItem.classList && parentItem.classList.contains('item')) {{ const parentLabel = parentItem.querySelector('.label'); if (parentLabel && parentLabel.textContent.trim() === 'API Reference') {{ console.log('Found item inside API Reference section, skipping expansion'); return true; }} }} }} parent = parent.parentElement; }} return false; }} Get all items with arrows that might be expandable const items = Array.from(root.querySelectorAll('div.item')); for (const item of items) {{ Check limit before expanding if (limit && currentExpanded >= limit) {{ console.log('Reached expansion limit:', limit); break; }} const arrow = item.querySelector('.arrow'); if (arrow) {{ const text = arrow.textContent.trim(); if (text === '►' || text === '▶' || text === '+') {{ const label = item.querySelector('.label'); const labelText = label ? label.textContent.trim() : 'no-label'; console.log('Found expandable item:', labelText); Skip API Reference sections and their children if (isApiReferenceRelated(item)) {{ console.log('Skipping API Reference related item:', labelText); continue; }} console.log('Expanding item:', labelText); try {{ arrow.click(); clicks++; currentExpanded++; }} catch (e) {{ try {{ item.click(); clicks++; currentExpanded++; }} catch (e2) {{ Continue to next item }} }} }} }} }} return {{clicks: clicks, expanded: currentExpanded}}; }})({self.limit or "null"}, {expanded_count})
-L4412> Stop if limit reached or no more clicks
-L4422> Wait for content to load after clicks
-L4432> Final pass: force expand any remaining collapsed elements, except API Reference
-L4433> Only if we haven't reached the limit
+- Brief: Execute `_expand_nav_tree_full`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_expand_nav_tree_full`. page Input argument for `_expand_nav_tree_full`.
+- Return: None Return value of `_expand_nav_tree_full`.
 
 ### fn `def _expand_nav_tree_limited(self, page, limit: int) -> None` `priv` (L4513-4622)
-L4436> (() => {
-L4437> const root = document.querySelector('#nav-tree-contents');
-L4438> if (!root) return;
-L4439> ...
-L4514-4521> @brief Execute `_expand_nav_tree_limited`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_expand_nav_tree_limited`. @param page Input argument for `_expand_nav_tree_limited`. @param limit Input argument for `_expand_nav_tree_limited`. @return None Return value of `_expand_nav_tree_limited`.
-L4526-4601> (limit) => { const root = document.querySelector('#nav-tree-contents > ul'); if (!root) return {expanded: 0, count: 0, reached: false}; let expanded = 0; let count = 0; function isApiReferenceRelated(item) { const label = item.querySelector('.label'); if (label && label.textContent.trim() === 'API Reference') { return true; } let parent = item.parentElement; while (parent) { if (parent.classList && parent.classList.contains('children_ul')) { const parentItem = parent.previousElementSibling; if (parentItem && parentItem.classList && parentItem.classList.contains('item')) { const parentLabel = parentItem.querySelector('.label'); if (parentLabel && parentLabel.textContent.trim() === 'API Reference') { return true; } } } parent = parent.parentElement; } return false; } function arrowState(arrow) { if (!arrow) return 'leaf'; const text = arrow.textContent.trim(); if (text === '▼') return 'expanded'; if (text === '►' || text === '▶' || text === '+') return 'collapsed'; return 'leaf'; } function walk(ul) { const items = Array.from(ul.children).filter(el => el.tagName.toLowerCase() === 'li'); for (const li of items) { if (count >= limit) return true; const item = li.querySelector(':scope > div.item'); if (!item) continue; count += 1; if (count >= limit) return true; const arrow = item.querySelector('.arrow'); const state = arrowState(arrow); let didExpand = false; if (state === 'collapsed' && !isApiReferenceRelated(item)) { try { arrow.click(); expanded += 1; didExpand = true; } catch (e) { try { item.click(); expanded += 1; didExpand = true; } catch (e2) { ignore } } } const childUl = li.querySelector(':scope > ul'); if (childUl && (state === 'expanded' || didExpand)) { if (walk(childUl)) return true; } } return false; } walk(root); return {expanded: expanded, count: count, reached: count >= limit}; } ,
+- Brief: Execute `_expand_nav_tree_limited`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_expand_nav_tree_limited`. page Input argument for `_expand_nav_tree_limited`. limit Input argument for `_expand_nav_tree_limited`.
+- Return: None Return value of `_expand_nav_tree_limited`.
 
 ### fn `def _cleanup_nav_tree_styles(self, page) -> None` `priv` (L4623-4654)
-L4624-4630> @brief Execute `_cleanup_nav_tree_styles`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_cleanup_nav_tree_styles`. @param page Input argument for `_cleanup_nav_tree_styles`. @return None Return value of `_cleanup_nav_tree_styles`.
-L4632-4652> (() => { const root = document.querySelector('#nav-tree-contents'); if (!root) return; Remove display styles from all elements const allElements = root.querySelectorAll('*'); allElements.forEach(el => { if (el.style.display) { el.style.display = ''; } }); Special handling for ul elements - ensure they have empty style const uls = root.querySelectorAll('ul'); uls.forEach(ul => { ul.removeAttribute('style'); ul.setAttribute('style', ''); }); })();
+- Brief: Execute `_cleanup_nav_tree_styles`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_cleanup_nav_tree_styles`. page Input argument for `_cleanup_nav_tree_styles`.
+- Return: None Return value of `_cleanup_nav_tree_styles`.
 
 ### fn `def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]` `priv` (L4655-4744)
-L4632> (() => {
-L4633> const root = document.querySelector('#nav-tree-contents');
-L4634> if (!root) return;
-L4635> ...
-L4656-4661> @brief Execute `_fetch_nav_tree_with_playwright`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_fetch_nav_tree_with_playwright`. @return Tuple[str, str] Return value of `_fetch_nav_tree_with_playwright`.
-L4688-4718> (() => { const el = document.querySelector('#nav-tree-contents ul'); if (!el) return ''; Clone the element to avoid modifying the original const clone = el.cloneNode(true); Clean up extra styles added during expansion const uls = clone.querySelectorAll('ul'); uls.forEach(ul => { ul.style.visibility = ''; ul.style.height = ''; ul.style.overflow = ''; }); Also clean up the root element itself if (clone.style) { clone.style.visibility = ''; clone.style.height = ''; clone.style.overflow = ''; } Remove only the expansion arrow links (those with arrow spans as siblings) Actually, let's not remove any javascript:void(0) links for now The fixture expects them to be preserved return clone.outerHTML; })()
-L4743> `return nav_html, nav_outline`
+- Brief: Execute `_fetch_nav_tree_with_playwright`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_fetch_nav_tree_with_playwright`.
+- Return: Tuple[str, str] Return value of `_fetch_nav_tree_with_playwright`.
 
 ### fn `def _nav_link_href(self, link, base_url: str) -> str` `priv` (L4745-4770)
-L4746-4753> @brief Execute `_nav_link_href`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_nav_link_href`. @param link Input argument for `_nav_link_href`. @param base_url Input argument for `_nav_link_href`. @return str Return value of `_nav_link_href`.
-L4755> `return ""`
-L4758> `return normalize_url(href, base_url)`
-L4766> `return normalize_url(f"{page}#{frag}" if frag else page, base_url)`
-L4768> `return normalize_url(cls, base_url)`
-L4769> `return ""`
+- Brief: Execute `_nav_link_href`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_nav_link_href`. link Input argument for `_nav_link_href`. base_url Input argument for `_nav_link_href`.
+- Return: str Return value of `_nav_link_href`.
 
 ### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L4771-4780)
-L4772-4778> @brief Execute `_toc_tree_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_toc_tree_from_html`. @param toc_html Input argument for `_toc_tree_from_html`. @return List[TocNode] Return value of `_toc_tree_from_html`.
-L4779> `return toc_from_nav_html(toc_html, "document.html")`
+- Brief: Execute `_toc_tree_from_html`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_toc_tree_from_html`. toc_html Input argument for `_toc_tree_from_html`.
+- Return: List[TocNode] Return value of `_toc_tree_from_html`.
 
 ### fn `def _toc_nodes_from_nav_html(self, nav_html: str) -> List[TocNode]` `priv` (L4781-4823)
-L4772> @brief Execute `_toc_tree_from_html`.
-L4773> @details Implements deterministic control flow as defined by module runtime semantics.
-L4774> @param self Input argument for `_toc_tree_from_html`.
-L4775> ...
-L4782-4788> @brief Execute `_toc_nodes_from_nav_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_toc_nodes_from_nav_html`. @param nav_html Input argument for `_toc_nodes_from_nav_html`. @return List[TocNode] Return value of `_toc_nodes_from_nav_html`.
-L4792> `return []`
-L4795-4800> @brief Execute `parse_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `parse_ul`. @return List[TocNode] Return value of `parse_ul`.
-L4817> `return items`
-L4821> `return nodes[0].children`
-L4822> `return nodes`
+- Brief: Execute `_toc_nodes_from_nav_html`. Execute `parse_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_toc_nodes_from_nav_html`. nav_html Input argument for `_toc_nodes_from_nav_html`. ul Input argument for `parse_ul`.
+- Return: List[TocNode] Return value of `_toc_nodes_from_nav_html`. List[TocNode] Return value of `parse_ul`.
 
 ### fn `def parse_ul(ul) -> List[TocNode]` (L4794-4818)
-L4795-4800> @brief Execute `parse_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `parse_ul`. @return List[TocNode] Return value of `parse_ul`.
-L4817> `return items`
+- Brief: Execute `parse_ul`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: ul Input argument for `parse_ul`.
+- Return: List[TocNode] Return value of `parse_ul`.
 
 ### fn `def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L4825-4835)
-L4826-4831> @brief Execute `_iter_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument for `_iter_toc_nodes`. @return Iterable[TocNode] Return value of `_iter_toc_nodes`.
-L4833> `yield n`
-L4834> `yield from DoxygenExportDownloader._iter_toc_nodes(n.children)`
+- Brief: Execute `_iter_toc_nodes`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: nodes Input argument for `_iter_toc_nodes`.
+- Return: Iterable[TocNode] Return value of `_iter_toc_nodes`.
 
 ### fn `def _select_main_container(self, soup: BeautifulSoup)` `priv` (L4836-4857)
-L4837-4843> @brief Execute `_select_main_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_select_main_container`. @param soup Input argument for `_select_main_container`. @return Any Return value of `_select_main_container`.
-L4845> `return None`
-L4854> `return None`
-L4856> `return main`
+- Brief: Execute `_select_main_container`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_select_main_container`. soup Input argument for `_select_main_container`.
+- Return: Any Return value of `_select_main_container`.
 
 ### fn `def _find_fragment_anchor(self, main, fragment: str)` `priv` (L4858-4885)
-L4859-4866> @brief Execute `_find_fragment_anchor`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_find_fragment_anchor`. @param main Input argument for `_find_fragment_anchor`. @param fragment Input argument for `_find_fragment_anchor`. @return Any Return value of `_find_fragment_anchor`.
-L4869> `return None`
-L4872> `return None`
-L4874> `return target`
-L4878> `return parent`
-L4883> `return next_heading`
-L4884> `return target`
+- Brief: Execute `_find_fragment_anchor`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_find_fragment_anchor`. main Input argument for `_find_fragment_anchor`. fragment Input argument for `_find_fragment_anchor`.
+- Return: Any Return value of `_find_fragment_anchor`.
 
 ### fn `def _normalize_heading_text(value: str) -> str` `priv` `@staticmethod` (L4887-4895)
-L4888-4893> @brief Execute `_normalize_heading_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument for `_normalize_heading_text`. @return str Return value of `_normalize_heading_text`.
-L4894> `return " ".join((value or "").split()).strip().lower()`
+- Brief: Execute `_normalize_heading_text`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: value Input argument for `_normalize_heading_text`.
+- Return: str Return value of `_normalize_heading_text`.
 
 ### fn `def _strip_duplicate_section_title(` `priv` (L4896-4897)
-L4888> @brief Execute `_normalize_heading_text`.
-L4889> @details Implements deterministic control flow as defined by module runtime semantics.
-L4890> @param value Input argument for `_normalize_heading_text`.
-L4891> ...
 
 ### fn `def _extract_section_html(` `priv` (L4940-4941)
 
 ### fn `def direct_child(el)` (L4969-4980)
-L4970-4975> @brief Execute `direct_child`. @details Implements deterministic control flow as defined by module runtime semantics. @param el Input argument for `direct_child`. @return Any Return value of `direct_child`.
-L4979> `return cur if cur and cur.parent == main else None`
+- Brief: Execute `direct_child`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: el Input argument for `direct_child`.
+- Return: Any Return value of `direct_child`.
 
 ### fn `def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]` `priv` (L5004-5069)
-L5005-5011> @brief Execute `_build_toc`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_build_toc`. @param doc Input argument for `_build_toc`. @return List[TocNode] Return value of `_build_toc`.
-L5015> `return nodes`
-L5017> Track content by hash to consolidate duplicates
-L5031> Create content hash for deduplication
-L5036> Duplicate content - point to existing anchor
-L5040> New content - use this section's anchor
-L5068> `return nodes`
+- Brief: Execute `_build_toc`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `_build_toc`. doc Input argument for `_build_toc`.
+- Return: List[TocNode] Return value of `_build_toc`.
 
 ### fn `def run(self) -> None` (L5070-5269)
-L5071-5076> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @return None Return value of `run`.
-L5090> `return`
-L5200> Download assets from the touched pages
-L5249> `return`
-L5255> Crawl pages
+- Brief: Execute `run`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `run`.
+- Return: None Return value of `run`.
 
-- var `MAX_PAGES = 250` (L5256) — Crawl pages
+- var `MAX_PAGES = 250` (L5256)
 ### class `class ResourceExplorerModule` (L5434-5466)
-L5431> ----------------------------
-- fn `def select(` (L5441-5442) L5435> @brief Define class `ResourceExplorerModule`. @details Encapsulates behavior used by downloader o...
-- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5455-5466) L5444> @brief Execute `select`. @details Implements deterministic control flow as defined by module runt...
-  L5456-5463> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @param downloader Input argument for `run`. @param selection Input argument for `run`. @return None Return value of `run`.
-  L5464> `raise NotImplementedError`
+- Brief: Define class `ResourceExplorerModule`. Execute `select`. Execute `run`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `select`. url Input argument for `select`. html Input argument for `select`. soup Input argument for `select`. self Input argument for `run`. downloader Input argument for `run`. selection Input argument for `run`.
+- Return: Optional[Dict[str, str]] Return value of `select`. None Return value of `run`.
+- fn `def select(` (L5441-5442)
+- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5455-5466)
+  - Brief: Execute `run`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `run`. downloader Input argument for `run`. selection Input argument for `run`.
+  - Return: None Return value of `run`.
 
 ### class `class RMModuleDoxigen(ResourceExplorerModule)` : ResourceExplorerModule (L5467-5524)
-L5468-5471> @brief Define class `RMModuleDoxigen`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
-L5479-5487> @brief Execute `select`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `select`. @param url Input argument for `select`. @param html Input argument for `select`. @param soup Input argument for `select`. @return Optional[Dict[str, str]] Return value of `select`.
-L5489> `return None`
-L5494> `return None`
-L5497> `return None`
-L5499> `return {"doxygen_url": doxygen_url}`
+- Brief: Define class `RMModuleDoxigen`. Execute `select`. Execute `run`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `select`. url Input argument for `select`. html Input argument for `select`. soup Input argument for `select`. self Input argument for `run`. downloader Input argument for `run`. selection Input argument for `run`.
+- Return: Optional[Dict[str, str]] Return value of `select`. None Return value of `run`.
 - fn `def select(` (L5476-5477)
 - fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5501-5524)
-  L5502-5509> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @param downloader Input argument for `run`. @param selection Input argument for `run`. @return None Return value of `run`.
-  L5512> `raise RuntimeError("Modulo RMModuleDoxigen: URL Doxygen non valida.")`
+  - Brief: Execute `run`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `run`. downloader Input argument for `run`. selection Input argument for `run`.
+  - Return: None Return value of `run`.
 
 ### class `class ResourceExplorerDownloader(BaseDownloader)` : BaseDownloader (L5525-5657)
-L5571-5578> @brief Execute `_select_module`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_select_module`. @param html Input argument for `_select_module`. @param soup Input argument for `_select_module`. @return Optional[Tuple[ResourceExplorerModule, Dict[str, str]]] Return value of `_select_module`.
-L5582> `return module, selection`
-L5583> `return None`
-- fn `def __init__(self, *args, **kwargs)` `priv` (L5532-5543) L5526> @brief Define class `ResourceExplorerDownloader`. @details Encapsulates behavior used by download...
-  L5533-5540> @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `__init__`. @param *args Input argument for `__init__`. @param **kwargs Input argument for `__init__`. @return Any Return value of `__init__`.
+- Brief: Define class `ResourceExplorerDownloader`. Execute `__init__`. Execute `matches_url`. Execute `probe_html`. Execute `_select_module`. Execute `_render_with_playwright`. Execute `run`.
+- Details: Encapsulates behavior used by downloader orchestration and processing pipeline. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics. Implements deterministic control flow as defined by module runtime semantics.
+- Param: self Input argument for `__init__`. *args Input argument for `__init__`. **kwargs Input argument for `__init__`. cls Input argument for `matches_url`. url Input argument for `matches_url`. cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`. self Input argument for `_select_module`. html Input argument for `_select_module`. soup Input argument for `_select_module`. self Input argument for `_render_with_playwright`. self Input argument for `run`.
+- Return: Any Return value of `__init__`. bool Return value of `matches_url`. bool Return value of `probe_html`. Optional[Tuple[ResourceExplorerModule, Dict[str, str]]] Return value of `_select_module`. str Return value of `_render_with_playwright`. None Return value of `run`.
+- fn `def __init__(self, *args, **kwargs)` `priv` (L5532-5543)
+  - Brief: Execute `__init__`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `__init__`. *args Input argument for `__init__`. **kwargs Input argument for `__init__`.
+  - Return: Any Return value of `__init__`.
 - fn `def matches_url(cls, url: str) -> bool` (L5545-5555)
-  L5546-5552> @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `matches_url`. @param url Input argument for `matches_url`. @return bool Return value of `matches_url`.
-  L5554> `return u.netloc.endswith("dev.ti.com") and "/tirex/explore/node" in u.path.lower()`
+  - Brief: Execute `matches_url`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `matches_url`. url Input argument for `matches_url`.
+  - Return: bool Return value of `matches_url`.
 - fn `def probe_html(cls, url: str, html: str) -> bool` (L5557-5567)
-  L5558-5565> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `probe_html`. @param url Input argument for `probe_html`. @param html Input argument for `probe_html`. @return bool Return value of `probe_html`.
-  L5566> `return "css-1aefuid-contentContainer" in (html or "")`
-- fn `def _select_module(` `priv` (L5568-5569) L5558> @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module ...
+  - Brief: Execute `probe_html`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: cls Input argument for `probe_html`. url Input argument for `probe_html`. html Input argument for `probe_html`.
+  - Return: bool Return value of `probe_html`.
+- fn `def _select_module(` `priv` (L5568-5569)
 - fn `def _render_with_playwright(self) -> str` `priv` (L5585-5622)
-  L5586-5591> @brief Execute `_render_with_playwright`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_render_with_playwright`. @return str Return value of `_render_with_playwright`.
-  L5619> `return html`
-  L5621> `return ""`
+  - Brief: Execute `_render_with_playwright`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `_render_with_playwright`.
+  - Return: str Return value of `_render_with_playwright`.
 - fn `def run(self) -> None` (L5623-5657)
-  L5624-5629> @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. @return None Return value of `run`.
-  L5635> `raise RuntimeError("Impossibile scaricare la pagina Resource Explorer.") from exc`
-  L5642> `return`
-  L5653> `return`
-  L5655> `raise RuntimeError("Nessun modulo Resource Explorer compatibile trovato.")`
+  - Brief: Execute `run`.
+  - Details: Implements deterministic control flow as defined by module runtime semantics.
+  - Param: self Input argument for `run`.
+  - Return: None Return value of `run`.
 
 ### fn `def build_arg_parser() -> argparse.ArgumentParser` (L5663-5708)
-L5660> ----------------------------
-L5664-5668> @brief Execute `build_arg_parser`. @details Implements deterministic control flow as defined by module runtime semantics. @return argparse.ArgumentParser Return value of `build_arg_parser`.
-L5706> `return ap`
+- Brief: Execute `build_arg_parser`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Return: argparse.ArgumentParser Return value of `build_arg_parser`.
 
 ### fn `def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None` (L5709-5758)
-L5710-5717> @brief Execute `print_strict_help`. @details Implements deterministic control flow as defined by module runtime semantics. @param program Input argument for `print_strict_help`. @param version Input argument for `print_strict_help`. @param parser Input argument for `print_strict_help`. @return None Return value of `print_strict_help`.
-L5718> Header
-L5722> Usage
-L5727> Example(s)
-L5732> Fixed core options block
-L5739> Generate full list of options from parser._actions (avoid duplicates)
-L5741> Collect actions in insertion order
-L5744> Skip the help/version that we've already printed
-L5750> show metavar for positional/optional arguments where appropriate
-L5755> Align to match typical formatting
+- Brief: Execute `print_strict_help`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Param: program Input argument for `print_strict_help`. version Input argument for `print_strict_help`. parser Input argument for `print_strict_help`.
+- Return: None Return value of `print_strict_help`.
 
 ### fn `def main() -> int` (L5759-5810)
-L5760-5764> @brief Execute `main`. @details Implements deterministic control flow as defined by module runtime semantics. @return int Return value of `main`.
-L5766> If executed with no parameters or with -h/--help, print strict help and exit 0
-L5769> `return 0`
-L5808> `return 0`
-
-## Comments
-- L2: @file cli.py @brief Module implementation for HtmlDownloader runtime. @details Contains executable logic and internal helpers used by the CLI workf...
-- L41: @brief Execute `_parse_version_tuple`. @details Implements deterministic control flow as defined by module runtime semantics. @param v Input argume...
-- L61: @brief Execute `_is_version_newer`. @details Implements deterministic control flow as defined by module runtime semantics. @param latest Input argu...
-- L79: @brief Execute `_get_latest_version_from_github`. @details Implements deterministic control flow as defined by module runtime semantics. @param own...
-- L109: @brief Execute `check_for_new_version`. @details Implements deterministic control flow as defined by module runtime semantics. @param program Input...
-- L127-128: ---------------------------- | Shared helpers
-- L133: @brief Execute `safe_filename`. @details Implements deterministic control flow as defined by module runtime semantics. @param path Input argument f...
-- L146: @brief Execute `positive_int`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument f...
-- L162: @brief Execute `is_http_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param s Input argument for `i...
-- L176: @brief Execute `normalize_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param u Input argument for ...
-- L192: @brief Execute `ensure_parent`. @details Implements deterministic control flow as defined by module runtime semantics. @param p Input argument for ...
-- L202: @brief Execute `local_path_for_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param asset_url Input ...
-- L227: @brief Execute `download_one`. @details Implements deterministic control flow as defined by module runtime semantics. @param session Input argument...
-- L250: @brief Execute `escape_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param s Input argument for `e...
-- L267: @brief Define class `TocNode`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
-- L277: @brief Execute `limit_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argumen...
-- L290: @brief Execute `trim_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for ...
-- L310: @brief Execute `ensure_heading_ids`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argum...
-- L335: @brief Execute `strip_styles`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument fo...
-- L353: @brief Execute `toc_from_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argume...
-- L391: @brief Execute `parse_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param list_el Input argument f...
-- L401: Check for title-only elements (e.g., <li class="toc-title">)
-- L405: Create a node without href (will be rendered as plain text)
-- L422: fallback: attempt with any list if no top-level found
-- L426: Process only the first list to avoid duplicates from multiple nav structures
-- L432: @brief Execute `nav_outline_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param nav_html Inpu...
-- L443: @brief Execute `norm_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param t Input argument for `nor...
-- L453: @brief Execute `bullet`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input argument for `bu...
-- L466: @brief Execute `walk_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `walk...
-- L514: @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L536: @brief Execute `verbose`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `ve...
-- L547: @brief Execute `debug`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `debu...
-- L558: @brief Execute `check`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `chec...
-- L581: @brief Execute `__call__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L614: @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L627: @brief Execute `format_usage`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument fo...
-- L636: Append version to the first line of the usage (preserve trailing parts)
-- L647: @brief Execute `iter_asset_urls`. @details Implements deterministic control flow as defined by module runtime semantics. @param soup Input argument...
-- L672: inline background-image url(...)
-- L697: @brief Execute `to_rel`. @details Implements deterministic control flow as defined by module runtime semantics. @param u Input argument for `to_rel...
-- L733: @brief Execute `repl`. @details Implements deterministic control flow as defined by module runtime semantics. @param m Input argument for `repl`. ...
-- L755: @brief Execute `normalize_document_links_inplace`. @details Implements deterministic control flow as defined by module runtime semantics. @param so...
-- L766: Index document ids case-insensitively
-- L798: Direct in-document anchor
-- L812: Normalize casing
-- L822: Unknown fragment → drop href
-- L835: External link with explicit scheme
-- L840: Attempt to rewrite any URL-with-fragment to a local in-doc anchor
-- L860: No fragment and not an allowed external scheme → drop href
-- L894: @brief Execute `resolved_href`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argument f...
-- L909: @brief Execute `render_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument f...
-- L950: @brief Execute `build_frameset_index`. @details Implements deterministic control flow as defined by module runtime semantics. @param toc_filename I...
-- L980-998: @brief Execute `minimal_readable_wrapper`. @details Implements deterministic control flow as defi... | return f"""<!doctype html> <html lang="it"> <head> <meta charset="utf-8"/> ...
-- L1001-1002: ---------------------------- | Downloader framework
-- L1023: @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L1067: @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for ...
-- L1108: @brief Execute `post_process`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument fo...
-- L1123: @brief Execute `_verify_toc_consistency`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ...
-- L1137: Find all links in TOC
-- L1151: Find corresponding element in document.html
-- L1159: Check if it's a heading and text matches
-- L1175: @brief Execute `_verify_toc_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argume...
-- L1188: @brief Execute `get_max_depth`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for...
-- L1215: @brief Execute `_prune_toc_and_clean_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self ...
-- L1226: @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argumen...
-- L1238: Process toc.html
-- L1245: Prune TOC at depth >=7
-- L1250: @brief Execute `prune_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `pru...
-- L1272: Clean heading prefixes from TOC links
-- L1279: Process document.html
-- L1284: Clean heading prefixes from headings
-- L1289-1292: If we pruned deep TOC entries, demote their corresponding headings in document.html. | A heading is associated to a pruned TOC entry if: | - the heading id is referenced by a pruned TOC href, OR | - the heading is contained in a div/section whose id is referenced by a pruned TOC href.
-- L1323: @brief Execute `_deduplicate_toc_entries`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input...
-- L1336: @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argumen...
-- L1355: @brief Execute `process_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument ...
-- L1369: promote children: process children and extend at this level
-- L1377: process children recursively
-- L1383-1384: Build TocNode list from the captured TOC HTML and process with the | TocNode-based algorithm, then rebuild the TOC HTML deterministically.
-- L1392: @brief Execute `_enforce_toc_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L1407: @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argumen...
-- L1419: Map fragment id -> toc depth (depth = number of UL ancestors)
-- L1431: @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input arg...
-- L1448: @brief Execute `find_referenced_container_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param h Inpu...
-- L1465: Process headings in document.html
-- L1483: Not referenced: convert to bold uppercase non-heading
-- L1492-1494: Referenced: correct heading level based on TOC depth. | For container-based references, correct only the first heading inside that container | to avoid flattening internal structure.
-- L1511: @brief Execute `_test_toc_headings`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argum...
-- L1527: @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argumen...
-- L1540: @brief Execute `clamp_heading_level`. @details Implements deterministic control flow as defined by module runtime semantics. @param depth Input arg...
-- L1670: @brief Execute `summarize`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for ...
-- L1707: @brief Execute `fix_heading_ref_position`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input...
-- L1742: Build an index of ids in the document (case-insensitive).
-- L1786: Remove id from the container and assign the TOC fragment id to the heading.
-- L1794-1795: Try to preserve the old heading id by moving it to the container, | but only if it does not collide with another element.
-- L1806: Re-index after modifications and ensure all TOC href fragments point to headings.
-- L1848: @brief Execute `fix_heading_numbering`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L1885: @brief Execute `set_flat_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param tag Input argument fo...
-- L1898: Phase 1: remove existing numbering from all TOC link texts
-- L1904: Phase 1: remove existing numbering from all headings in the document
-- L1917: @brief Execute `href_fragment_id`. @details Implements deterministic control flow as defined by module runtime semantics. @param href Input argumen...
-- L1941: Maintain counters per depth
-- L1960: Apply numbering to corresponding headings (by fragment id)
-- L1987-1993: @brief Execute `_clean_document_style`. @details Implements deterministic control flow as defined... | Process document.html
-- L2000: Process toc.html
-- L2008: @brief Execute `_add_document_style`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argu...
-- L2020: Check if there are any tables or images in the document
-- L2026: Create or find the head element
-- L2036-2048: Create style tag with table border CSS and image border CSS | style_tag.string = table { border-collapse: collapse; } ...
-- L2054: @brief Execute `_normalize_document_links`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Inpu...
-- L2069: @brief Execute `_remove_unused_images`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L2079: Read HTML contents to search references
-- L2102: If neither the relative path nor the basename appear in the HTML, delete
-- L2111: @brief Execute `_remove_unused_assets`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L2137: If neither the relative path nor the basename appear in document.html, delete
-- L2146: @brief Execute `_normalize_image_position`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Inpu...
-- L2162: Collect image files under assets recursively
-- L2166: skip files already in the root of assets
-- L2177: ensure unique
-- L2193: Update references in HTML files
-- L2206: @brief Execute `_clean_assets_tree`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argum...
-- L2216-2217: Walk directories bottom-up and try to remove empty ones | Use sorted(reverse=True) to attempt children before parents
-- L2221: rmdir only if empty
-- L2229: @brief Execute `_remove_empty_assets_root`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Inpu...
-- L2239: Check for any files or non-empty directories under assets
-- L2242-2243: if any file exists, or any directory that contains something, mark | as non-empty
-- L2249: if dir contains any children, it's non-empty
-- L2292: @brief Execute `detect`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `det...
-- L2325-2326: ---------------------------- | Document-viewer (TI) downloader
-- L2331: @brief Execute `guess_ext_from_content_type`. @details Implements deterministic control flow as defined by module runtime semantics. @param ct Inpu...
-- L2357: @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L2377: @brief Execute `on_response`. @details Implements deterministic control flow as defined by module runtime semantics. @param resp Input argument for...
-- L2452: @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for ...
-- L2464: @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `...
-- L2476: @brief Execute `_pick_best_outerhtml`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input arg...
-- L2510: @brief Execute `_expand_full_toc`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argumen...
-- L2571: @brief Execute `_scroll_toc_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L2627: @brief Execute `_find_scroll_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input a...
-- L2702: @brief Execute `_auto_scroll_element`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input arg...
-- L2781: @brief Execute `_auto_scroll`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument fo...
-- L2858: @brief Execute `_collect_cards_from_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self ...
-- L2937: @brief Execute `_best_card_for_fragment`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ...
-- L2955: @brief Execute `score_value`. @details Implements deterministic control flow as defined by module runtime semantics. @param val Input argument for ...
-- L2992: @brief Execute `_fragment_matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L3012: @brief Execute `_toc_tree_from_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argu...
-- L3023: @brief Execute `_iter_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argument fo...
-- L3035: @brief Execute `_first_numeric_index`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input ar...
-- L3049: @brief Execute `_trim_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argumen...
-- L3074: @brief Execute `_limit_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argume...
-- L3087: @brief Execute `_limit_by_reading_order`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input...
-- L3126: @brief Execute `_prune_toc_to_allowed`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input a...
-- L3148: @brief Execute `_first_toc_entry_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input ...
-- L3162: @brief Execute `_is_important_notice_label`. @details Implements deterministic control flow as defined by module runtime semantics. @param title In...
-- L3173: @brief Execute `_is_important_notice_section`. @details Implements deterministic control flow as defined by module runtime semantics. @param sectio...
-- L3190: @brief Execute `_select_section_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input a...
-- L3225: @brief Execute `dedup_list`. @details Implements deterministic control flow as defined by module runtime semantics. @param items Input argument for...
-- L3235: Recursively deduplicate children first
-- L3240: Merge children and prefer the more descriptive/structured title
-- L3255: @brief Execute `_is_section_scrollable`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input a...
-- L3278-3285: @brief Execute `_remove_toc_elements`. @details Implements deterministic control flow as defined ... | Remove by tag name (TI custom components)
-- L3295: Remove by selector
-- L3315-3323: @brief Execute `_convert_doxygen_definition_lists`. @details Implements deterministic control flo... | Handle <dl><dt>/<dd> pairs first
-- L3337-3339: Handle adjacent paragraph style variations: | 1) <p>Label</p> + <p>: description</p> | 2) <p>Label</p> + <p>:</p> + <p>description</p>
-- L3349: Case A: right paragraph starts with a colon followed by text
-- L3361: Case B: right paragraph is just a colon (possibly with spaces)
-- L3372: remove the marker and the description nodes
-- L3376: Otherwise, not a definition-style pair
-- L3384: @brief Execute `_extract_fragment_only`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input a...
-- L3402: @brief Execute `score_value`. @details Implements deterministic control flow as defined by module runtime semantics. @param val Input argument for ...
-- L3426: @brief Execute `pick_best_section`. @details Implements deterministic control flow as defined by module runtime semantics. @param elements Input ar...
-- L3449: Prefer a single documentSection card that matches the fragment to avoid duplicated parent cards.
-- L3460: @brief Execute `matches_fragment`. @details Implements deterministic control flow as defined by module runtime semantics. @param el Input argument ...
-- L3507: @brief Execute `_wait_for_fragment`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argum...
-- L3560: @brief Execute `_click_toc_link`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument...
-- L3589: @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. ...
-- L3599: @brief Execute `make_anchor`. @details Implements deterministic control flow as defined by module runtime semantics. @param raw_fragment Input argu...
-- L3618: @brief Execute `normalize_text`. @details Implements deterministic control flow as defined by module runtime semantics. @param value Input argument...
-- L3629: @brief Execute `strip_ti_disclaimer`. @details Implements deterministic control flow as defined by module runtime semantics. @param section_html In...
-- L3673: Expand navigation tree (with repeated passes and scroll in TOC) to capture full TOC
-- L3695: Also capture doc-lister title if present (TI pages have this as a separate element)
-- L3716: Prepend doc title if captured separately
-- L3733: Apply reading-order limit: take the first <limit> entries across all levels
-- L3786: Choose/reuse anchor for this fragment (regardless of whether it will be downloaded)
-- L3793: Reuse anchor for repeated section URLs so TOC always points to a kept section
-- L3807-3808: For TI document-viewer, the fragment determines which content is loaded | Use the full URL with fragment to ensure unique content per section
-- L3855: Download all deduplicated sections (skip scrollability filtering)
-- L3858: Download sections starting from the first scrollable one
-- L4031-4032: Convert Doxygen-style definition lists and textual definition | pairs into inline bold uppercase labels to improve text retrieval
-- L4061-4062: ---------------------------- | Doxygen-export downloader
-- L4067: @brief Define class `DoxygenExportDownloader`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
-- L4075-4083: @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module... | TI export path typically contains /exports/ and ends with index.html
-- L4090: @brief Execute `probe_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for `...
-- L4102: @brief Execute `_scope`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_sc...
-- L4116: @brief Execute `_fetch_soup`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for...
-- L4128: @brief Execute `_is_in_scope`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument fo...
-- L4145: @brief Execute `_page_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for...
-- L4161: @brief Execute `_document_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument...
-- L4193: @brief Execute `_extract_main`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument f...
-- L4206: Remove TOC elements from page content
-- L4217: @brief Execute `_remove_toc_elements`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input arg...
-- L4227: Remove TOC containers and navigation elements
-- L4246: @brief Execute `_links_to_html_pages`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input arg...
-- L4270-4277: Wait for the nav tree to load completely | @brief Execute `_expand_nav_tree`. @details Implements deterministic control flow as defined by m...
-- L4283-4293: Scroll to make sure all content is loaded | (() => { const navTree = document.querySelector('#nav-tree-contents'); if (navTree) { ...
-- L4302: Wait for final DOM stabilization
-- L4307-4314: Track expanded items for limit enforcement | @brief Execute `_expand_nav_tree_full`. @details Implements deterministic control flow as defined...
-- L4317: Expand systematically by clicking on arrows multiple times
-- L4321: f ((limit, expandedCount) => {{ const root = document.querySelector('#nav-tree-contents'); if (!root) return {{clicks: 0, expanded: expandedCount}}...
-- L4412: Stop if limit reached or no more clicks
-- L4422: Wait for content to load after clicks
-- L4432-4433: Final pass: force expand any remaining collapsed elements, except API Reference | Only if we haven't reached the limit
-- L4514: @brief Execute `_expand_nav_tree_limited`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input...
-- L4526: (limit) => { const root = document.querySelector('#nav-tree-contents > ul'); if (!root) return {expanded: 0, count: 0, reached: false}; ...
-- L4624: @brief Execute `_cleanup_nav_tree_styles`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input...
-- L4656: @brief Execute `_fetch_nav_tree_with_playwright`. @details Implements deterministic control flow as defined by module runtime semantics. @param sel...
-- L4688: (() => { const el = document.querySelector('#nav-tree-contents ul'); if (!el) return ''; ...
-- L4746: @brief Execute `_nav_link_href`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument ...
-- L4782: @brief Execute `_toc_nodes_from_nav_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input...
-- L4795: @brief Execute `parse_ul`. @details Implements deterministic control flow as defined by module runtime semantics. @param ul Input argument for `par...
-- L4826: @brief Execute `_iter_toc_nodes`. @details Implements deterministic control flow as defined by module runtime semantics. @param nodes Input argumen...
-- L4837: @brief Execute `_select_main_container`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input a...
-- L4859: @brief Execute `_find_fragment_anchor`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L4899: @brief Execute `_strip_duplicate_section_title`. @details Implements deterministic control flow as defined by module runtime semantics. @param self...
-- L4943: @brief Execute `_extract_section_html`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ar...
-- L4970: @brief Execute `direct_child`. @details Implements deterministic control flow as defined by module runtime semantics. @param el Input argument for ...
-- L5005: @brief Execute `_build_toc`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for ...
-- L5017: Track content by hash to consolidate duplicates
-- L5031: Create content hash for deduplication
-- L5036: Duplicate content - point to existing anchor
-- L5040: New content - use this section's anchor
-- L5071: @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. ...
-- L5200: Download assets from the touched pages
-- L5307: Build unified doc with robust anchors and content deduplication
-- L5327: Skip duplicate content
-- L5380: Download assets from all pages
-- L5399: Rewrite to local
-- L5402: Remove stylesheet references and inline styles
-- L5405: Output
-- L5429-5430: ---------------------------- | Resource Explorer downloader
-- L5456: @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. ...
-- L5468: @brief Define class `RMModuleDoxigen`. @details Encapsulates behavior used by downloader orchestration and processing pipeline.
-- L5479: @brief Execute `select`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `sel...
-- L5502: @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. ...
-- L5533: @brief Execute `__init__`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `_...
-- L5546: @brief Execute `matches_url`. @details Implements deterministic control flow as defined by module runtime semantics. @param cls Input argument for ...
-- L5571: @brief Execute `_select_module`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument ...
-- L5586: @brief Execute `_render_with_playwright`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input ...
-- L5624: @brief Execute `run`. @details Implements deterministic control flow as defined by module runtime semantics. @param self Input argument for `run`. ...
-- L5658-5659: ---------------------------- | Main
-- L5664: @brief Execute `build_arg_parser`. @details Implements deterministic control flow as defined by module runtime semantics. @return argparse.Argument...
-- L5710-5718: @brief Execute `print_strict_help`. @details Implements deterministic control flow as defined by ... | Header
-- L5722: Usage
-- L5727: Example(s)
-- L5732: Fixed core options block
-- L5739-5741: Generate full list of options from parser._actions (avoid duplicates) | Collect actions in insertion order
-- L5744: Skip the help/version that we've already printed
-- L5750: show metavar for positional/optional arguments where appropriate
-- L5755: Align to match typical formatting
-- L5760-5766: @brief Execute `main`. @details Implements deterministic control flow as defined by module runtim... | If executed with no parameters or with -h/--help, print strict help and exit 0
+- Brief: Execute `main`.
+- Details: Implements deterministic control flow as defined by module runtime semantics.
+- Return: int Return value of `main`.
 
 ## Symbol Index
 |Symbol|Kind|Vis|Lines|Sig|
@@ -1495,9 +1187,4 @@ L5808> `return 0`
 
 # version.py | Python | 13L | 0 symbols | 0 imports | 3 comments
 > Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/version.py`
-> @file version.py @brief HtmlDownloader package entry module. @details Exposes package-level symbols used by CLI entrypoints and version reporting. ...
-
-## Comments
-- L9: : @var __version__ @brief Module-level variable `__version__`.
-- L12: : @var __all__ @brief Module-level variable `__all__`.
 
