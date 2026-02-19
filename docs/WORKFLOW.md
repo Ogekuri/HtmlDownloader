@@ -1,236 +1,205 @@
-# WORKFLOW
+## Execution Units Index
+- id: PROC:main
+  type: Process
+  parent_process: null
+  role: CLI runtime process for downloader selection and export orchestration
+  entrypoint_symbols:
+    - __main__.py::__main__ -> main(...)
+    - cli.py::main(...)
+  defining_files:
+    - src/htmldownloader/__main__.py
+    - src/htmldownloader/cli.py
+- id: PROC:pip-upgrade
+  type: Process
+  parent_process: null
+  role: On-demand package upgrade child process
+  entrypoint_symbols:
+    - cli.py::UpgradeAction.__call__(...)
+  defining_files:
+    - src/htmldownloader/cli.py
+- id: PROC:chromium
+  type: Process
+  parent_process: null
+  role: Browser automation child process started by Playwright
+  entrypoint_symbols:
+    - cli.py::DocumentViewerDownloader.run(...)
+    - cli.py::DoxygenExportDownloader._fetch_nav_tree_with_playwright(...)
+    - cli.py::ResourceExplorerDownloader._render_with_playwright(...)
+  defining_files:
+    - src/htmldownloader/cli.py
+- id: PROC:gha-build-release
+  type: Process
+  parent_process: null
+  role: GitHub Actions runner process for release workflow
+  entrypoint_symbols:
+    - .github/workflows/release-uvx.yml::jobs.build-release
+  defining_files:
+    - .github/workflows/release-uvx.yml
 
-## Scope
-- analyzed_paths:
-  - `doxygen.sh`
-  - `src/htmldownloader/__main__.py`
-  - `src/htmldownloader/__init__.py`
-  - `src/htmldownloader/version.py`
-  - `src/htmldownloader/cli.py`
-  - `.github/workflows/release-uvx.yml`
-  - `docs/REQUIREMENTS.md`
-- ignored_paths:
-  - `src/tests/*` (test fixtures)
-- maintenance_update:
-- `2026-02-15`: Documentazione Doxygen in `src/htmldownloader/*.py` normalizzata e verificata con audit di conformita' automatico; runtime call graph invariato.
-- `2026-02-17`: Rieseguito audit su `src/` per copertura Doxygen (moduli/classi/funzioni/variabili esportate) e verifica assenza riferimenti pdoc; call graph runtime invariato.
-- `2026-02-17`: Aggiunto workflow `doxygen.sh` per generazione documentazione multi-formato (`html`, `pdf`, `markdown`) da `src/` con output in `doxygen/`.
+## Execution Units
+### PROC:main
+- Entrypoint(s):
+  - src/htmldownloader/__main__.py:11-12
+  - src/htmldownloader/cli.py:5759-5812
+- Lifecycle/trigger:
+  - start: python module execution (`python -m htmldownloader`) or script entry execution.
+  - stop: returns exit code via `SystemExit(main())`.
+  - loop_blocking: no explicit infinite loop; blocking on HTTP I/O and Playwright calls.
+  - explicit_threads: no explicit threads detected.
+- Internal Call-Trace Tree:
+  - `main(...)`: bootstrap CLI runtime and dispatch downloader [`src/htmldownloader/__main__.py`]
+    - `main(...)`: parse arguments, initialize runtime, run selected downloader [`src/htmldownloader/cli.py`]
+      - `build_arg_parser(...)`: build option schema and actions [`src/htmldownloader/cli.py`]
+      - `print_strict_help(...)`: print strict help for empty/help invocation branch [`src/htmldownloader/cli.py`]
+      - `check_for_new_version(...)`: update-notice preflight branch [`src/htmldownloader/cli.py`]
+        - `_get_latest_version_from_github(...)`: fetch latest release tag [`src/htmldownloader/cli.py`]
+        - `_is_version_newer(...)`: semantic tuple comparison [`src/htmldownloader/cli.py`]
+          - `_parse_version_tuple(...)`: parse dotted version parts [`src/htmldownloader/cli.py`]
+      - `DownloaderRegistry.register(...)`: register candidate downloader classes [`src/htmldownloader/cli.py`]
+      - `DownloaderRegistry.detect(...)`: select downloader class by URL/probe [`src/htmldownloader/cli.py`]
+      - `ResourceExplorerDownloader.run(...)`: branch when detected class is ResourceExplorer [`src/htmldownloader/cli.py`]
+        - `_select_module(...)`: module detection over fetched HTML [`src/htmldownloader/cli.py`]
+          - `RMModuleDoxigen.select(...)`: detect embedded Doxygen iframe URL [`src/htmldownloader/cli.py`]
+        - `_render_with_playwright(...)`: JS-render fallback HTML acquisition [`src/htmldownloader/cli.py`]
+        - `RMModuleDoxigen.run(...)`: delegate to DoxygenExport downloader [`src/htmldownloader/cli.py`]
+          - `DoxygenExportDownloader.run(...)`: execute Doxygen export flow [`src/htmldownloader/cli.py`]
+      - `DocumentViewerDownloader.run(...)`: branch when detected class is DocumentViewer [`src/htmldownloader/cli.py`]
+        - `_expand_full_toc(...)`: expand TOC nodes [`src/htmldownloader/cli.py`]
+        - `_scroll_toc_container(...)`: reveal lazy TOC entries [`src/htmldownloader/cli.py`]
+        - `_pick_best_outerhtml(...)`: capture TOC/content DOM candidates [`src/htmldownloader/cli.py`]
+        - `_toc_tree_from_html(...)`: parse TOC HTML to `TocNode` [`src/htmldownloader/cli.py`]
+        - `_select_section_nodes(...)`: choose section extraction set [`src/htmldownloader/cli.py`]
+        - `_trim_toc_nodes(...)`: trim display TOC (`IMPORTANT NOTICE` policy) [`src/htmldownloader/cli.py`]
+        - `_limit_by_reading_order(...)`: apply optional limit [`src/htmldownloader/cli.py`]
+        - `_prune_toc_to_allowed(...)`: prune TOC to selected nodes [`src/htmldownloader/cli.py`]
+        - `_dedup_toc_nodes_by_href(...)`: remove duplicate href nodes [`src/htmldownloader/cli.py`]
+        - `_click_toc_link(...)`: trigger section navigation [`src/htmldownloader/cli.py`]
+        - `_wait_for_fragment(...)`: wait for fragment realization [`src/htmldownloader/cli.py`]
+        - `_extract_fragment_only(...)`: isolate fragment-specific section [`src/htmldownloader/cli.py`]
+        - `_remove_toc_elements(...)`: remove navigation artifacts [`src/htmldownloader/cli.py`]
+        - `iter_asset_urls(...)`: enumerate asset URLs [`src/htmldownloader/cli.py`]
+        - `local_path_for_url(...)`: map asset URL to local path [`src/htmldownloader/cli.py`]
+        - `download_one(...)`: stream asset file [`src/htmldownloader/cli.py`]
+        - `rewrite_asset_links_inplace(...)`: rewrite links to local assets [`src/htmldownloader/cli.py`]
+        - `_convert_doxygen_definition_lists(...)`: convert definition list patterns [`src/htmldownloader/cli.py`]
+        - `build_toc_html(...)`: emit toc.html payload [`src/htmldownloader/cli.py`]
+        - `build_frameset_index(...)`: emit index.html payload [`src/htmldownloader/cli.py`]
+        - `post_process(...)`: shared cleanup/validation pipeline [`src/htmldownloader/cli.py`]
+      - `DoxygenExportDownloader.run(...)`: branch when detected class is Doxygen export [`src/htmldownloader/cli.py`]
+        - `_scope(...)`: derive host and scoped root [`src/htmldownloader/cli.py`]
+        - `_fetch_soup(...)`: fetch and parse HTML pages [`src/htmldownloader/cli.py`]
+        - `_document_title(...)`: derive document title [`src/htmldownloader/cli.py`]
+          - `_page_title(...)`: fallback title extraction [`src/htmldownloader/cli.py`]
+        - `_fetch_nav_tree_with_playwright(...)`: acquire expanded nav tree [`src/htmldownloader/cli.py`]
+          - `_expand_nav_tree(...)`: dispatch expansion strategy [`src/htmldownloader/cli.py`]
+            - `_expand_nav_tree_limited(...)`: bounded expansion branch [`src/htmldownloader/cli.py`]
+            - `_expand_nav_tree_full(...)`: full expansion branch [`src/htmldownloader/cli.py`]
+          - `_cleanup_nav_tree_styles(...)`: normalize nav styles [`src/htmldownloader/cli.py`]
+        - `_toc_nodes_from_nav_html(...)`: parse nav HTML to TOC nodes [`src/htmldownloader/cli.py`]
+        - `_extract_section_html(...)`: per-fragment extraction from page soup [`src/htmldownloader/cli.py`]
+        - `_links_to_html_pages(...)`: discover in-scope crawl targets [`src/htmldownloader/cli.py`]
+        - `_extract_main(...)`: normalize page main content [`src/htmldownloader/cli.py`]
+          - `_remove_toc_elements(...)`: remove navigation nodes [`src/htmldownloader/cli.py`]
+        - `_build_toc(...)`: build TOC from unified document [`src/htmldownloader/cli.py`]
+        - `iter_asset_urls(...)`: enumerate asset URLs [`src/htmldownloader/cli.py`]
+        - `download_one(...)`: stream asset files [`src/htmldownloader/cli.py`]
+        - `rewrite_asset_links_inplace(...)`: rewrite links to local assets [`src/htmldownloader/cli.py`]
+        - `build_toc_html(...)`: emit toc.html payload [`src/htmldownloader/cli.py`]
+        - `build_frameset_index(...)`: emit index.html payload [`src/htmldownloader/cli.py`]
+        - `post_process(...)`: shared cleanup/validation pipeline [`src/htmldownloader/cli.py`]
+- External Boundaries:
+  - network/http: `requests.get`, `requests.Session.get`.
+  - browser automation: Playwright API and Chromium runtime.
+  - filesystem: output directory creation and HTML/asset writes.
+  - subprocess spawn: `subprocess.run` via upgrade action.
 
-## Requirements Alignment Matrix (code-evidenced)
-- `REQ-001`, `REQ-009`, `REQ-013`, `REQ-017`, `REQ-020`, `REQ-023`, `REQ-024` -> CLI parser + help/version/upgrade + validation (`src/htmldownloader/cli.py:4627-4759`, `395-416`, `4668-4712`).
-- `REQ-002`, `DES-001`, `DES-006` -> downloader registry and dynamic detection (`src/htmldownloader/cli.py:1830-1860`, `4736-4742`).
-- `REQ-003`, `DES-003`, `REQ-022` -> TI document-viewer extraction, TOC trimming, section assembly, definition-list conversion (`src/htmldownloader/cli.py:2416-2553`, `2635-2705`, `2872-3316`).
-- `REQ-004`, `DES-004`, `DES-010/011`, `REQ-010` -> Doxygen crawl / TOC extraction / unified document output (`src/htmldownloader/cli.py:3340-4479`).
-- `REQ-005`, `REQ-008`, `REQ-014` -> gated log channels info/verbose/debug (`src/htmldownloader/cli.py:372-392`, usage across `2872-4479`, `4751-4758`).
-- `REQ-006`, `DES-002`, `DES-005` -> URL-to-local-path mapping + streamed downloads + asset rewrite (`src/htmldownloader/cli.py:119-173`, `176-189`, `444-513`).
-- `REQ-012`, `DES-014..027` -> shared post-process pipeline and TOC/document consistency normalization (`src/htmldownloader/cli.py:747-808`, `810-1827`).
-- `REQ-015`, `REQ-016`, `DES-024` -> Resource Explorer module dispatch to Doxygen downloader (`src/htmldownloader/cli.py:4499-4619`).
-- `REQ-018`, `REQ-019` -> GitHub latest release check (`src/htmldownloader/cli.py:50-111`).
-- `REQ-026`, `DES-031` -> script root-level Doxygen generation pipeline (`doxygen.sh:1-146`).
+### PROC:pip-upgrade
+- Entrypoint(s):
+  - src/htmldownloader/cli.py:574-604
+- Lifecycle/trigger:
+  - start: argparse action branch `--upgrade`.
+  - stop: process exits with `parser.exit(proc.returncode)`.
+  - loop_blocking: blocking child process execution until pip returns.
+  - explicit_threads: no explicit threads detected.
+- Internal Call-Trace Tree:
+  - `UpgradeAction.__call__(...)`: run self-upgrade command and forward exit code [`src/htmldownloader/cli.py`]
+- External Boundaries:
+  - child process execution: `python -m pip install --upgrade htmldownloader`.
 
-## Technical Call Tree
+### PROC:chromium
+- Entrypoint(s):
+  - src/htmldownloader/cli.py:3659-3661
+  - src/htmldownloader/cli.py:4666-4668
+  - src/htmldownloader/cli.py:5593-5595
+- Lifecycle/trigger:
+  - start: `p.chromium.launch(headless=True)` inside Playwright contexts.
+  - stop: explicit `browser.close()` or context manager exit.
+  - loop_blocking: event-driven browser loop managed by Playwright runtime.
+  - explicit_threads: no explicit threads detected in repository source.
+- Internal Call-Trace Tree:
+  - no internal functions defined under `src/` or `.github/workflows/` execute inside this process.
+- External Boundaries:
+  - Playwright transport/channel between Python process and browser process.
 
-- Feature: CLI bootstrap and execution dispatch
-  - Module: `src/htmldownloader/__main__.py`, `src/htmldownloader/cli.py`
-    - `main()`: module entrypoint delegates process exit code to CLI main [`src/htmldownloader/__main__.py:1-7`]
-      - description: imports CLI `main` and terminates with `sys.exit(main())`; no business logic.
-      - `main()`: orchestrates argument handling, update check, downloader detection, execution, and final saved-path logs [`src/htmldownloader/cli.py:4715-4759`]
-        - description: prints strict help for empty/help invocation; parses args; calls version check; resolves and creates output directory; initializes `requests.Session`; registers concrete downloaders; detects downloader class; instantiates downloader with shared options (`limit`, `disable_numbering`, logger/session); runs downloader; prints output artifact paths.
-        - `build_arg_parser()`: defines all CLI options and validation bindings [`src/htmldownloader/cli.py:4627-4665`]
-          - description: configures `--from-url`, `--to-dir`, `--user-agent`, `--limit` (typed by `positive_int`), verbosity flags, numbering toggle, upgrade action, and version aliases.
-          - `positive_int()`: validates positive integer constraints for `--limit` [`src/htmldownloader/cli.py:126-133`]
-            - description: parses integer and raises `argparse.ArgumentTypeError` for non-positive or invalid values.
-        - `print_strict_help()`: emits fixed-format help block with dynamic option listing [`src/htmldownloader/cli.py:4668-4712`]
-          - description: prints deterministic header/usage/example/core options and appends parser action options while de-duplicating predefined flags.
-        - `check_for_new_version()`: performs pre-download upgrade notification flow [`src/htmldownloader/cli.py:98-111`]
-          - description: pulls latest release version and prints upgrade instruction only if remote semantic version is newer.
-          - `_get_latest_version_from_github()`: calls GitHub releases API and extracts version tag [`src/htmldownloader/cli.py:75-95`]
-            - description: sends HTTP GET to `https://api.github.com/repos/{owner}/{repo}/releases/latest` with 1s timeout; validates JSON payload and normalized tag.
-          - `_is_version_newer()`: compares normalized semantic version tuples [`src/htmldownloader/cli.py:64-72`]
-            - description: normalizes tuple widths via zero-padding and returns lexicographic greater-than.
-        - `DownloaderRegistry.detect()`: chooses concrete downloader class from URL rules + optional HTML probe [`src/htmldownloader/cli.py:1837-1860`]
-          - description: evaluates `matches_url`; if ambiguous/none, fetches source HTML then applies `probe_html`; resolves first deterministic class or raises runtime error.
+### PROC:gha-build-release
+- Entrypoint(s):
+  - .github/workflows/release-uvx.yml:13-48
+- Lifecycle/trigger:
+  - start: Git tag push matching `v*`.
+  - stop: workflow job completion/failure.
+  - loop_blocking: step-sequential job execution.
+  - explicit_threads: no explicit threads detected.
+- Internal Call-Trace Tree:
+  - no internal functions defined under `src/` or `.github/workflows/`; workflow file defines step orchestration only.
+- External Boundaries:
+  - GitHub Actions hosted runner.
+  - third-party actions (`actions/checkout`, `actions/setup-python`, `astral-sh/setup-uv`, `actions/attest-build-provenance`, `softprops/action-gh-release`).
 
-- Feature: Downloader strategy and modular delegation
-  - Module: `src/htmldownloader/cli.py` (`ResourceExplorer*`, registry consumers)
-    - `run()`: executes Resource Explorer module selection and delegation [`src/htmldownloader/cli.py:4593-4619`]
-      - description: fetches page HTML via session, selects module from parsed soup, falls back to Playwright-rendered HTML when static fetch misses iframe/frame, raises on no compatible module.
-      - `_select_module()`: performs ordered module probing [`src/htmldownloader/cli.py:4552-4559`]
-        - description: invokes each registered module `select()` and returns first non-null selection payload.
-      - `_render_with_playwright()`: obtains JS-rendered Resource Explorer DOM [`src/htmldownloader/cli.py:4561-4591`]
-        - description: launches headless Chromium, loads page with optional custom user-agent, waits for iframe selector, returns serialized HTML snapshot.
-      - `RMModuleDoxigen.select()`: discovers embedded Doxygen target URL [`src/htmldownloader/cli.py:4504-4518`]
-        - description: locates iframe/frame under TI Resource Explorer container and builds absolute Doxygen URL with fixed base.
-      - `RMModuleDoxigen.run()`: delegates execution to Doxygen downloader instance [`src/htmldownloader/cli.py:4520-4533`]
-        - description: instantiates `DoxygenExportDownloader` with inherited runtime options and executes its `run()`.
-
-- Feature: TI document-viewer offline export
-  - Module: `src/htmldownloader/cli.py` (`DocumentViewerDownloader` + shared helpers)
-    - `run()`: captures TOC and section content, rewrites assets, writes offline outputs, executes post-process [`src/htmldownloader/cli.py:2872-3316`]
-      - description: launches Playwright browser; expands TOC; captures TOC/content HTML; derives section plan from TOC; applies optional reading-order limit; navigates/clicks per fragment; extracts section-specific HTML; downloads/relinks assets; strips source styling; assembles `document.html`; builds `toc.html` and `index.html`; removes TI disclaimer tail; runs shared post-processing pipeline.
-      - `_expand_full_toc()`: expands nested viewer TOC across repeated passes [`src/htmldownloader/cli.py:1992-2042`]
-        - description: performs repeated expansion interactions to expose hidden navigation entries before extraction.
-      - `_scroll_toc_container()`: scrolls TOC viewport to trigger lazy entries [`src/htmldownloader/cli.py:2044-2090`]
-        - description: locates scrollable TOC container and iterates scrolling to force item rendering.
-      - `_pick_best_outerhtml()`: selects first usable DOM fragment from selector candidates [`src/htmldownloader/cli.py:1968-1990`]
-        - description: evaluates selector list and returns outerHTML of highest-priority matched element.
-      - `_toc_tree_from_html()`: parses TOC HTML into `TocNode` tree [`src/htmldownloader/cli.py:2412-2413`]
-        - description: delegates to shared `toc_from_nav_html()` with source base URL normalization.
-      - `_select_section_nodes()`: computes downloadable TOC slice [`src/htmldownloader/cli.py:2529-2553`]
-        - description: flattens nodes, starts at first title prefixed by `"1 "`, ends at last `IMPORTANT NOTICE`, otherwise falls back to full set.
-      - `_trim_toc_nodes()`: computes display TOC trimming policy [`src/htmldownloader/cli.py:2430-2445`]
-        - description: removes preface nodes before first numeric chapter and excludes trailing `IMPORTANT NOTICE` label.
-      - `_limit_by_reading_order()`: applies optional node-cap for section extraction [`src/htmldownloader/cli.py:2454-2484`]
-        - description: returns first `limit` entries while preserving traversal order semantics.
-      - `_prune_toc_to_allowed()`: keeps only nodes represented in final section plan [`src/htmldownloader/cli.py:2487-2502`]
-        - description: recursively prunes TOC tree by allowed object IDs while retaining hierarchical structure.
-      - `_dedup_toc_nodes_by_href()`: merges same-href siblings and child branches [`src/htmldownloader/cli.py:2554-2579`]
-        - description: de-duplicates per level by normalized href and merges/retains richer title+children content.
-      - `_click_toc_link()`: triggers in-page navigation to target fragment [`src/htmldownloader/cli.py:2851-2870`]
-        - description: finds matching anchor/link by fragment substring, scrolls to it, executes click, returns success flag.
-      - `_wait_for_fragment()`: waits for fragment-related element availability [`src/htmldownloader/cli.py:2807-2849`]
-        - description: polls DOM for id/name/data-url matches across normalized fragment variants.
-      - `_extract_fragment_only()`: narrows captured soup to fragment-relevant section [`src/htmldownloader/cli.py:2707-2805`]
-        - description: scores `data-url`/id/name matches, selects best matching section/ancestor subtree, minimizing duplicate parent capture.
-      - `_remove_toc_elements()`: strips embedded navigation artifacts from section content [`src/htmldownloader/cli.py:2601-2633`]
-        - description: removes TI-specific nav components/selectors to avoid TOC duplication in output document.
-      - `iter_asset_urls()`: enumerates remote asset URLs from content [`src/htmldownloader/cli.py:444-473`]
-        - description: collects normalized HTTP(S) URLs from asset tags and inline CSS `url(...)` declarations.
-      - `local_path_for_url()`: maps remote asset URL to deterministic local path [`src/htmldownloader/cli.py:157-173`]
-        - description: resolves output target under `assets/<host>/<path>` with sanitized segments and query fingerprint suffix.
-      - `download_one()`: streams asset bytes to local file [`src/htmldownloader/cli.py:176-189`]
-        - description: creates parent directories, performs chunked HTTP streaming write, returns boolean success.
-      - `rewrite_asset_links_inplace()`: rewrites document asset refs to local relative paths [`src/htmldownloader/cli.py:476-513`]
-        - description: transforms `src`/`href`/`srcset` and inline CSS URLs into output-relative asset paths.
-      - `_convert_doxygen_definition_lists()`: converts definition-list patterns to inline labeled paragraphs [`src/htmldownloader/cli.py:2635-2705`]
-        - description: rewrites `<dl><dt>/<dd>` and paragraph colon-pattern forms into `strong` uppercase labels plus description payload.
-      - `build_toc_html()`: renders output TOC document [`src/htmldownloader/cli.py:652-696`]
-        - description: serializes `TocNode` hierarchy into nested list HTML targeting `document.html` anchors in right frame.
-      - `build_frameset_index()`: renders two-frame index page [`src/htmldownloader/cli.py:699-719`]
-        - description: outputs legacy frameset binding `toc.html` (left) and `document.html` (right).
-      - `post_process()`: executes shared verification/cleanup pipeline [`src/htmldownloader/cli.py:800-808`]
-        - description: runs ordered post-processing methods; logs failures; re-raises `_test_toc_headings` failures.
-
-- Feature: Doxygen export offline aggregation
-  - Module: `src/htmldownloader/cli.py` (`DoxygenExportDownloader` + shared helpers)
-    - `run()`: performs TOC extraction, optional TOC-limited build, or BFS crawl build; writes outputs; post-processes [`src/htmldownloader/cli.py:4129-4479`]
-      - description: resolves crawl scope; fetches index metadata title; extracts nav tree with Playwright; supports `toc_only` output; if limit with TOC exists, builds document by TOC order/fragment slicing; else executes bounded in-scope BFS crawl (max 250 pages), deduplicates section content, downloads assets, rewrites links/styles, emits offline files, then runs post-process pipeline.
-      - `_scope()`: derives host and scoped base directory URL [`src/htmldownloader/cli.py:3340-3346`]
-        - description: computes URL prefix constraints used to keep crawler in export subtree.
-      - `_fetch_soup()`: performs HTTP fetch and parses HTML [`src/htmldownloader/cli.py:3348-3351`]
-        - description: session GET with redirects and lxml parsing into BeautifulSoup.
-      - `_document_title()`: extracts top-level project title metadata [`src/htmldownloader/cli.py:3370-3393`]
-        - description: prioritizes `#titlearea`, then `#projectname` + `#projectnumber`, then fallback page title.
-      - `_fetch_nav_tree_with_playwright()`: extracts expanded nav tree HTML and normalized outline [`src/htmldownloader/cli.py:3806-3888`]
-        - description: opens page in headless Chromium, expands nav tree (full or limited), snapshots `#nav-tree-contents ul`, computes deterministic text outline.
-        - `_expand_nav_tree()`: controls TOC expansion strategy [`src/htmldownloader/cli.py:3449-3477`]
-          - description: waits for tree, scrolls root, dispatches full/limited expansion, final cleanup.
-          - `_expand_nav_tree_full()`: exhaustive expansion excluding API Reference subtree [`src/htmldownloader/cli.py:3479-3677`]
-            - description: repeated JS-driven arrow clicking with progress accounting and subtree guard rules.
-          - `_expand_nav_tree_limited()`: bounded expansion for TOC limit mode [`src/htmldownloader/cli.py:3679-3779`]
-            - description: recursive walk expands only needed nodes until limit count reached.
-          - `_cleanup_nav_tree_styles()`: removes temporary expansion style artifacts [`src/htmldownloader/cli.py:3781-3804`]
-            - description: resets inline styles in cloned/expanded nav tree for stable output.
-      - `_toc_nodes_from_nav_html()`: builds hierarchical TOC nodes from expanded nav DOM [`src/htmldownloader/cli.py:3911-3939`]
-        - description: parses labels/hrefs recursively, normalizes link targets, unwraps single synthetic root when present.
-      - `_extract_section_html()`: slices page main container by current/next fragment boundaries [`src/htmldownloader/cli.py:4021-4068`]
-        - description: selects content root, resolves start/end anchors, maps to direct child boundaries, returns fragment-scoped HTML chunk.
-      - `_links_to_html_pages()`: enumerates in-scope crawl targets [`src/htmldownloader/cli.py:3433-3447`]
-        - description: normalizes links, strips fragments, keeps only scoped `.html` URLs on same host.
-      - `_extract_main()`: normalizes page content payload for unified document sections [`src/htmldownloader/cli.py:3395-3410`]
-        - description: selects preferred main content container and removes navigation artifacts before wrapping.
-      - `_build_toc()`: constructs TOC from generated unified document sections/headings [`src/htmldownloader/cli.py:4070-4127`]
-        - description: emits top-level node per section anchor and nested heading nodes (`h2..h6`), while consolidating duplicate-content anchors.
-      - `iter_asset_urls()`: discovers asset URLs from crawled pages [`src/htmldownloader/cli.py:444-473`]
-        - description: gathers static resource URLs from tags + inline styles for bulk asset download.
-      - `download_one()`: performs streamed asset download [`src/htmldownloader/cli.py:176-189`]
-        - description: writes each asset into deterministic mapped location.
-      - `rewrite_asset_links_inplace()`: rewrites resource links to local filesystem assets [`src/htmldownloader/cli.py:476-513`]
-        - description: mutates references in unified soup before file emission.
-      - `build_toc_html()`: serializes final TOC HTML [`src/htmldownloader/cli.py:652-696`]
-        - description: creates nested TOC document linked to local `document.html` anchors.
-      - `build_frameset_index()`: serializes final frameset HTML [`src/htmldownloader/cli.py:699-719`]
-        - description: produces left-right TOC/document container page.
-      - `post_process()`: runs common cleanup and verification pipeline [`src/htmldownloader/cli.py:800-808`]
-        - description: applies shared post-generation validation and normalization passes.
-
-- Feature: Shared post-processing and normalization pipeline
-  - Module: `src/htmldownloader/cli.py` (`BaseDownloader` and utility helpers)
-    - `post_process()`: ordered post-generation orchestration [`src/htmldownloader/cli.py:800-808`]
-      - description: invokes cleanup/validation stages in predefined sequence with selective hard-failure behavior.
-      - `_clean_document_style()`: removes stylesheet links, style tags, inline style/class attributes in output files [`src/htmldownloader/cli.py:1570-1584`]
-        - description: loads `document.html` and `toc.html`, applies `strip_styles()`, persists cleaned HTML.
-      - `_add_document_style()`: injects minimal border CSS for tables/images [`src/htmldownloader/cli.py:1586-1629`]
-        - description: ensures `head` exists then appends style block with table and non-table image borders.
-      - `_normalize_document_links()`: canonicalizes/removes invalid anchors/links in `document.html` [`src/htmldownloader/cli.py:1631-1644`]
-        - description: applies in-place link normalization and logs rewrite/remove counters.
-        - `normalize_document_links_inplace()`: validates allowed external schemes and in-document anchors [`src/htmldownloader/cli.py:524-649`]
-          - description: builds case-insensitive id index; preserves allowed external links; rewrites resolvable fragments; removes unresolved/disallowed hrefs.
-      - `_remove_unused_images()`: removes unreferenced image files under `assets/` [`src/htmldownloader/cli.py:1646-1681`]
-        - description: scans output HTML files for path/basename references and deletes unused image suffix matches.
-      - `_remove_unused_assets()`: removes any unreferenced asset file under `assets/` based on `document.html` [`src/htmldownloader/cli.py:1683-1715`]
-        - description: deletes non-referenced assets regardless of media type.
-      - `_normalize_image_position()`: flattens nested `assets/**` images into `assets/` root [`src/htmldownloader/cli.py:1717-1770`]
-        - description: moves files with UUID-suffixed renaming and updates references in generated HTML files.
-      - `_clean_assets_tree()`: prunes empty asset subdirectories [`src/htmldownloader/cli.py:1772-1788`]
-        - description: removes leaf-empty directories bottom-up.
-      - `_remove_empty_assets_root()`: removes top-level `assets/` if fully empty [`src/htmldownloader/cli.py:1790-1827`]
-        - description: deletes `assets/` only when no files/non-empty subdirs remain.
-      - `_verify_toc_consistency()`: validates TOC links and heading text equivalence [`src/htmldownloader/cli.py:810-856`]
-        - description: checks each `toc.html` anchor existence in `document.html` and compares TOC label vs heading text.
-      - `_verify_toc_depth()`: validates TOC nesting depth threshold [`src/htmldownloader/cli.py:858-884`]
-        - description: recursively computes max `<ul>` depth and warns above 6.
-      - `_prune_toc_and_clean_headings()`: prunes depth>=7 and strips heading numeric prefixes [`src/htmldownloader/cli.py:886-974`]
-        - description: edits TOC and document headings to remove deep nodes and numeric prefix artifacts.
-      - `_enforce_toc_headings()`: synchronizes TOC/document heading coverage [`src/htmldownloader/cli.py:1035-1136`]
-        - description: enforces heading-link constraints before validation checks.
-      - `_test_toc_headings()`: asserts TOC-heading structural correctness [`src/htmldownloader/cli.py:1138-1309`]
-        - description: hard-fails on orphan headings, invalid TOC href targets, and level mismatches.
-      - `fix_heading_ref_position()`: moves container ids to heading targets [`src/htmldownloader/cli.py:1311-1452`]
-        - description: ensures TOC fragments resolve directly to heading nodes instead of container wrappers.
-      - `_deduplicate_toc_entries()`: removes repeated fragment targets while promoting children [`src/htmldownloader/cli.py:976-1033`]
-        - description: deduplicates TOC in pre-order and preserves child ordering by promoting subtree nodes.
-      - `fix_heading_numbering()`: normalizes and optionally regenerates heading numbering [`src/htmldownloader/cli.py:1454-1568`]
-        - description: strips existing numeric prefixes and re-applies numbering unless disabled by runtime flag.
-
-- Feature: Build/release workflow (CI/CD)
-  - Module: `.github/workflows/release-uvx.yml`
-    - process: `build-release` job executes tag-triggered packaging and release publishing [` .github/workflows/release-uvx.yml:1-48`]
-      - description: on tag push (`v*`), checks out code, installs Python 3.11 + uv, installs build dependencies from `requirements.txt`, builds distributions, attests provenance, and publishes GitHub release assets from `dist/*`.
-
-- Feature: Root-level Doxygen documentation build
-  - Module: `doxygen.sh`
-    - `main()`: orchestrates full documentation generation lifecycle [`doxygen.sh:109-139`]
-      - description: validates required tooling (`doxygen`, `make`, `pdflatex`), resets `doxygen/`, writes temporary Doxygen configuration, executes documentation generation, compiles PDF artifact, derives markdown artifacts from generated HTML, removes temporary LaTeX build folder, prints final output directories.
-      - `require_command()`: enforces command-level prerequisites [`doxygen.sh:23-31`]
-        - description: resolves each executable with `command -v` and raises explicit error/exit on missing dependency.
-      - `write_doxyfile()`: emits best-practice Doxygen configuration [`doxygen.sh:33-87`]
-        - description: configures recursive source scan on `src/`, full symbol extraction, graph generation, source browser, and output drivers for HTML + LaTeX under `doxygen/`.
-      - `generate_markdown_from_html()`: creates markdown projection from Doxygen HTML output [`doxygen.sh:89-107`]
-        - description: converts each generated HTML file to deterministic markdown by stripping scripts/styles/tags, preserving decoded textual content, and writing one `.md` file per HTML source in `doxygen/markdown`.
-      - `cleanup()`: removes temporary Doxygen config artifact [`doxygen.sh:17-21`]
-        - description: deletes `mktemp`-allocated Doxyfile via EXIT trap to prevent stale config leakage.
-
-## I/O Boundary Inventory
-- Filesystem read/write operations (evidenced)
-  - script output tree reset/generation: `rm -rf doxygen` + directory creation + file writes (`doxygen.sh:117-139`).
-  - temporary Doxyfile lifecycle: `mktemp /tmp/...` + `cat >` + trap cleanup (`doxygen.sh:15-21`, `33-87`).
-  - markdown artifact generation: HTML reads and `.md` writes under `doxygen/markdown` (`doxygen.sh:89-107`).
-  - output_dir creation: `Path(args.to_dir).expanduser().resolve(); mkdir(parents=True, exist_ok=True)` (`src/htmldownloader/cli.py:4727-4728`).
-  - asset writes: streamed binary write in `download_one()` (`src/htmldownloader/cli.py:181-186`) and Playwright response capture in `NetworkImageRecorder.attach()` (`src/htmldownloader/cli.py:1893-1915`).
-  - generated artifacts: `document.html`, `toc.html`, `index.html`, optional `toc_raw.html`/`toc_raw.txt` (`src/htmldownloader/cli.py:3296-3310`, `4137-4142`, `4286-4300`, `4463-4477`).
-  - post-process mutations/deletions: rewrites HTML files and prunes asset files/directories (`src/htmldownloader/cli.py:1570-1827`).
-
-- External API/network calls
-  - none_detected_for_doxygen_script: workflow uses local tooling only (`doxygen.sh:109-139`).
-  - GitHub Releases API: `requests.get("https://api.github.com/repos/Ogekuri/HtmlDownloader/releases/latest", timeout=1)` (`src/htmldownloader/cli.py:75-83`).
-  - runtime content/asset HTTP: `session.get(...)` in downloader detection, page fetch, and asset streaming (`src/htmldownloader/cli.py:1844-1846`, `3348-3350`, `181-182`, `4595-4597`).
-  - browser automation network: Playwright Chromium page loads for TI viewer / Doxygen nav / Resource Explorer rendering (`src/htmldownloader/cli.py:2917-2927`, `3811-3828`, `4563-4587`).
-
-- External database access
-  - none_detected: no SQL client/ORM/database driver usage in analyzed source.
-
-## Common Logic Reuse Nodes
-- TOC model + rendering reuse: `TocNode`, `toc_from_headings()`, `toc_from_nav_html()`, `build_toc_html()` used by both downloader families (`src/htmldownloader/cli.py:203-319`, `652-696`).
-- Asset pipeline reuse: `iter_asset_urls()` + `local_path_for_url()` + `download_one()` + `rewrite_asset_links_inplace()` shared across document-viewer and doxygen-export flows (`src/htmldownloader/cli.py:157-189`, `444-513`, call sites in `2872-3316` and `4129-4479`).
-- Unified post-processing reuse: `BaseDownloader.post_process()` and ordered cleanup/verification methods applied by all concrete downloaders (`src/htmldownloader/cli.py:747-808`, `1570-1827`).
+## Communication Edges
+- id: EDGE:main-to-pip-upgrade
+  source: PROC:main
+  destination: PROC:pip-upgrade
+  direction: PROC:main -> PROC:pip-upgrade
+  mechanism: child_process_spawn
+  endpoint_or_channel: subprocess argv (`sys.executable -m pip install --upgrade htmldownloader`)
+  payload_or_data_shape: argv:list[str], exit_code:int
+  evidence:
+    - src/htmldownloader/cli.py:592-603
+- id: EDGE:main-to-chromium-document-viewer
+  source: PROC:main
+  destination: PROC:chromium
+  direction: PROC:main -> PROC:chromium
+  mechanism: playwright_browser_launch
+  endpoint_or_channel: Playwright sync API browser context
+  payload_or_data_shape: page commands (goto/evaluate/wait), HTML snapshots (str)
+  evidence:
+    - src/htmldownloader/cli.py:3659-3710
+    - src/htmldownloader/cli.py:3914-3921
+- id: EDGE:main-to-chromium-doxygen-nav
+  source: PROC:main
+  destination: PROC:chromium
+  direction: PROC:main -> PROC:chromium
+  mechanism: playwright_browser_launch
+  endpoint_or_channel: Playwright sync API browser context
+  payload_or_data_shape: nav expansion commands, nav HTML (`#nav-tree-contents ul`)
+  evidence:
+    - src/htmldownloader/cli.py:4655-4684
+    - src/htmldownloader/cli.py:4686-4704
+- id: EDGE:main-to-chromium-resource-explorer
+  source: PROC:main
+  destination: PROC:chromium
+  direction: PROC:main -> PROC:chromium
+  mechanism: playwright_browser_launch
+  endpoint_or_channel: Playwright sync API browser context
+  payload_or_data_shape: rendered page HTML for iframe/frame discovery
+  evidence:
+    - src/htmldownloader/cli.py:5585-5619
+- id: EDGE:gha-runner-to-main-build
+  source: PROC:gha-build-release
+  destination: PROC:main
+  direction: PROC:gha-build-release -> PROC:main
+  mechanism: build_step_execution
+  endpoint_or_channel: `python -m build` workflow step
+  payload_or_data_shape: source tree input -> `dist/*` artifacts
+  evidence:
+    - .github/workflows/release-uvx.yml:34-40
