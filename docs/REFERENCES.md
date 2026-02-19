@@ -10,7 +10,7 @@
 ```
 
 # __init__.py | Python | 14L | 0 symbols | 2 imports | 2 comments
-> Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/__init__.py`
+> Path: `src/htmldownloader/__init__.py`
 
 ## Imports
 ```
@@ -22,7 +22,7 @@ from .cli import main
 ---
 
 # __main__.py | Python | 12L | 0 symbols | 2 imports | 1 comments
-> Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/__main__.py`
+> Path: `src/htmldownloader/__main__.py`
 
 ## Imports
 ```
@@ -34,7 +34,7 @@ import sys
 ---
 
 # cli.py | Python | 5812L | 184 symbols | 21 imports | 339 comments
-> Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/cli.py`
+> Path: `src/htmldownloader/cli.py`
 
 ## Imports
 ```
@@ -1186,5 +1186,5 @@ from bs4 import NavigableString
 ---
 
 # version.py | Python | 13L | 0 symbols | 0 imports | 3 comments
-> Path: `/home/ogekuri/HtmlDownloader/src/htmldownloader/version.py`
+> Path: `src/htmldownloader/version.py`
 
