@@ -10,3 +10,6 @@ beautifulsoup4
 lxml
 playwright
 tqdm
+ruff
+pyright
+
