@@ -17,18 +17,17 @@ import os
 import re
 import subprocess
 import sys
-import time
 from dataclasses import dataclass, field
 from pathlib import Path
-from typing import Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, Dict, Iterable, List, Optional, Set, Tuple
 from urllib.parse import urljoin, urlparse, urldefrag, unquote
 
 import requests
-from bs4 import BeautifulSoup
-from tqdm import tqdm
+from bs4 import BeautifulSoup  # pyright: ignore[reportMissingImports]
+from tqdm import tqdm  # pyright: ignore[reportMissingModuleSource]
 import uuid
 
-from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError
+from playwright.sync_api import sync_playwright, TimeoutError as PlaywrightTimeoutError  # pyright: ignore[reportMissingImports]
 
 from .version import __version__
 
@@ -1235,12 +1234,11 @@ class BaseDownloader:
             _, frag = urldefrag(href)
             return (frag or "").strip()
 
+        pruned_ids: Set[str] = set()
         # Process toc.html
         toc_path = self.out_dir / "toc.html"
         if toc_path.exists():
             toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
-
-            pruned_ids: Set[str] = set()
 
             # Prune TOC at depth >=7
             root_ul = toc_soup.find("ul")
@@ -1290,11 +1288,6 @@ class BaseDownloader:
             # A heading is associated to a pruned TOC entry if:
             # - the heading id is referenced by a pruned TOC href, OR
             # - the heading is contained in a div/section whose id is referenced by a pruned TOC href.
-            try:
-                pruned_ids
-            except NameError:
-                pruned_ids = set()
-
             if pruned_ids:
                 for h in list(doc_soup.find_all(re.compile(r"^h[1-6]$"))):
                     hid = (h.get("id") or "").strip()
@@ -1565,7 +1558,7 @@ class BaseDownloader:
             )
             return
 
-        doc_by_id: Dict[str, object] = {}
+        doc_by_id: Dict[str, Any] = {}
         for el in doc_soup.find_all(True):
             el_id = (el.get("id") or "").strip()
             if el_id:
@@ -1740,7 +1733,7 @@ class BaseDownloader:
             return
 
         # Build an index of ids in the document (case-insensitive).
-        doc_by_id: Dict[str, List[object]] = {}
+        doc_by_id: Dict[str, List[Any]] = {}
         for el in doc_soup.find_all(True):
             el_id = (el.get("id") or "").strip()
             if not el_id:
@@ -1805,7 +1798,7 @@ class BaseDownloader:
 
         # Re-index after modifications and ensure all TOC href fragments point to headings.
         if moved:
-            doc_by_id2: Dict[str, object] = {}
+            doc_by_id2: Dict[str, Any] = {}
             for el in doc_soup.find_all(True):
                 el_id = (el.get("id") or "").strip()
                 if el_id:
@@ -1853,7 +1846,7 @@ class BaseDownloader:
         """
 
         import re
-        from bs4 import NavigableString
+        from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 
         toc_path = self.out_dir / "toc.html"
         doc_path = self.out_dir / "document.html"
@@ -1958,7 +1951,7 @@ class BaseDownloader:
             set_flat_text(a, numbered_title)
 
         # Apply numbering to corresponding headings (by fragment id)
-        doc_by_id: Dict[str, object] = {}
+        doc_by_id: Dict[str, Any] = {}
         for el in doc_soup.find_all(True):
             el_id = (el.get("id") or "").strip()
             if el_id:
@@ -4316,6 +4309,7 @@ class DoxygenExportDownloader(BaseDownloader):
 
         # Expand systematically by clicking on arrows multiple times
         total_clicks = 0
+        round_num = -1
         for round_num in range(50):  # Increased rounds for deep nesting
             clicked = page.evaluate(
                 f"""
@@ -5016,7 +5010,6 @@ class DoxygenExportDownloader(BaseDownloader):
 
         # Track content by hash to consolidate duplicates
         content_to_anchor: Dict[str, str] = {}
-        url_to_anchor: Dict[str, str] = {}
 
         for sec in container.find_all("section", recursive=False):
             title_el = sec.find(re.compile(r"^h[1-6]$"))
@@ -5159,6 +5152,7 @@ class DoxygenExportDownloader(BaseDownloader):
                         section_soup.get_text(" ", strip=True).split()
                     )
 
+                    content_hash = ""
                     if section_text:
                         content_hash = str(hash(section_text))
                         if content_hash in content_hashes:
@@ -5747,10 +5741,6 @@ def print_strict_help(program: str, version: str, parser: argparse.ArgumentParse
             continue
         seen_opts.update(opt_strings)
         opt_display = ", ".join(opt_strings)
-        # show metavar for positional/optional arguments where appropriate
-        metavar = ""
-        if a.dest and a.nargs not in (0, None) and not a.option_strings:
-            metavar = f" <{a.dest}>"
         help_text = (a.help or "").strip()
         # Align to match typical formatting
         print(f"  {opt_display.ljust(22)} {help_text}")
