@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.5](https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.5) - 2026-02-24
+## [0.0.6](https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6) - 2026-02-24
 ### ⛰️  Features
 - add req/ dir. *(core)*
 - add examples download and test. *(core)*
@@ -9,6 +9,7 @@
 - implement --version command. *(core)*
 
 ### 🐛  Bug Fixes
+- Fix .g.conf file. *(core)*
 - fix workflow script. *(core)*
 - resolve static-check defects [2026-02-20 14:33:17] *(cli)*
 - WORKFLOW.md position. *(core)*
@@ -32,6 +33,6 @@
 
 # History
 
-- \[0.0.5\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.5
+- \[0.0.6\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6
 
-[0.0.5]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.5
+[0.0.6]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6
