@@ -1,6 +1,6 @@
 # Changelog
 
-## [0.0.6](https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6) - 2026-02-24
+## [0.1.0](https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0) - 2026-02-24
 ### ⛰️  Features
 - add req/ dir. *(core)*
 - add examples download and test. *(core)*
@@ -33,6 +33,6 @@
 
 # History
 
-- \[0.0.6\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6
+- \[0.1.0\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
 
-[0.0.6]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.0.6
+[0.1.0]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
