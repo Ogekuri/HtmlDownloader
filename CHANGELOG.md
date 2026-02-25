@@ -1,5 +1,33 @@
 # Changelog
 
+## [0.1.1](https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.1) - 2026-02-25
+### ⛰️  Features
+- Update workflow.
+
+### 🚜  Changes
+- renumber TOC/document heading IDs to title-N [useReq] *(anchors)*
+  - Update SRS anchor requirements from GUID format to progressive title-N format.
+  - Implement BaseDownloader post-process renumbering step to rewrite TOC/document fragments.
+  - Align Doxygen and Resource Explorer limit tests with progressive title-N anchors.
+  - Refresh WORKFLOW and regenerate REFERENCES for updated call graph/evidence.
+- BREAKING CHANGE: switch generated IDs to UUID GUID format [useReq] *(anchors)*
+  - Update REQUIREMENTS IDs DES-009, REQ-007, and TST-002 for GUID anchors.
+  - Implement shared generate_guid_anchor() and apply it in TI/Doxygen download flows.
+  - Refactor limit tests to enforce guid-<uuid>-guid-<uuid> anchors and reject page-* IDs.
+  - Refresh WORKFLOW.md and regenerate REFERENCES.md.
+- serialize toc list items per line [useReq] *(cli)*
+  - Update REQ-007 and TST-004 for toc list serialization behavior.
+  - Format build_toc_html output with one <li> per dedicated line.
+  - Add unit test coverage for toc html serialization.
+  - Update WORKFLOW and regenerate REFERENCES for traceability.
+
+### 📚  Documentation
+- Update TODO.md file.
+- recreate SRS structure in English [useReq] *(requirements)*
+  - Preserve existing requirement IDs and canonicalize RFC 2119 syntax.
+  - Reorganize sections for parser-oriented structure and atomicity.
+  - Add evidence-backed requirements from workflow and runtime behavior.
+
 ## [0.1.0](https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0) - 2026-02-24
 ### ⛰️  Features
 - add req/ dir. *(core)*
@@ -34,5 +62,7 @@
 # History
 
 - \[0.1.0\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
+- \[0.1.1\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.1
 
 [0.1.0]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
+[0.1.1]: https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.1

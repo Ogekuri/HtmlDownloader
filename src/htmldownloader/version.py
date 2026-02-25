@@ -7,7 +7,7 @@
 """
 
 #: @var __version__ @brief Module-level variable `__version__`.
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 #: @var __all__ @brief Module-level variable `__all__`.
 __all__ = ["__version__"]
