@@ -16,6 +16,10 @@ from tests.heading_toc_check import assert_toc_headings_consistent
 
 API_GUIDE_URL = "https://software-dl.ti.com/mcu-plus-sdk/esd/AM64X/latest/exports/docs/api_guide_am64x/index.html"
 LIMIT = 30
+GUID_ANCHOR_RE = re.compile(
+    r"^guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    r"-guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+)
 
 EXPECTED_TOC_ENTRIES = [
     ("1 Introduction", 1),
@@ -128,12 +132,11 @@ def test_api_guide_limit_downloads_first_30_sections():
     assert title_text == "AM64x MCU+ SDK 11.02.00", f"Titolo documento inatteso: {title_text!r}"
 
     heading_ids = {h.get("id") for h in doc_soup.find_all(re.compile(r"^h[1-6]$")) if h.get("id")}
-    page_ids = {hid for hid in heading_ids if hid.startswith("page-")}
-    expected_pages = {f"page-{i}" for i in range(1, LIMIT + 1)}
+    guid_ids = {hid for hid in heading_ids if GUID_ANCHOR_RE.fullmatch(hid)}
 
-    assert expected_pages.issubset(page_ids), "document.html deve contenere tutti gli anchor page-1..page-30 sugli heading"
-    extra_pages = [sid for sid in page_ids if sid not in expected_pages]
-    assert not extra_pages, f"document.html contiene sezioni oltre il limite: {extra_pages[:5]}"
+    assert len(guid_ids) == LIMIT, "document.html deve contenere 30 anchor GUID sugli heading"
+    legacy_page_ids = [sid for sid in heading_ids if sid.startswith("page-")]
+    assert not legacy_page_ids, f"document.html contiene anchor legacy page-*: {legacy_page_ids[:5]}"
 
     for section in doc_soup.find_all("section"):
         headings = section.find_all(re.compile(r"^h[1-6]$"))
@@ -167,11 +170,9 @@ def test_api_guide_limit_downloads_first_30_sections():
         _, frag = urldefrag(href)
         if frag:
             toc_fragments.append(frag)
-    page_frags_over_limit = [frag for frag in toc_fragments if frag.startswith("page-") and frag not in expected_pages]
-    assert not page_frags_over_limit, f"TOC contiene link a sezioni oltre il limite: {page_frags_over_limit[:5]}"
-
-    # Verifica che i link a page-* puntino ad anchor realmente presenti
-    missing_in_doc = [frag for frag in toc_fragments if frag.startswith("page-") and frag not in heading_ids]
+    invalid_guid_fragments = [frag for frag in toc_fragments if not GUID_ANCHOR_RE.fullmatch(frag)]
+    assert not invalid_guid_fragments, f"TOC contiene anchor non GUID: {invalid_guid_fragments[:5]}"
+    missing_in_doc = [frag for frag in toc_fragments if frag not in heading_ids]
     assert not missing_in_doc, f"Anchor mancanti sugli heading in document.html: {missing_in_doc[:5]}"
 
 

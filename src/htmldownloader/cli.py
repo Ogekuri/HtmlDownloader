@@ -3,8 +3,8 @@
 @file cli.py
 @brief Module implementation for HtmlDownloader runtime.
 @details Contains executable logic and internal helpers used by the CLI workflow.
-@module_symbols functions=28 classes=12 variables=4
-@functions _parse_version_tuple, _is_version_newer, _get_latest_version_from_github, check_for_new_version, safe_filename, positive_int, is_http_url, normalize_url, ensure_parent, local_path_for_url, download_one, escape_html, limit_toc_nodes, ensure_heading_ids, strip_styles, toc_from_headings, toc_from_nav_html, nav_outline_from_html, iter_asset_urls, rewrite_asset_links_inplace, normalize_document_links_inplace, build_toc_html, build_frameset_index, minimal_readable_wrapper, guess_ext_from_content_type, build_arg_parser, print_strict_help, main
+@module_symbols functions=29 classes=12 variables=4
+@functions _parse_version_tuple, _is_version_newer, _get_latest_version_from_github, check_for_new_version, safe_filename, generate_guid_anchor, positive_int, is_http_url, normalize_url, ensure_parent, local_path_for_url, download_one, escape_html, limit_toc_nodes, ensure_heading_ids, strip_styles, toc_from_headings, toc_from_nav_html, nav_outline_from_html, iter_asset_urls, rewrite_asset_links_inplace, normalize_document_links_inplace, build_toc_html, build_frameset_index, minimal_readable_wrapper, guess_ext_from_content_type, build_arg_parser, print_strict_help, main
 @classes TocNode, Logger, UpgradeAction, VersionedArgumentParser, BaseDownloader, DownloaderRegistry, NetworkImageRecorder, DocumentViewerDownloader, DoxygenExportDownloader, ResourceExplorerModule, RMModuleDoxigen, ResourceExplorerDownloader
 @variables GITHUB_API_TIMEOUT_S, ASSET_ATTRS, HEADING_TAG_RE, ALLOWED_EXTERNAL_LINK_SCHEMES
 """
@@ -139,6 +139,20 @@ def safe_filename(path: str) -> str:
     path = re.sub(r"[<>:\"|?*\x00-\x1F]", "_", path)
     path = path.replace("\\", "_")
     return path
+
+
+def generate_guid_anchor(used: Set[str]) -> str:
+    """
+    @brief Execute `generate_guid_anchor`.
+    @details Implements deterministic control flow as defined by module runtime semantics.
+    @param used Input argument for `generate_guid_anchor`.
+    @return str Return value of `generate_guid_anchor`.
+    """
+    candidate = f"guid-{uuid.uuid4()}-guid-{uuid.uuid4()}"
+    while candidate in used:
+        candidate = f"guid-{uuid.uuid4()}-guid-{uuid.uuid4()}"
+    used.add(candidate)
+    return candidate
 
 
 def positive_int(value: str) -> int:
@@ -3608,15 +3622,8 @@ class DocumentViewerDownloader(BaseDownloader):
             @param used Input argument for `make_anchor`.
             @return str Return value of `make_anchor`.
             """
-            base = (raw_fragment or title or "sezione").strip()
-            base = re.sub(r"[^a-zA-Z0-9]+", "-", base).strip("-").lower() or "sezione"
-            cand = base
-            i = 2
-            while cand in used:
-                cand = f"{base}-{i}"
-                i += 1
-            used.add(cand)
-            return cand
+            del raw_fragment, title
+            return generate_guid_anchor(used)
 
         def normalize_text(value: str) -> str:
             """
@@ -5136,6 +5143,7 @@ class DoxygenExportDownloader(BaseDownloader):
                 doc.append(container)
 
                 content_hashes: Dict[str, str] = {}
+                used_anchor_ids: Set[str] = set()
                 duplicates_skipped = 0
                 page_positions = {url: 0 for url in page_fragments}
 
@@ -5154,7 +5162,7 @@ class DoxygenExportDownloader(BaseDownloader):
                     psoup = pages_by_url.get(page_url)
                     section_html = self._extract_section_html(psoup, frag, next_frag)
                     section_soup = BeautifulSoup(section_html, "lxml")
-                    anchor = f"page-{idx}"
+                    anchor = generate_guid_anchor(used_anchor_ids)
                     section_container = section_soup.body or section_soup
                     preserved_id = self._strip_duplicate_section_title(
                         section_container, title, anchor
@@ -5316,13 +5324,14 @@ class DoxygenExportDownloader(BaseDownloader):
         doc.append(container)
 
         content_hashes: Dict[str, str] = {}  # content_hash -> anchor
+        used_anchor_ids: Set[str] = set()
         duplicates_skipped = 0
 
         self.log.verbose("[verbose] Costruzione documento unificato...")
 
         for i, (url, psoup) in enumerate(pages, start=1):
             title = self._page_title(psoup)
-            anchor = f"page-{i}"
+            anchor = generate_guid_anchor(used_anchor_ids)
 
             main = self._extract_main(psoup)
             preserved_id = self._strip_duplicate_section_title(main, title, anchor)

@@ -15,6 +15,10 @@ RESOURCE_EXPLORER_URL = (
     "A__AD2nw6Uu4txAz2eqZdShBg__DIGITAL-POWER-SDK-AM263X__k-hvNHd__LATEST"
 )
 LIMIT = 30
+GUID_ANCHOR_RE = re.compile(
+    r"^guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
+    r"-guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
+)
 
 _DOWNLOADED = False
 
@@ -87,7 +91,6 @@ def test_resource_explorer_limit_downloads_first_30_sections():
         for h in doc_soup.find_all(re.compile(r"^h[1-6]$"))
         if h.get("id")
     }
-    expected_pages = {f"page-{i}" for i in range(1, LIMIT + 1)}
 
     toc_soup = _read_html(toc_path)
     toc_fragments = []
@@ -98,8 +101,9 @@ def test_resource_explorer_limit_downloads_first_30_sections():
             if frag:
                 toc_fragments.append(frag)
 
+    invalid_guid_fragments = [frag for frag in toc_fragments if not GUID_ANCHOR_RE.fullmatch(frag)]
+    assert not invalid_guid_fragments, f"TOC contiene anchor non GUID: {invalid_guid_fragments[:5]}"
     missing_in_doc = [frag for frag in toc_fragments if frag not in heading_ids]
     assert not missing_in_doc, f"Anchor mancanti per link TOC: {missing_in_doc[:5]}"
-
-    extra_pages = [hid for hid in heading_ids if hid.startswith("page-") and hid not in expected_pages]
-    assert not extra_pages, f"document.html contiene sezioni oltre il limite: {extra_pages[:5]}"
+    legacy_page_ids = [hid for hid in heading_ids if hid.startswith("page-")]
+    assert not legacy_page_ids, f"document.html contiene anchor legacy page-*: {legacy_page_ids[:5]}"

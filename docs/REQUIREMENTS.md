@@ -1,7 +1,7 @@
 ---
 title: "HtmlDownloader Requirements"
 description: Software requirements specification
-version: "0.46"
+version: "0.47"
 date: "2026-02-25"
 author: "Ogekuri"
 scope:
@@ -16,7 +16,7 @@ tags: ["markdown", "requirements"]
 ---
 
 # HtmlDownloader Requirements
-**Version**: 0.46  
+**Version**: 0.47  
 **Author**: Ogekuri  
 **Date**: 2026-02-25
 
@@ -80,7 +80,7 @@ No explicit performance optimizations identified.
 - **DES-006**: MUST combine URL matching and optional initial HTML probing to select the downloader or raise an explicit error.
 - **DES-007**: MUST remove external stylesheet links, `<style>` blocks, and inline `style` attributes from exported `document.html`.
 - **DES-008**: MUST generate `index.html` as a two-frame frameset with `toc.html` on the left and `document.html` on the right.
-- **DES-009**: MUST apply optional TOC limiting in reading order and generate `document.html` from the same limited TOC order.
+- **DES-009**: MUST apply optional TOC limiting in reading order, generate `document.html` from the same order, and assign generated section anchors with `guid-<uuid>-guid-<uuid>` format.
 - **DES-010**: MUST extract Doxygen TOC with Playwright and support internal TOC-only execution that writes `toc_raw.html` and `toc_raw.txt`.
 - **DES-011**: MUST extract expanded Doxygen TOC from `#nav-tree-contents > ul` and derive a hierarchical textual outline from that HTML.
 - **DES-012**: MUST consolidate duplicate Doxygen TOC references so duplicate entries point to preserved exported anchors.
@@ -116,7 +116,7 @@ No explicit performance optimizations identified.
 - **REQ-004**: MUST export Doxygen pages within detected scope, rewrite assets to local paths, and generate `document.html`, `toc.html`, and `index.html`.
 - **REQ-005**: MUST print selected downloader and output paths to stdout, and MUST print progress/check logs only when verbose or debug is enabled.
 - **REQ-006**: MUST sanitize URL-derived filenames by replacing invalid filesystem characters and query-derived unsafe patterns.
-- **REQ-007**: MUST generate a hierarchical TOC with valid anchors opened in frame `doc`, title `TOC`, no extra "open full document" link, and one serialized `<li>` per dedicated output line.
+- **REQ-007**: MUST generate a hierarchical TOC with `target="doc"` and title `TOC`, no extra "open full document" link, one serialized `<li>` per line, generated anchors in `guid-<uuid>-guid-<uuid>` format, and MUST NOT use `page-N`.
 - **REQ-008**: MUST expose `--verbose` and `--debug`, with debug implying verbose and including additional diagnostic detail.
 - **REQ-009**: MUST expose `--limit <max>` as a positive integer and MUST reject non-positive values at argument validation.
 - **REQ-010**: MUST prepend Doxygen `document.html` with a document title extracted from `#titlearea`, `#projectname`, and `#projectnumber` when available.
@@ -147,7 +147,7 @@ No explicit performance optimizations identified.
 
 ### 4.1 Verification requirements
 - **TST-001**: MUST verify TI export generates readable `document.html`, `index.html`, and `assets/` with local images and navigable heading anchors.
-- **TST-002**: MUST verify Doxygen export respects 250-page cap, generates `page-N` sections, and rewrites assets to local references.
+- **TST-002**: MUST verify Doxygen export respects the 250-page cap, generates section anchors in `guid-<uuid>-guid-<uuid>` format, and rewrites assets to local references.
 - **TST-003**: MUST verify required CLI arguments, automatic downloader selection, and explicit error when no downloader matches.
 - **TST-004**: MUST verify style stripping, TOC hierarchy, TOC title, TOC `<li>` line-by-line serialization, frame targeting, and two-frame `index.html` layout for both downloader families.
 - **TST-005**: MUST verify TI TOC starts from the first numeric section, excludes trailing IMPORTANT NOTICE entry, and contains expected intermediate sections.
@@ -182,5 +182,6 @@ No explicit performance optimizations identified.
 ## 5. Revision History
 | Date | Version | Change summary |
 |------|---------|----------------|
+| 2026-02-25 | 0.47 | Updated anchor-generation requirements to mandate `guid-<uuid>-guid-<uuid>` format for generated downloader anchors and aligned verification expectations. |
 | 2026-02-25 | 0.46 | Recreated SRS in English with preserved IDs, canonical atomic format, and evidence-backed additions from `src/` and `.github/workflows/`. |
 | 2026-02-17 | 0.45 | Prior draft baseline before req-recreate restructuring. |
