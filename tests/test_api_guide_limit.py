@@ -16,10 +16,7 @@ from tests.heading_toc_check import assert_toc_headings_consistent
 
 API_GUIDE_URL = "https://software-dl.ti.com/mcu-plus-sdk/esd/AM64X/latest/exports/docs/api_guide_am64x/index.html"
 LIMIT = 30
-GUID_ANCHOR_RE = re.compile(
-    r"^guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    r"-guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-)
+TITLE_ANCHOR_RE = re.compile(r"^title-[1-9]\d*$")
 
 EXPECTED_TOC_ENTRIES = [
     ("1 Introduction", 1),
@@ -132,9 +129,11 @@ def test_api_guide_limit_downloads_first_30_sections():
     assert title_text == "AM64x MCU+ SDK 11.02.00", f"Titolo documento inatteso: {title_text!r}"
 
     heading_ids = {h.get("id") for h in doc_soup.find_all(re.compile(r"^h[1-6]$")) if h.get("id")}
-    guid_ids = {hid for hid in heading_ids if GUID_ANCHOR_RE.fullmatch(hid)}
+    title_ids = {hid for hid in heading_ids if TITLE_ANCHOR_RE.fullmatch(hid)}
 
-    assert len(guid_ids) == LIMIT, "document.html deve contenere 30 anchor GUID sugli heading"
+    assert len(title_ids) == LIMIT, "document.html must contain 30 title-* heading anchors"
+    expected_title_ids = {f"title-{idx}" for idx in range(1, LIMIT + 1)}
+    assert title_ids == expected_title_ids, "document.html must contain progressive title-* anchors"
     legacy_page_ids = [sid for sid in heading_ids if sid.startswith("page-")]
     assert not legacy_page_ids, f"document.html contiene anchor legacy page-*: {legacy_page_ids[:5]}"
 
@@ -170,8 +169,10 @@ def test_api_guide_limit_downloads_first_30_sections():
         _, frag = urldefrag(href)
         if frag:
             toc_fragments.append(frag)
-    invalid_guid_fragments = [frag for frag in toc_fragments if not GUID_ANCHOR_RE.fullmatch(frag)]
-    assert not invalid_guid_fragments, f"TOC contiene anchor non GUID: {invalid_guid_fragments[:5]}"
+    invalid_title_fragments = [frag for frag in toc_fragments if not TITLE_ANCHOR_RE.fullmatch(frag)]
+    assert not invalid_title_fragments, f"TOC contains non title-* anchors: {invalid_title_fragments[:5]}"
+    expected_toc_fragments = [f"title-{idx}" for idx in range(1, LIMIT + 1)]
+    assert toc_fragments == expected_toc_fragments, "TOC fragments must be progressive title-* anchors"
     missing_in_doc = [frag for frag in toc_fragments if frag not in heading_ids]
     assert not missing_in_doc, f"Anchor mancanti sugli heading in document.html: {missing_in_doc[:5]}"
 

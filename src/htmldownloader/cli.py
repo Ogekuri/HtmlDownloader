@@ -1083,6 +1083,7 @@ class BaseDownloader:
             self._deduplicate_toc_entries,
             self._enforce_toc_headings,
             self.fix_heading_numbering,
+            self._renumber_title_anchors,
             self._test_toc_headings,
         ]
 
@@ -2000,6 +2001,82 @@ class BaseDownloader:
         toc_path.write_text(str(toc_soup), encoding="utf-8")
         doc_path.write_text(str(doc_soup), encoding="utf-8")
         self.log.check("[check] fix_heading_numbering completato")
+
+    def _renumber_title_anchors(self) -> None:
+        """
+        @brief Execute `_renumber_title_anchors`.
+        @details Renumbers TOC/document heading anchors as ordered `title-<n>` values while preserving TOC-document referential integrity.
+        @param self Input argument for `_renumber_title_anchors`.
+        @return None Return value of `_renumber_title_anchors`.
+        """
+        toc_path = self.out_dir / "toc.html"
+        doc_path = self.out_dir / "document.html"
+        if not toc_path.exists() or not doc_path.exists():
+            return
+
+        toc_soup = BeautifulSoup(toc_path.read_text(encoding="utf-8"), "lxml")
+        doc_soup = BeautifulSoup(doc_path.read_text(encoding="utf-8"), "lxml")
+
+        fragment_map: Dict[str, str] = {}
+        for link in toc_soup.find_all("a", href=True):
+            href = (link.get("href") or "").strip()
+            if not href:
+                continue
+            href_base, frag = urldefrag(href)
+            frag = (frag or "").strip()
+            if not frag:
+                continue
+            frag_l = frag.lower()
+            if frag_l not in fragment_map:
+                fragment_map[frag_l] = f"title-{len(fragment_map) + 1}"
+            new_frag = fragment_map[frag_l]
+            link["href"] = f"{href_base}#{new_frag}" if href_base else f"#{new_frag}"
+
+        if not fragment_map:
+            self.log.verbose("[verbose] renumber_title_anchors: no TOC fragments found")
+            return
+
+        doc_by_id: Dict[str, List[Any]] = {}
+        for element in doc_soup.find_all(True):
+            element_id = (element.get("id") or "").strip()
+            if not element_id:
+                continue
+            doc_by_id.setdefault(element_id.lower(), []).append(element)
+
+        targets: List[Tuple[str, Any]] = []
+        for old_frag_l in fragment_map.keys():
+            candidates = doc_by_id.get(old_frag_l) or []
+            if not candidates:
+                continue
+            primary = candidates[0]
+            targets.append((old_frag_l, primary))
+            for duplicate in candidates[1:]:
+                if duplicate.get("id") is not None:
+                    del duplicate["id"]
+
+        for idx, (_, target) in enumerate(targets, start=1):
+            target["id"] = f"__tmp-title-{idx}"
+        for old_frag_l, target in targets:
+            target["id"] = fragment_map[old_frag_l]
+
+        for link in doc_soup.find_all("a", href=True):
+            href = (link.get("href") or "").strip()
+            if not href:
+                continue
+            href_base, frag = urldefrag(href)
+            frag = (frag or "").strip()
+            if not frag:
+                continue
+            mapped = fragment_map.get(frag.lower())
+            if not mapped:
+                continue
+            link["href"] = f"{href_base}#{mapped}" if href_base else f"#{mapped}"
+
+        toc_path.write_text(str(toc_soup), encoding="utf-8")
+        doc_path.write_text(str(doc_soup), encoding="utf-8")
+        self.log.check(
+            f"[check] renumber_title_anchors completed ({len(fragment_map)} anchors)"
+        )
 
     def _clean_document_style(self) -> None:
         """

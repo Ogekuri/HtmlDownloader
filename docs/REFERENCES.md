@@ -40,7 +40,7 @@ import sys
 
 ---
 
-# cli.py | Python | 5822L | 185 symbols | 20 imports | 339 comments
+# cli.py | Python | 5899L | 186 symbols | 20 imports | 340 comments
 > Path: `src/htmldownloader/cli.py`
 - Brief: Module implementation for HtmlDownloader runtime.
 - Details: Contains executable logic and internal helpers used by the CLI workflow.
@@ -394,41 +394,41 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - fn `def __init__(` `priv` (L1037-1045)
   - Brief: Define class `BaseDownloader`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def matches_url(cls, url: str) -> bool` (L1090-1099)
+- fn `def matches_url(cls, url: str) -> bool` (L1091-1100)
   - Brief: Execute `matches_url`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `matches_url`.
   - Param: url Input argument for `matches_url`.
   - Return: bool Return value of `matches_url`.
-- fn `def probe_html(cls, url: str, html: str) -> bool` (L1101-1111)
+- fn `def probe_html(cls, url: str, html: str) -> bool` (L1102-1112)
   - Brief: Execute `probe_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `probe_html`.
   - Param: url Input argument for `probe_html`.
   - Param: html Input argument for `probe_html`.
   - Return: bool Return value of `probe_html`.
-- fn `def run(self) -> None` (L1112-1120)
+- fn `def run(self) -> None` (L1113-1121)
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `run`.
   - Return: None Return value of `run`.
-- fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L1121-1130)
+- fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L1122-1131)
   - Brief: Execute `_toc_tree_from_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_toc_tree_from_html`.
   - Param: toc_html Input argument for `_toc_tree_from_html`.
   - Return: List[TocNode] Return value of `_toc_tree_from_html`.
-- fn `def post_process(self) -> None` (L1131-1145)
+- fn `def post_process(self) -> None` (L1132-1146)
   - Brief: Execute `post_process`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `post_process`.
   - Return: None Return value of `post_process`.
-- fn `def _verify_toc_consistency(self) -> None` `priv` (L1146-1197)
+- fn `def _verify_toc_consistency(self) -> None` `priv` (L1147-1198)
   - Brief: Execute `_verify_toc_consistency`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_verify_toc_consistency`.
   - Return: None Return value of `_verify_toc_consistency`.
-- fn `def get_max_depth(ul, current_depth=0)` (L1211-1227)
+- fn `def get_max_depth(ul, current_depth=0)` (L1212-1228)
   - Brief: Execute `_verify_toc_depth`.
   - Brief: Execute `get_max_depth`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -439,38 +439,38 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: None Return value of `_verify_toc_depth`.
   - Return: Any Return value of `get_max_depth`.
 
-### fn `def _verify_toc_depth(self) -> None` `priv` (L1198-1237)
+### fn `def _verify_toc_depth(self) -> None` `priv` (L1199-1238)
 - Brief: Execute `_verify_toc_depth`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_verify_toc_depth`.
 - Return: None Return value of `_verify_toc_depth`.
 
-### fn `def _prune_toc_and_clean_headings(self) -> None` `priv` (L1238-1339)
+### fn `def _prune_toc_and_clean_headings(self) -> None` `priv` (L1239-1340)
 - Brief: Execute `_prune_toc_and_clean_headings`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_prune_toc_and_clean_headings`.
 - Return: None Return value of `_prune_toc_and_clean_headings`.
 
-### fn `def href_fragment_id(href: str) -> str` (L1249-1261)
+### fn `def href_fragment_id(href: str) -> str` (L1250-1262)
 - Brief: Execute `href_fragment_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: href Input argument for `href_fragment_id`.
 - Return: str Return value of `href_fragment_id`.
 
-### fn `def prune_ul(ul, depth)` (L1272-1292)
+### fn `def prune_ul(ul, depth)` (L1273-1293)
 - Brief: Execute `prune_ul`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: ul Input argument for `prune_ul`.
 - Param: depth Input argument for `prune_ul`.
 - Return: Any Return value of `prune_ul`.
 
-### fn `def _deduplicate_toc_entries(self) -> None` `priv` (L1340-1408)
+### fn `def _deduplicate_toc_entries(self) -> None` `priv` (L1341-1409)
 - Brief: Execute `_deduplicate_toc_entries`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_deduplicate_toc_entries`.
 - Return: None Return value of `_deduplicate_toc_entries`.
 
-### fn `def href_fragment_id(href: str) -> str` (L1353-1365)
+### fn `def href_fragment_id(href: str) -> str` (L1354-1366)
 - Brief: Execute `_deduplicate_toc_entries`.
 - Brief: Execute `href_fragment_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -480,20 +480,20 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: None Return value of `_deduplicate_toc_entries`.
 - Return: str Return value of `href_fragment_id`.
 
-### fn `def process_nodes(nodes: List[TocNode], seen: Set[str]) -> List[TocNode]` (L1372-1400)
+### fn `def process_nodes(nodes: List[TocNode], seen: Set[str]) -> List[TocNode]` (L1373-1401)
 - Brief: Execute `process_nodes`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `process_nodes`.
 - Param: seen Input argument for `process_nodes`.
 - Return: List[TocNode] Return value of `process_nodes`.
 
-### fn `def _enforce_toc_headings(self) -> None` `priv` (L1409-1527)
+### fn `def _enforce_toc_headings(self) -> None` `priv` (L1410-1528)
 - Brief: Execute `_enforce_toc_headings`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_enforce_toc_headings`.
 - Return: None Return value of `_enforce_toc_headings`.
 
-### fn `def href_fragment_id(href: str) -> str` (L1424-1436)
+### fn `def href_fragment_id(href: str) -> str` (L1425-1437)
 - Brief: Execute `_enforce_toc_headings`.
 - Brief: Execute `href_fragment_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -503,25 +503,25 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: None Return value of `_enforce_toc_headings`.
 - Return: str Return value of `href_fragment_id`.
 
-### fn `def clamp_heading_level(depth: int) -> int` (L1448-1464)
+### fn `def clamp_heading_level(depth: int) -> int` (L1449-1465)
 - Brief: Execute `clamp_heading_level`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: depth Input argument for `clamp_heading_level`.
 - Return: int Return value of `clamp_heading_level`.
 
-### fn `def find_referenced_container_id(h) -> str` (L1465-1482)
+### fn `def find_referenced_container_id(h) -> str` (L1466-1483)
 - Brief: Execute `find_referenced_container_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: h Input argument for `find_referenced_container_id`.
 - Return: str Return value of `find_referenced_container_id`.
 
-### fn `def _test_toc_headings(self) -> None` `priv` (L1528-1723)
+### fn `def _test_toc_headings(self) -> None` `priv` (L1529-1724)
 - Brief: Execute `_test_toc_headings`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_test_toc_headings`.
 - Return: None Return value of `_test_toc_headings`.
 
-### fn `def href_fragment_id(href: str) -> str` (L1544-1556)
+### fn `def href_fragment_id(href: str) -> str` (L1545-1557)
 - Brief: Execute `_test_toc_headings`.
 - Brief: Execute `href_fragment_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -531,120 +531,126 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: None Return value of `_test_toc_headings`.
 - Return: str Return value of `href_fragment_id`.
 
-### fn `def clamp_heading_level(depth: int) -> int` (L1557-1569)
+### fn `def clamp_heading_level(depth: int) -> int` (L1558-1570)
 - Brief: Execute `clamp_heading_level`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: depth Input argument for `clamp_heading_level`.
 - Return: int Return value of `clamp_heading_level`.
 
-### fn `def summarize(items: List[str]) -> str` (L1687-1700)
+### fn `def summarize(items: List[str]) -> str` (L1688-1701)
 - Brief: Execute `summarize`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: items Input argument for `summarize`.
 - Return: str Return value of `summarize`.
 
-### fn `def fix_heading_ref_position(self) -> None` (L1724-1864)
+### fn `def fix_heading_ref_position(self) -> None` (L1725-1865)
 - Brief: Execute `fix_heading_ref_position`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `fix_heading_ref_position`.
 - Return: None Return value of `fix_heading_ref_position`.
 
-### fn `def fix_heading_numbering(self) -> None` (L1865-2003)
+### fn `def fix_heading_numbering(self) -> None` (L1866-2004)
 - Brief: Execute `fix_heading_numbering`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `fix_heading_numbering`.
 - Return: None Return value of `fix_heading_numbering`.
 
-### fn `def normalize_ws(text: str) -> str` (L1884-1892)
+### fn `def normalize_ws(text: str) -> str` (L1885-1893)
 - Brief: Execute `normalize_ws`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: text Input argument for `normalize_ws`.
 - Return: str Return value of `normalize_ws`.
 
-### fn `def strip_numbering_prefix(text: str) -> str` (L1893-1901)
+### fn `def strip_numbering_prefix(text: str) -> str` (L1894-1902)
 - Brief: Execute `strip_numbering_prefix`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: text Input argument for `strip_numbering_prefix`.
 - Return: str Return value of `strip_numbering_prefix`.
 
-### fn `def set_flat_text(tag, text: str) -> None` (L1902-1912)
+### fn `def set_flat_text(tag, text: str) -> None` (L1903-1913)
 - Brief: Execute `set_flat_text`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: tag Input argument for `set_flat_text`.
 - Param: text Input argument for `set_flat_text`.
 - Return: None Return value of `set_flat_text`.
 
-### fn `def href_fragment_id(href: str) -> str` (L1934-1946)
+### fn `def href_fragment_id(href: str) -> str` (L1935-1947)
 - Brief: Execute `href_fragment_id`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: href Input argument for `href_fragment_id`.
 - Return: str Return value of `href_fragment_id`.
 
-### fn `def _clean_document_style(self) -> None` `priv` (L2004-2024)
+### fn `def _renumber_title_anchors(self) -> None` `priv` (L2005-2080)
+- Brief: Execute `_renumber_title_anchors`.
+- Details: Renumbers TOC/document heading anchors as ordered `title-<n>` values while preserving TOC-document referential integrity.
+- Param: self Input argument for `_renumber_title_anchors`.
+- Return: None Return value of `_renumber_title_anchors`.
+
+### fn `def _clean_document_style(self) -> None` `priv` (L2081-2101)
 - Brief: Execute `_clean_document_style`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_clean_document_style`.
 - Return: None Return value of `_clean_document_style`.
 
-### fn `def _add_document_style(self) -> None` `priv` (L2025-2056)
+### fn `def _add_document_style(self) -> None` `priv` (L2102-2133)
 - Brief: Execute `_add_document_style`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_add_document_style`.
 - Return: None Return value of `_add_document_style`.
 
-### fn `def _normalize_document_links(self) -> None` `priv` (L2071-2085)
+### fn `def _normalize_document_links(self) -> None` `priv` (L2148-2162)
 - Brief: Execute `_normalize_document_links`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_normalize_document_links`.
 - Return: None Return value of `_normalize_document_links`.
 
-### fn `def _remove_unused_images(self) -> None` `priv` (L2086-2127)
+### fn `def _remove_unused_images(self) -> None` `priv` (L2163-2204)
 - Brief: Execute `_remove_unused_images`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_remove_unused_images`.
 - Return: None Return value of `_remove_unused_images`.
 
-### fn `def _remove_unused_assets(self) -> None` `priv` (L2128-2162)
+### fn `def _remove_unused_assets(self) -> None` `priv` (L2205-2239)
 - Brief: Execute `_remove_unused_assets`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_remove_unused_assets`.
 - Return: None Return value of `_remove_unused_assets`.
 
-### fn `def _normalize_image_position(self) -> None` `priv` (L2163-2222)
+### fn `def _normalize_image_position(self) -> None` `priv` (L2240-2299)
 - Brief: Execute `_normalize_image_position`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_normalize_image_position`.
 - Return: None Return value of `_normalize_image_position`.
 
-### fn `def _clean_assets_tree(self) -> None` `priv` (L2223-2245)
+### fn `def _clean_assets_tree(self) -> None` `priv` (L2300-2322)
 - Brief: Execute `_clean_assets_tree`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_clean_assets_tree`.
 - Return: None Return value of `_clean_assets_tree`.
 
-### fn `def _remove_empty_assets_root(self) -> None` `priv` (L2246-2284)
+### fn `def _remove_empty_assets_root(self) -> None` `priv` (L2323-2361)
 - Brief: Execute `_remove_empty_assets_root`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_remove_empty_assets_root`.
 - Return: None Return value of `_remove_empty_assets_root`.
 
-### class `class DownloaderRegistry` (L2285-2342)
+### class `class DownloaderRegistry` (L2362-2419)
 - Brief: Define class `DownloaderRegistry`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def __init__(self)` `priv` (L2290-2298)
+- fn `def __init__(self)` `priv` (L2367-2375)
   - Brief: Define class `DownloaderRegistry`.
   - Brief: Execute `__init__`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `__init__`.
   - Return: Any Return value of `__init__`.
-- fn `def register(self, downloader_cls: type[BaseDownloader]) -> None` (L2299-2308)
+- fn `def register(self, downloader_cls: type[BaseDownloader]) -> None` (L2376-2385)
   - Brief: Execute `register`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `register`.
   - Param: downloader_cls Input argument for `register`.
   - Return: None Return value of `register`.
-- fn `def detect(self, url: str, session: requests.Session) -> type[BaseDownloader]` (L2309-2342)
+- fn `def detect(self, url: str, session: requests.Session) -> type[BaseDownloader]` (L2386-2419)
   - Brief: Execute `detect`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `detect`.
@@ -652,16 +658,16 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: session Input argument for `detect`.
   - Return: type[BaseDownloader] Return value of `detect`.
 
-### fn `def guess_ext_from_content_type(ct: str) -> str` (L2348-2367)
+### fn `def guess_ext_from_content_type(ct: str) -> str` (L2425-2444)
 - Brief: Execute `guess_ext_from_content_type`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: ct Input argument for `guess_ext_from_content_type`.
 - Return: str Return value of `guess_ext_from_content_type`.
 
-### class `class NetworkImageRecorder` (L2368-2430)
+### class `class NetworkImageRecorder` (L2445-2507)
 - Brief: Define class `NetworkImageRecorder`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def __init__(self, out_dir: Path)` `priv` (L2374-2385)
+- fn `def __init__(self, out_dir: Path)` `priv` (L2451-2462)
   - Brief: Define class `NetworkImageRecorder`.
   - Brief: Execute `__init__`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
@@ -669,13 +675,13 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: self Input argument for `__init__`.
   - Param: out_dir Input argument for `__init__`.
   - Return: Any Return value of `__init__`.
-- fn `def attach(self, page)` (L2386-2430)
+- fn `def attach(self, page)` (L2463-2507)
   - Brief: Execute `attach`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `attach`.
   - Param: page Input argument for `attach`.
   - Return: Any Return value of `attach`.
-- fn `def on_response(resp)` (L2394-2427)
+- fn `def on_response(resp)` (L2471-2504)
   - Brief: Execute `attach`.
   - Brief: Execute `on_response`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -686,36 +692,36 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: Any Return value of `attach`.
   - Return: Any Return value of `on_response`.
 
-### class `class DocumentViewerDownloader(BaseDownloader)` : BaseDownloader (L2431-2630)
+### class `class DocumentViewerDownloader(BaseDownloader)` : BaseDownloader (L2508-2707)
 - Brief: Define class `DocumentViewerDownloader`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- var `TOC_SELECTORS = [` (L2438)
+- var `TOC_SELECTORS = [` (L2515)
   - Brief: Define class `DocumentViewerDownloader`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- var `CONTENT_SELECTORS = [` (L2447)
-- var `TOC_SCROLL_SELECTORS = [` (L2460)
-- fn `def matches_url(cls, url: str) -> bool` (L2469-2479)
+- var `CONTENT_SELECTORS = [` (L2524)
+- var `TOC_SCROLL_SELECTORS = [` (L2537)
+- fn `def matches_url(cls, url: str) -> bool` (L2546-2556)
   - Brief: Execute `matches_url`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `matches_url`.
   - Param: url Input argument for `matches_url`.
   - Return: bool Return value of `matches_url`.
-- fn `def probe_html(cls, url: str, html: str) -> bool` (L2481-2492)
+- fn `def probe_html(cls, url: str, html: str) -> bool` (L2558-2569)
   - Brief: Execute `probe_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `probe_html`.
   - Param: url Input argument for `probe_html`.
   - Param: html Input argument for `probe_html`.
   - Return: bool Return value of `probe_html`.
-- fn `def _pick_best_outerhtml(self, page, selectors: List[str]) -> Optional[str]` `priv` (L2493-2524)
+- fn `def _pick_best_outerhtml(self, page, selectors: List[str]) -> Optional[str]` `priv` (L2570-2601)
   - Brief: Execute `_pick_best_outerhtml`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_pick_best_outerhtml`.
   - Param: page Input argument for `_pick_best_outerhtml`.
   - Param: selectors Input argument for `_pick_best_outerhtml`.
   - Return: Optional[str] Return value of `_pick_best_outerhtml`.
-- fn `def _expand_full_toc(` `priv` (L2525-2526)
-- fn `def _scroll_toc_container(` `priv` (L2586-2587)
+- fn `def _expand_full_toc(` `priv` (L2602-2603)
+- fn `def _scroll_toc_container(` `priv` (L2663-2664)
   - Brief: Execute `_expand_full_toc`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_expand_full_toc`.
@@ -724,16 +730,16 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: settle_ms Input argument for `_expand_full_toc`.
   - Return: None Return value of `_expand_full_toc`.
 
-### fn `def _find_scroll_container(self, page)` `priv` (L2644-2709)
+### fn `def _find_scroll_container(self, page)` `priv` (L2721-2786)
 - Brief: Execute `_find_scroll_container`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_find_scroll_container`.
 - Param: page Input argument for `_find_scroll_container`.
 - Return: Any Return value of `_find_scroll_container`.
 
-### fn `def _auto_scroll_element(` `priv` (L2710-2718)
+### fn `def _auto_scroll_element(` `priv` (L2787-2795)
 
-### fn `def _auto_scroll(` `priv` (L2791-2797)
+### fn `def _auto_scroll(` `priv` (L2868-2874)
 - Brief: Execute `_auto_scroll_element`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_auto_scroll_element`.
@@ -746,7 +752,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: label Input argument for `_auto_scroll_element`.
 - Return: bool Return value of `_auto_scroll_element`.
 
-### fn `def _collect_cards_from_container(` `priv` (L2867-2874)
+### fn `def _collect_cards_from_container(` `priv` (L2944-2951)
 - Brief: Execute `_auto_scroll`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_auto_scroll`.
@@ -757,7 +763,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: stable_rounds Input argument for `_auto_scroll`.
 - Return: None Return value of `_auto_scroll`.
 
-### fn `def _best_card_for_fragment(` `priv` (L2952-2953)
+### fn `def _best_card_for_fragment(` `priv` (L3029-3030)
 - Brief: Execute `_collect_cards_from_container`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_collect_cards_from_container`.
@@ -769,7 +775,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: max_rounds Input argument for `_collect_cards_from_container`.
 - Return: Dict[str, str] Return value of `_collect_cards_from_container`.
 
-### fn `def score_value(val: str) -> int` (L2972-2992)
+### fn `def score_value(val: str) -> int` (L3049-3069)
 - Brief: Execute `_best_card_for_fragment`.
 - Brief: Execute `score_value`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -781,7 +787,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: Optional[Tuple[str, str]] Return value of `_best_card_for_fragment`.
 - Return: int Return value of `score_value`.
 
-### fn `def _fragment_matches_url(self, fragment: str, data_url: str) -> bool` `priv` (L3009-3028)
+### fn `def _fragment_matches_url(self, fragment: str, data_url: str) -> bool` `priv` (L3086-3105)
 - Brief: Execute `_fragment_matches_url`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_fragment_matches_url`.
@@ -789,69 +795,69 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: data_url Input argument for `_fragment_matches_url`.
 - Return: bool Return value of `_fragment_matches_url`.
 
-### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L3029-3038)
+### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L3106-3115)
 - Brief: Execute `_toc_tree_from_html`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_toc_tree_from_html`.
 - Param: toc_html Input argument for `_toc_tree_from_html`.
 - Return: List[TocNode] Return value of `_toc_tree_from_html`.
 
-### fn `def _iter_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L3040-3050)
+### fn `def _iter_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L3117-3127)
 - Brief: Execute `_iter_nodes`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_iter_nodes`.
 - Return: Iterable[TocNode] Return value of `_iter_nodes`.
 
-### fn `def _first_numeric_index(nodes: List[TocNode]) -> Optional[int]` `priv` `@staticmethod` (L3052-3064)
+### fn `def _first_numeric_index(nodes: List[TocNode]) -> Optional[int]` `priv` `@staticmethod` (L3129-3141)
 - Brief: Execute `_first_numeric_index`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_first_numeric_index`.
 - Return: Optional[int] Return value of `_first_numeric_index`.
 
-### fn `def _trim_toc_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3066-3087)
+### fn `def _trim_toc_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3143-3164)
 - Brief: Execute `_trim_toc_nodes`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_trim_toc_nodes`.
 - Return: List[TocNode] Return value of `_trim_toc_nodes`.
 
-### fn `def _limit_toc_nodes(` `priv` `@staticmethod` (L3089-3090)
+### fn `def _limit_toc_nodes(` `priv` `@staticmethod` (L3166-3167)
 
-### fn `def _limit_by_reading_order(` `priv` `@staticmethod` (L3102-3103)
+### fn `def _limit_by_reading_order(` `priv` `@staticmethod` (L3179-3180)
 
-### fn `def _prune_toc_to_allowed(` `priv` `@staticmethod` (L3141-3142)
+### fn `def _prune_toc_to_allowed(` `priv` `@staticmethod` (L3218-3219)
 
-### fn `def _first_toc_entry_title(nodes: List[TocNode]) -> Optional[str]` `priv` `@staticmethod` (L3165-3177)
+### fn `def _first_toc_entry_title(nodes: List[TocNode]) -> Optional[str]` `priv` `@staticmethod` (L3242-3254)
 - Brief: Execute `_first_toc_entry_title`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_first_toc_entry_title`.
 - Return: Optional[str] Return value of `_first_toc_entry_title`.
 
-### fn `def _is_important_notice_label(title: Optional[str]) -> bool` `priv` `@staticmethod` (L3179-3188)
+### fn `def _is_important_notice_label(title: Optional[str]) -> bool` `priv` `@staticmethod` (L3256-3265)
 - Brief: Execute `_is_important_notice_label`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: title Input argument for `_is_important_notice_label`.
 - Return: bool Return value of `_is_important_notice_label`.
 
-### fn `def _is_important_notice_section(section_html: str) -> bool` `priv` `@staticmethod` (L3190-3205)
+### fn `def _is_important_notice_section(section_html: str) -> bool` `priv` `@staticmethod` (L3267-3282)
 - Brief: Execute `_is_important_notice_section`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: section_html Input argument for `_is_important_notice_section`.
 - Return: bool Return value of `_is_important_notice_section`.
 
-### fn `def _select_section_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3207-3232)
+### fn `def _select_section_nodes(nodes: List[TocNode]) -> List[TocNode]` `priv` `@staticmethod` (L3284-3309)
 - Brief: Execute `_select_section_nodes`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_select_section_nodes`.
 - Return: List[TocNode] Return value of `_select_section_nodes`.
 
-### fn `def _dedup_toc_nodes_by_href(self, nodes: List[TocNode]) -> List[TocNode]` `priv` (L3233-3271)
+### fn `def _dedup_toc_nodes_by_href(self, nodes: List[TocNode]) -> List[TocNode]` `priv` (L3310-3348)
 - Brief: Execute `_dedup_toc_nodes_by_href`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_dedup_toc_nodes_by_href`.
 - Param: nodes Input argument for `_dedup_toc_nodes_by_href`.
 - Return: List[TocNode] Return value of `_dedup_toc_nodes_by_href`.
 
-### fn `def dedup_list(items: List[TocNode]) -> List[TocNode]` (L3242-3269)
+### fn `def dedup_list(items: List[TocNode]) -> List[TocNode]` (L3319-3346)
 - Brief: Execute `_dedup_toc_nodes_by_href`.
 - Brief: Execute `dedup_list`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -862,7 +868,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: List[TocNode] Return value of `_dedup_toc_nodes_by_href`.
 - Return: List[TocNode] Return value of `dedup_list`.
 
-### fn `def _is_section_scrollable(self, page, viewport_multiplier: float = 2.0) -> bool` `priv` (L3272-3294)
+### fn `def _is_section_scrollable(self, page, viewport_multiplier: float = 2.0) -> bool` `priv` (L3349-3371)
 - Brief: Execute `_is_section_scrollable`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_is_section_scrollable`.
@@ -870,23 +876,23 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: viewport_multiplier Input argument for `_is_section_scrollable`.
 - Return: bool Return value of `_is_section_scrollable`.
 
-### fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L3295-3331)
+### fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L3372-3408)
 - Brief: Execute `_remove_toc_elements`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_remove_toc_elements`.
 - Param: soup Input argument for `_remove_toc_elements`.
 - Return: None Return value of `_remove_toc_elements`.
 
-### fn `def _convert_doxygen_definition_lists(self, soup: BeautifulSoup) -> None` `priv` (L3332-3398)
+### fn `def _convert_doxygen_definition_lists(self, soup: BeautifulSoup) -> None` `priv` (L3409-3475)
 - Brief: Execute `_convert_doxygen_definition_lists`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_convert_doxygen_definition_lists`.
 - Param: soup Input argument for `_convert_doxygen_definition_lists`.
 - Return: None Return value of `_convert_doxygen_definition_lists`.
 
-### fn `def _extract_fragment_only(` `priv` (L3399-3400)
+### fn `def _extract_fragment_only(` `priv` (L3476-3477)
 
-### fn `def score_value(val: str) -> int` (L3419-3442)
+### fn `def score_value(val: str) -> int` (L3496-3519)
 - Brief: Execute `_extract_fragment_only`.
 - Brief: Execute `score_value`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -898,19 +904,19 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: BeautifulSoup Return value of `_extract_fragment_only`.
 - Return: int Return value of `score_value`.
 
-### fn `def pick_best_section(elements)` (L3443-3466)
+### fn `def pick_best_section(elements)` (L3520-3543)
 - Brief: Execute `pick_best_section`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: elements Input argument for `pick_best_section`.
 - Return: Any Return value of `pick_best_section`.
 
-### fn `def matches_fragment(el) -> bool` (L3477-3496)
+### fn `def matches_fragment(el) -> bool` (L3554-3573)
 - Brief: Execute `matches_fragment`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: el Input argument for `matches_fragment`.
 - Return: bool Return value of `matches_fragment`.
 
-### fn `def _wait_for_fragment(self, page, fragment: str, timeout_ms: int = 8000) -> bool` `priv` (L3524-3576)
+### fn `def _wait_for_fragment(self, page, fragment: str, timeout_ms: int = 8000) -> bool` `priv` (L3601-3653)
 - Brief: Execute `_wait_for_fragment`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_wait_for_fragment`.
@@ -919,7 +925,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: timeout_ms Input argument for `_wait_for_fragment`.
 - Return: bool Return value of `_wait_for_fragment`.
 
-### fn `def _click_toc_link(self, page, fragment: str) -> bool` `priv` (L3577-3605)
+### fn `def _click_toc_link(self, page, fragment: str) -> bool` `priv` (L3654-3682)
 - Brief: Execute `_click_toc_link`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_click_toc_link`.
@@ -927,13 +933,13 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: fragment Input argument for `_click_toc_link`.
 - Return: bool Return value of `_click_toc_link`.
 
-### fn `def run(self) -> None` (L3606-3805)
+### fn `def run(self) -> None` (L3683-3882)
 - Brief: Execute `run`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `run`.
 - Return: None Return value of `run`.
 
-### fn `def make_anchor(raw_fragment: str, title: str, used: Set[str]) -> str` (L3616-3627)
+### fn `def make_anchor(raw_fragment: str, title: str, used: Set[str]) -> str` (L3693-3704)
 - Brief: Execute `run`.
 - Brief: Execute `make_anchor`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -945,46 +951,46 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: None Return value of `run`.
 - Return: str Return value of `make_anchor`.
 
-### fn `def normalize_text(value: str) -> str` (L3628-3638)
+### fn `def normalize_text(value: str) -> str` (L3705-3715)
 - Brief: Execute `normalize_text`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: value Input argument for `normalize_text`.
 - Return: str Return value of `normalize_text`.
 
-### fn `def strip_ti_disclaimer(section_html: str) -> str` (L3639-3669)
+### fn `def strip_ti_disclaimer(section_html: str) -> str` (L3716-3746)
 - Brief: Execute `strip_ti_disclaimer`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: section_html Input argument for `strip_ti_disclaimer`.
 - Return: str Return value of `strip_ti_disclaimer`.
 
-### class `class DoxygenExportDownloader(BaseDownloader)` : BaseDownloader (L4077-4276)
+### class `class DoxygenExportDownloader(BaseDownloader)` : BaseDownloader (L4154-4353)
 - Brief: Define class `DoxygenExportDownloader`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def matches_url(cls, url: str) -> bool` (L4085-4098)
+- fn `def matches_url(cls, url: str) -> bool` (L4162-4175)
   - Brief: Execute `matches_url`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `matches_url`.
   - Param: url Input argument for `matches_url`.
   - Return: bool Return value of `matches_url`.
-- fn `def probe_html(cls, url: str, html: str) -> bool` (L4100-4111)
+- fn `def probe_html(cls, url: str, html: str) -> bool` (L4177-4188)
   - Brief: Execute `probe_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `probe_html`.
   - Param: url Input argument for `probe_html`.
   - Param: html Input argument for `probe_html`.
   - Return: bool Return value of `probe_html`.
-- fn `def _scope(self) -> Tuple[str, str]` `priv` (L4112-4125)
+- fn `def _scope(self) -> Tuple[str, str]` `priv` (L4189-4202)
   - Brief: Execute `_scope`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_scope`.
   - Return: Tuple[str, str] Return value of `_scope`.
-- fn `def _fetch_soup(self, url: str) -> BeautifulSoup` `priv` (L4126-4137)
+- fn `def _fetch_soup(self, url: str) -> BeautifulSoup` `priv` (L4203-4214)
   - Brief: Execute `_fetch_soup`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_fetch_soup`.
   - Param: url Input argument for `_fetch_soup`.
   - Return: BeautifulSoup Return value of `_fetch_soup`.
-- fn `def _is_in_scope(self, url: str, host: str, scope_dir_url: str) -> bool` `priv` (L4138-4154)
+- fn `def _is_in_scope(self, url: str, host: str, scope_dir_url: str) -> bool` `priv` (L4215-4231)
   - Brief: Execute `_is_in_scope`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_is_in_scope`.
@@ -992,47 +998,47 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: host Input argument for `_is_in_scope`.
   - Param: scope_dir_url Input argument for `_is_in_scope`.
   - Return: bool Return value of `_is_in_scope`.
-- fn `def _page_title(self, soup: BeautifulSoup) -> str` `priv` (L4155-4170)
+- fn `def _page_title(self, soup: BeautifulSoup) -> str` `priv` (L4232-4247)
   - Brief: Execute `_page_title`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_page_title`.
   - Param: soup Input argument for `_page_title`.
   - Return: str Return value of `_page_title`.
-- fn `def _document_title(self, soup: BeautifulSoup) -> str` `priv` (L4171-4202)
+- fn `def _document_title(self, soup: BeautifulSoup) -> str` `priv` (L4248-4279)
   - Brief: Execute `_document_title`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_document_title`.
   - Param: soup Input argument for `_document_title`.
   - Return: str Return value of `_document_title`.
-- fn `def _extract_main(self, soup: BeautifulSoup) -> BeautifulSoup` `priv` (L4203-4226)
+- fn `def _extract_main(self, soup: BeautifulSoup) -> BeautifulSoup` `priv` (L4280-4303)
   - Brief: Execute `_extract_main`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_extract_main`.
   - Param: soup Input argument for `_extract_main`.
   - Return: BeautifulSoup Return value of `_extract_main`.
-- fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L4227-4253)
+- fn `def _remove_toc_elements(self, soup: BeautifulSoup) -> None` `priv` (L4304-4330)
   - Brief: Execute `_remove_toc_elements`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `_remove_toc_elements`.
   - Param: soup Input argument for `_remove_toc_elements`.
   - Return: None Return value of `_remove_toc_elements`.
-- fn `def _links_to_html_pages(` `priv` (L4254-4255)
+- fn `def _links_to_html_pages(` `priv` (L4331-4332)
 
-### fn `def _expand_nav_tree(self, page) -> None` `priv` (L4280-4316)
+### fn `def _expand_nav_tree(self, page) -> None` `priv` (L4357-4393)
 - Brief: Execute `_expand_nav_tree`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_expand_nav_tree`.
 - Param: page Input argument for `_expand_nav_tree`.
 - Return: None Return value of `_expand_nav_tree`.
 
-### fn `def _expand_nav_tree_full(self, page) -> None` `priv` (L4317-4516)
+### fn `def _expand_nav_tree_full(self, page) -> None` `priv` (L4394-4593)
 - Brief: Execute `_expand_nav_tree_full`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_expand_nav_tree_full`.
 - Param: page Input argument for `_expand_nav_tree_full`.
 - Return: None Return value of `_expand_nav_tree_full`.
 
-### fn `def _expand_nav_tree_limited(self, page, limit: int) -> None` `priv` (L4525-4634)
+### fn `def _expand_nav_tree_limited(self, page, limit: int) -> None` `priv` (L4602-4711)
 - Brief: Execute `_expand_nav_tree_limited`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_expand_nav_tree_limited`.
@@ -1040,20 +1046,20 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: limit Input argument for `_expand_nav_tree_limited`.
 - Return: None Return value of `_expand_nav_tree_limited`.
 
-### fn `def _cleanup_nav_tree_styles(self, page) -> None` `priv` (L4635-4666)
+### fn `def _cleanup_nav_tree_styles(self, page) -> None` `priv` (L4712-4743)
 - Brief: Execute `_cleanup_nav_tree_styles`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_cleanup_nav_tree_styles`.
 - Param: page Input argument for `_cleanup_nav_tree_styles`.
 - Return: None Return value of `_cleanup_nav_tree_styles`.
 
-### fn `def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]` `priv` (L4667-4756)
+### fn `def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]` `priv` (L4744-4833)
 - Brief: Execute `_fetch_nav_tree_with_playwright`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_fetch_nav_tree_with_playwright`.
 - Return: Tuple[str, str] Return value of `_fetch_nav_tree_with_playwright`.
 
-### fn `def _nav_link_href(self, link, base_url: str) -> str` `priv` (L4757-4782)
+### fn `def _nav_link_href(self, link, base_url: str) -> str` `priv` (L4834-4859)
 - Brief: Execute `_nav_link_href`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_nav_link_href`.
@@ -1061,21 +1067,21 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: base_url Input argument for `_nav_link_href`.
 - Return: str Return value of `_nav_link_href`.
 
-### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L4783-4792)
+### fn `def _toc_tree_from_html(self, toc_html: str) -> List[TocNode]` `priv` (L4860-4869)
 - Brief: Execute `_toc_tree_from_html`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_toc_tree_from_html`.
 - Param: toc_html Input argument for `_toc_tree_from_html`.
 - Return: List[TocNode] Return value of `_toc_tree_from_html`.
 
-### fn `def _toc_nodes_from_nav_html(self, nav_html: str) -> List[TocNode]` `priv` (L4793-4835)
+### fn `def _toc_nodes_from_nav_html(self, nav_html: str) -> List[TocNode]` `priv` (L4870-4912)
 - Brief: Execute `_toc_nodes_from_nav_html`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_toc_nodes_from_nav_html`.
 - Param: nav_html Input argument for `_toc_nodes_from_nav_html`.
 - Return: List[TocNode] Return value of `_toc_nodes_from_nav_html`.
 
-### fn `def parse_ul(ul) -> List[TocNode]` (L4806-4830)
+### fn `def parse_ul(ul) -> List[TocNode]` (L4883-4907)
 - Brief: Execute `_toc_nodes_from_nav_html`.
 - Brief: Execute `parse_ul`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1086,20 +1092,20 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: List[TocNode] Return value of `_toc_nodes_from_nav_html`.
 - Return: List[TocNode] Return value of `parse_ul`.
 
-### fn `def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L4837-4847)
+### fn `def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[TocNode]` `priv` `@staticmethod` (L4914-4924)
 - Brief: Execute `_iter_toc_nodes`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: nodes Input argument for `_iter_toc_nodes`.
 - Return: Iterable[TocNode] Return value of `_iter_toc_nodes`.
 
-### fn `def _select_main_container(self, soup: BeautifulSoup)` `priv` (L4848-4869)
+### fn `def _select_main_container(self, soup: BeautifulSoup)` `priv` (L4925-4946)
 - Brief: Execute `_select_main_container`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_select_main_container`.
 - Param: soup Input argument for `_select_main_container`.
 - Return: Any Return value of `_select_main_container`.
 
-### fn `def _find_fragment_anchor(self, main, fragment: str)` `priv` (L4870-4897)
+### fn `def _find_fragment_anchor(self, main, fragment: str)` `priv` (L4947-4974)
 - Brief: Execute `_find_fragment_anchor`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_find_fragment_anchor`.
@@ -1107,15 +1113,15 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: fragment Input argument for `_find_fragment_anchor`.
 - Return: Any Return value of `_find_fragment_anchor`.
 
-### fn `def _normalize_heading_text(value: str) -> str` `priv` `@staticmethod` (L4899-4907)
+### fn `def _normalize_heading_text(value: str) -> str` `priv` `@staticmethod` (L4976-4984)
 - Brief: Execute `_normalize_heading_text`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: value Input argument for `_normalize_heading_text`.
 - Return: str Return value of `_normalize_heading_text`.
 
-### fn `def _strip_duplicate_section_title(` `priv` (L4908-4909)
+### fn `def _strip_duplicate_section_title(` `priv` (L4985-4986)
 
-### fn `def _extract_section_html(` `priv` (L4952-4953)
+### fn `def _extract_section_html(` `priv` (L5029-5030)
 - Brief: Execute `_strip_duplicate_section_title`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_strip_duplicate_section_title`.
@@ -1124,7 +1130,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: section_anchor Input argument for `_strip_duplicate_section_title`.
 - Return: Optional[str] Return value of `_strip_duplicate_section_title`.
 
-### fn `def direct_child(el)` (L4981-4992)
+### fn `def direct_child(el)` (L5058-5069)
 - Brief: Execute `_extract_section_html`.
 - Brief: Execute `direct_child`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1137,27 +1143,27 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Return: str Return value of `_extract_section_html`.
 - Return: Any Return value of `direct_child`.
 
-### fn `def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]` `priv` (L5016-5080)
+### fn `def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]` `priv` (L5093-5157)
 - Brief: Execute `_build_toc`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `_build_toc`.
 - Param: doc Input argument for `_build_toc`.
 - Return: List[TocNode] Return value of `_build_toc`.
 
-### fn `def run(self) -> None` (L5081-5280)
+### fn `def run(self) -> None` (L5158-5357)
 - Brief: Execute `run`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: self Input argument for `run`.
 - Return: None Return value of `run`.
 
-- var `MAX_PAGES = 250` (L5269)
-### class `class ResourceExplorerModule` (L5448-5480)
+- var `MAX_PAGES = 250` (L5346)
+### class `class ResourceExplorerModule` (L5525-5557)
 - Brief: Define class `ResourceExplorerModule`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def select(` (L5455-5456)
+- fn `def select(` (L5532-5533)
   - Brief: Define class `ResourceExplorerModule`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5469-5480)
+- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5546-5557)
   - Brief: Execute `select`.
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1172,13 +1178,13 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: Optional[Dict[str, str]] Return value of `select`.
   - Return: None Return value of `run`.
 
-### class `class RMModuleDoxigen(ResourceExplorerModule)` : ResourceExplorerModule (L5481-5538)
+### class `class RMModuleDoxigen(ResourceExplorerModule)` : ResourceExplorerModule (L5558-5615)
 - Brief: Define class `RMModuleDoxigen`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def select(` (L5490-5491)
+- fn `def select(` (L5567-5568)
   - Brief: Define class `RMModuleDoxigen`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5515-5538)
+- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5592-5615)
   - Brief: Execute `select`.
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1193,10 +1199,10 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: Optional[Dict[str, str]] Return value of `select`.
   - Return: None Return value of `run`.
 
-### class `class ResourceExplorerDownloader(BaseDownloader)` : BaseDownloader (L5539-5671)
+### class `class ResourceExplorerDownloader(BaseDownloader)` : BaseDownloader (L5616-5748)
 - Brief: Define class `ResourceExplorerDownloader`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def __init__(self, *args, **kwargs)` `priv` (L5546-5557)
+- fn `def __init__(self, *args, **kwargs)` `priv` (L5623-5634)
   - Brief: Define class `ResourceExplorerDownloader`.
   - Brief: Execute `__init__`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
@@ -1205,21 +1211,21 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: *args Input argument for `__init__`.
   - Param: **kwargs Input argument for `__init__`.
   - Return: Any Return value of `__init__`.
-- fn `def matches_url(cls, url: str) -> bool` (L5559-5569)
+- fn `def matches_url(cls, url: str) -> bool` (L5636-5646)
   - Brief: Execute `matches_url`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `matches_url`.
   - Param: url Input argument for `matches_url`.
   - Return: bool Return value of `matches_url`.
-- fn `def probe_html(cls, url: str, html: str) -> bool` (L5571-5581)
+- fn `def probe_html(cls, url: str, html: str) -> bool` (L5648-5658)
   - Brief: Execute `probe_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `probe_html`.
   - Param: url Input argument for `probe_html`.
   - Param: html Input argument for `probe_html`.
   - Return: bool Return value of `probe_html`.
-- fn `def _select_module(` `priv` (L5582-5583)
-- fn `def _render_with_playwright(self) -> str` `priv` (L5599-5636)
+- fn `def _select_module(` `priv` (L5659-5660)
+- fn `def _render_with_playwright(self) -> str` `priv` (L5676-5713)
   - Brief: Execute `_select_module`.
   - Brief: Execute `_render_with_playwright`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1230,18 +1236,18 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: self Input argument for `_render_with_playwright`.
   - Return: Optional[Tuple[ResourceExplorerModule, Dict[str, str]]] Return value of `_select_module`.
   - Return: str Return value of `_render_with_playwright`.
-- fn `def run(self) -> None` (L5637-5671)
+- fn `def run(self) -> None` (L5714-5748)
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `run`.
   - Return: None Return value of `run`.
 
-### fn `def build_arg_parser() -> argparse.ArgumentParser` (L5677-5722)
+### fn `def build_arg_parser() -> argparse.ArgumentParser` (L5754-5799)
 - Brief: Execute `build_arg_parser`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Return: argparse.ArgumentParser Return value of `build_arg_parser`.
 
-### fn `def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None` (L5723-5768)
+### fn `def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None` (L5800-5845)
 - Brief: Execute `print_strict_help`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: program Input argument for `print_strict_help`.
@@ -1249,7 +1255,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: parser Input argument for `print_strict_help`.
 - Return: None Return value of `print_strict_help`.
 
-### fn `def main() -> int` (L5769-5820)
+### fn `def main() -> int` (L5846-5897)
 - Brief: Execute `main`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Return: int Return value of `main`.
@@ -1309,139 +1315,140 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 |`minimal_readable_wrapper`|fn|pub|1001-1002|def minimal_readable_wrapper(|
 |`BaseDownloader`|class|pub|1030-1229|class BaseDownloader|
 |`BaseDownloader.__init__`|fn|priv|1037-1045|def __init__(|
-|`BaseDownloader.matches_url`|fn|pub|1090-1099|def matches_url(cls, url: str) -> bool|
-|`BaseDownloader.probe_html`|fn|pub|1101-1111|def probe_html(cls, url: str, html: str) -> bool|
-|`BaseDownloader.run`|fn|pub|1112-1120|def run(self) -> None|
-|`BaseDownloader._toc_tree_from_html`|fn|priv|1121-1130|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
-|`BaseDownloader.post_process`|fn|pub|1131-1145|def post_process(self) -> None|
-|`BaseDownloader._verify_toc_consistency`|fn|priv|1146-1197|def _verify_toc_consistency(self) -> None|
-|`_verify_toc_depth`|fn|priv|1198-1237|def _verify_toc_depth(self) -> None|
-|`BaseDownloader.get_max_depth`|fn|pub|1211-1227|def get_max_depth(ul, current_depth=0)|
-|`_prune_toc_and_clean_headings`|fn|priv|1238-1339|def _prune_toc_and_clean_headings(self) -> None|
-|`href_fragment_id`|fn|pub|1249-1261|def href_fragment_id(href: str) -> str|
-|`prune_ul`|fn|pub|1272-1292|def prune_ul(ul, depth)|
-|`_deduplicate_toc_entries`|fn|priv|1340-1408|def _deduplicate_toc_entries(self) -> None|
-|`href_fragment_id`|fn|pub|1353-1365|def href_fragment_id(href: str) -> str|
-|`process_nodes`|fn|pub|1372-1400|def process_nodes(nodes: List[TocNode], seen: Set[str]) -...|
-|`_enforce_toc_headings`|fn|priv|1409-1527|def _enforce_toc_headings(self) -> None|
-|`href_fragment_id`|fn|pub|1424-1436|def href_fragment_id(href: str) -> str|
-|`clamp_heading_level`|fn|pub|1448-1464|def clamp_heading_level(depth: int) -> int|
-|`find_referenced_container_id`|fn|pub|1465-1482|def find_referenced_container_id(h) -> str|
-|`_test_toc_headings`|fn|priv|1528-1723|def _test_toc_headings(self) -> None|
-|`href_fragment_id`|fn|pub|1544-1556|def href_fragment_id(href: str) -> str|
-|`clamp_heading_level`|fn|pub|1557-1569|def clamp_heading_level(depth: int) -> int|
-|`summarize`|fn|pub|1687-1700|def summarize(items: List[str]) -> str|
-|`fix_heading_ref_position`|fn|pub|1724-1864|def fix_heading_ref_position(self) -> None|
-|`fix_heading_numbering`|fn|pub|1865-2003|def fix_heading_numbering(self) -> None|
-|`normalize_ws`|fn|pub|1884-1892|def normalize_ws(text: str) -> str|
-|`strip_numbering_prefix`|fn|pub|1893-1901|def strip_numbering_prefix(text: str) -> str|
-|`set_flat_text`|fn|pub|1902-1912|def set_flat_text(tag, text: str) -> None|
-|`href_fragment_id`|fn|pub|1934-1946|def href_fragment_id(href: str) -> str|
-|`_clean_document_style`|fn|priv|2004-2024|def _clean_document_style(self) -> None|
-|`_add_document_style`|fn|priv|2025-2056|def _add_document_style(self) -> None|
-|`_normalize_document_links`|fn|priv|2071-2085|def _normalize_document_links(self) -> None|
-|`_remove_unused_images`|fn|priv|2086-2127|def _remove_unused_images(self) -> None|
-|`_remove_unused_assets`|fn|priv|2128-2162|def _remove_unused_assets(self) -> None|
-|`_normalize_image_position`|fn|priv|2163-2222|def _normalize_image_position(self) -> None|
-|`_clean_assets_tree`|fn|priv|2223-2245|def _clean_assets_tree(self) -> None|
-|`_remove_empty_assets_root`|fn|priv|2246-2284|def _remove_empty_assets_root(self) -> None|
-|`DownloaderRegistry`|class|pub|2285-2342|class DownloaderRegistry|
-|`DownloaderRegistry.__init__`|fn|priv|2290-2298|def __init__(self)|
-|`DownloaderRegistry.register`|fn|pub|2299-2308|def register(self, downloader_cls: type[BaseDownloader]) ...|
-|`DownloaderRegistry.detect`|fn|pub|2309-2342|def detect(self, url: str, session: requests.Session) -> ...|
-|`guess_ext_from_content_type`|fn|pub|2348-2367|def guess_ext_from_content_type(ct: str) -> str|
-|`NetworkImageRecorder`|class|pub|2368-2430|class NetworkImageRecorder|
-|`NetworkImageRecorder.__init__`|fn|priv|2374-2385|def __init__(self, out_dir: Path)|
-|`NetworkImageRecorder.attach`|fn|pub|2386-2430|def attach(self, page)|
-|`NetworkImageRecorder.on_response`|fn|pub|2394-2427|def on_response(resp)|
-|`DocumentViewerDownloader`|class|pub|2431-2630|class DocumentViewerDownloader(BaseDownloader)|
-|`DocumentViewerDownloader.TOC_SELECTORS`|var|pub|2438||
-|`DocumentViewerDownloader.CONTENT_SELECTORS`|var|pub|2447||
-|`DocumentViewerDownloader.TOC_SCROLL_SELECTORS`|var|pub|2460||
-|`DocumentViewerDownloader.matches_url`|fn|pub|2469-2479|def matches_url(cls, url: str) -> bool|
-|`DocumentViewerDownloader.probe_html`|fn|pub|2481-2492|def probe_html(cls, url: str, html: str) -> bool|
-|`DocumentViewerDownloader._pick_best_outerhtml`|fn|priv|2493-2524|def _pick_best_outerhtml(self, page, selectors: List[str]...|
-|`DocumentViewerDownloader._expand_full_toc`|fn|priv|2525-2526|def _expand_full_toc(|
-|`DocumentViewerDownloader._scroll_toc_container`|fn|priv|2586-2587|def _scroll_toc_container(|
-|`_find_scroll_container`|fn|priv|2644-2709|def _find_scroll_container(self, page)|
-|`_auto_scroll_element`|fn|priv|2710-2718|def _auto_scroll_element(|
-|`_auto_scroll`|fn|priv|2791-2797|def _auto_scroll(|
-|`_collect_cards_from_container`|fn|priv|2867-2874|def _collect_cards_from_container(|
-|`_best_card_for_fragment`|fn|priv|2952-2953|def _best_card_for_fragment(|
-|`score_value`|fn|pub|2972-2992|def score_value(val: str) -> int|
-|`_fragment_matches_url`|fn|priv|3009-3028|def _fragment_matches_url(self, fragment: str, data_url: ...|
-|`_toc_tree_from_html`|fn|priv|3029-3038|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
-|`_iter_nodes`|fn|priv|3040-3050|def _iter_nodes(nodes: List[TocNode]) -> Iterable[TocNode]|
-|`_first_numeric_index`|fn|priv|3052-3064|def _first_numeric_index(nodes: List[TocNode]) -> Optiona...|
-|`_trim_toc_nodes`|fn|priv|3066-3087|def _trim_toc_nodes(nodes: List[TocNode]) -> List[TocNode]|
-|`_limit_toc_nodes`|fn|priv|3089-3090|def _limit_toc_nodes(|
-|`_limit_by_reading_order`|fn|priv|3102-3103|def _limit_by_reading_order(|
-|`_prune_toc_to_allowed`|fn|priv|3141-3142|def _prune_toc_to_allowed(|
-|`_first_toc_entry_title`|fn|priv|3165-3177|def _first_toc_entry_title(nodes: List[TocNode]) -> Optio...|
-|`_is_important_notice_label`|fn|priv|3179-3188|def _is_important_notice_label(title: Optional[str]) -> bool|
-|`_is_important_notice_section`|fn|priv|3190-3205|def _is_important_notice_section(section_html: str) -> bool|
-|`_select_section_nodes`|fn|priv|3207-3232|def _select_section_nodes(nodes: List[TocNode]) -> List[T...|
-|`_dedup_toc_nodes_by_href`|fn|priv|3233-3271|def _dedup_toc_nodes_by_href(self, nodes: List[TocNode]) ...|
-|`dedup_list`|fn|pub|3242-3269|def dedup_list(items: List[TocNode]) -> List[TocNode]|
-|`_is_section_scrollable`|fn|priv|3272-3294|def _is_section_scrollable(self, page, viewport_multiplie...|
-|`_remove_toc_elements`|fn|priv|3295-3331|def _remove_toc_elements(self, soup: BeautifulSoup) -> None|
-|`_convert_doxygen_definition_lists`|fn|priv|3332-3398|def _convert_doxygen_definition_lists(self, soup: Beautif...|
-|`_extract_fragment_only`|fn|priv|3399-3400|def _extract_fragment_only(|
-|`score_value`|fn|pub|3419-3442|def score_value(val: str) -> int|
-|`pick_best_section`|fn|pub|3443-3466|def pick_best_section(elements)|
-|`matches_fragment`|fn|pub|3477-3496|def matches_fragment(el) -> bool|
-|`_wait_for_fragment`|fn|priv|3524-3576|def _wait_for_fragment(self, page, fragment: str, timeout...|
-|`_click_toc_link`|fn|priv|3577-3605|def _click_toc_link(self, page, fragment: str) -> bool|
-|`run`|fn|pub|3606-3805|def run(self) -> None|
-|`make_anchor`|fn|pub|3616-3627|def make_anchor(raw_fragment: str, title: str, used: Set[...|
-|`normalize_text`|fn|pub|3628-3638|def normalize_text(value: str) -> str|
-|`strip_ti_disclaimer`|fn|pub|3639-3669|def strip_ti_disclaimer(section_html: str) -> str|
-|`DoxygenExportDownloader`|class|pub|4077-4276|class DoxygenExportDownloader(BaseDownloader)|
-|`DoxygenExportDownloader.matches_url`|fn|pub|4085-4098|def matches_url(cls, url: str) -> bool|
-|`DoxygenExportDownloader.probe_html`|fn|pub|4100-4111|def probe_html(cls, url: str, html: str) -> bool|
-|`DoxygenExportDownloader._scope`|fn|priv|4112-4125|def _scope(self) -> Tuple[str, str]|
-|`DoxygenExportDownloader._fetch_soup`|fn|priv|4126-4137|def _fetch_soup(self, url: str) -> BeautifulSoup|
-|`DoxygenExportDownloader._is_in_scope`|fn|priv|4138-4154|def _is_in_scope(self, url: str, host: str, scope_dir_url...|
-|`DoxygenExportDownloader._page_title`|fn|priv|4155-4170|def _page_title(self, soup: BeautifulSoup) -> str|
-|`DoxygenExportDownloader._document_title`|fn|priv|4171-4202|def _document_title(self, soup: BeautifulSoup) -> str|
-|`DoxygenExportDownloader._extract_main`|fn|priv|4203-4226|def _extract_main(self, soup: BeautifulSoup) -> Beautiful...|
-|`DoxygenExportDownloader._remove_toc_elements`|fn|priv|4227-4253|def _remove_toc_elements(self, soup: BeautifulSoup) -> None|
-|`DoxygenExportDownloader._links_to_html_pages`|fn|priv|4254-4255|def _links_to_html_pages(|
-|`_expand_nav_tree`|fn|priv|4280-4316|def _expand_nav_tree(self, page) -> None|
-|`_expand_nav_tree_full`|fn|priv|4317-4516|def _expand_nav_tree_full(self, page) -> None|
-|`_expand_nav_tree_limited`|fn|priv|4525-4634|def _expand_nav_tree_limited(self, page, limit: int) -> None|
-|`_cleanup_nav_tree_styles`|fn|priv|4635-4666|def _cleanup_nav_tree_styles(self, page) -> None|
-|`_fetch_nav_tree_with_playwright`|fn|priv|4667-4756|def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]|
-|`_nav_link_href`|fn|priv|4757-4782|def _nav_link_href(self, link, base_url: str) -> str|
-|`_toc_tree_from_html`|fn|priv|4783-4792|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
-|`_toc_nodes_from_nav_html`|fn|priv|4793-4835|def _toc_nodes_from_nav_html(self, nav_html: str) -> List...|
-|`parse_ul`|fn|pub|4806-4830|def parse_ul(ul) -> List[TocNode]|
-|`_iter_toc_nodes`|fn|priv|4837-4847|def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[Toc...|
-|`_select_main_container`|fn|priv|4848-4869|def _select_main_container(self, soup: BeautifulSoup)|
-|`_find_fragment_anchor`|fn|priv|4870-4897|def _find_fragment_anchor(self, main, fragment: str)|
-|`_normalize_heading_text`|fn|priv|4899-4907|def _normalize_heading_text(value: str) -> str|
-|`_strip_duplicate_section_title`|fn|priv|4908-4909|def _strip_duplicate_section_title(|
-|`_extract_section_html`|fn|priv|4952-4953|def _extract_section_html(|
-|`direct_child`|fn|pub|4981-4992|def direct_child(el)|
-|`_build_toc`|fn|priv|5016-5080|def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]|
-|`run`|fn|pub|5081-5280|def run(self) -> None|
-|`MAX_PAGES`|var|pub|5269||
-|`ResourceExplorerModule`|class|pub|5448-5480|class ResourceExplorerModule|
-|`ResourceExplorerModule.select`|fn|pub|5455-5456|def select(|
-|`ResourceExplorerModule.run`|fn|pub|5469-5480|def run(self, downloader: "ResourceExplorerDownloader", s...|
-|`RMModuleDoxigen`|class|pub|5481-5538|class RMModuleDoxigen(ResourceExplorerModule)|
-|`RMModuleDoxigen.select`|fn|pub|5490-5491|def select(|
-|`RMModuleDoxigen.run`|fn|pub|5515-5538|def run(self, downloader: "ResourceExplorerDownloader", s...|
-|`ResourceExplorerDownloader`|class|pub|5539-5671|class ResourceExplorerDownloader(BaseDownloader)|
-|`ResourceExplorerDownloader.__init__`|fn|priv|5546-5557|def __init__(self, *args, **kwargs)|
-|`ResourceExplorerDownloader.matches_url`|fn|pub|5559-5569|def matches_url(cls, url: str) -> bool|
-|`ResourceExplorerDownloader.probe_html`|fn|pub|5571-5581|def probe_html(cls, url: str, html: str) -> bool|
-|`ResourceExplorerDownloader._select_module`|fn|priv|5582-5583|def _select_module(|
-|`ResourceExplorerDownloader._render_with_playwright`|fn|priv|5599-5636|def _render_with_playwright(self) -> str|
-|`ResourceExplorerDownloader.run`|fn|pub|5637-5671|def run(self) -> None|
-|`build_arg_parser`|fn|pub|5677-5722|def build_arg_parser() -> argparse.ArgumentParser|
-|`print_strict_help`|fn|pub|5723-5768|def print_strict_help(program: str, version: str, parser:...|
-|`main`|fn|pub|5769-5820|def main() -> int|
+|`BaseDownloader.matches_url`|fn|pub|1091-1100|def matches_url(cls, url: str) -> bool|
+|`BaseDownloader.probe_html`|fn|pub|1102-1112|def probe_html(cls, url: str, html: str) -> bool|
+|`BaseDownloader.run`|fn|pub|1113-1121|def run(self) -> None|
+|`BaseDownloader._toc_tree_from_html`|fn|priv|1122-1131|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
+|`BaseDownloader.post_process`|fn|pub|1132-1146|def post_process(self) -> None|
+|`BaseDownloader._verify_toc_consistency`|fn|priv|1147-1198|def _verify_toc_consistency(self) -> None|
+|`_verify_toc_depth`|fn|priv|1199-1238|def _verify_toc_depth(self) -> None|
+|`BaseDownloader.get_max_depth`|fn|pub|1212-1228|def get_max_depth(ul, current_depth=0)|
+|`_prune_toc_and_clean_headings`|fn|priv|1239-1340|def _prune_toc_and_clean_headings(self) -> None|
+|`href_fragment_id`|fn|pub|1250-1262|def href_fragment_id(href: str) -> str|
+|`prune_ul`|fn|pub|1273-1293|def prune_ul(ul, depth)|
+|`_deduplicate_toc_entries`|fn|priv|1341-1409|def _deduplicate_toc_entries(self) -> None|
+|`href_fragment_id`|fn|pub|1354-1366|def href_fragment_id(href: str) -> str|
+|`process_nodes`|fn|pub|1373-1401|def process_nodes(nodes: List[TocNode], seen: Set[str]) -...|
+|`_enforce_toc_headings`|fn|priv|1410-1528|def _enforce_toc_headings(self) -> None|
+|`href_fragment_id`|fn|pub|1425-1437|def href_fragment_id(href: str) -> str|
+|`clamp_heading_level`|fn|pub|1449-1465|def clamp_heading_level(depth: int) -> int|
+|`find_referenced_container_id`|fn|pub|1466-1483|def find_referenced_container_id(h) -> str|
+|`_test_toc_headings`|fn|priv|1529-1724|def _test_toc_headings(self) -> None|
+|`href_fragment_id`|fn|pub|1545-1557|def href_fragment_id(href: str) -> str|
+|`clamp_heading_level`|fn|pub|1558-1570|def clamp_heading_level(depth: int) -> int|
+|`summarize`|fn|pub|1688-1701|def summarize(items: List[str]) -> str|
+|`fix_heading_ref_position`|fn|pub|1725-1865|def fix_heading_ref_position(self) -> None|
+|`fix_heading_numbering`|fn|pub|1866-2004|def fix_heading_numbering(self) -> None|
+|`normalize_ws`|fn|pub|1885-1893|def normalize_ws(text: str) -> str|
+|`strip_numbering_prefix`|fn|pub|1894-1902|def strip_numbering_prefix(text: str) -> str|
+|`set_flat_text`|fn|pub|1903-1913|def set_flat_text(tag, text: str) -> None|
+|`href_fragment_id`|fn|pub|1935-1947|def href_fragment_id(href: str) -> str|
+|`_renumber_title_anchors`|fn|priv|2005-2080|def _renumber_title_anchors(self) -> None|
+|`_clean_document_style`|fn|priv|2081-2101|def _clean_document_style(self) -> None|
+|`_add_document_style`|fn|priv|2102-2133|def _add_document_style(self) -> None|
+|`_normalize_document_links`|fn|priv|2148-2162|def _normalize_document_links(self) -> None|
+|`_remove_unused_images`|fn|priv|2163-2204|def _remove_unused_images(self) -> None|
+|`_remove_unused_assets`|fn|priv|2205-2239|def _remove_unused_assets(self) -> None|
+|`_normalize_image_position`|fn|priv|2240-2299|def _normalize_image_position(self) -> None|
+|`_clean_assets_tree`|fn|priv|2300-2322|def _clean_assets_tree(self) -> None|
+|`_remove_empty_assets_root`|fn|priv|2323-2361|def _remove_empty_assets_root(self) -> None|
+|`DownloaderRegistry`|class|pub|2362-2419|class DownloaderRegistry|
+|`DownloaderRegistry.__init__`|fn|priv|2367-2375|def __init__(self)|
+|`DownloaderRegistry.register`|fn|pub|2376-2385|def register(self, downloader_cls: type[BaseDownloader]) ...|
+|`DownloaderRegistry.detect`|fn|pub|2386-2419|def detect(self, url: str, session: requests.Session) -> ...|
+|`guess_ext_from_content_type`|fn|pub|2425-2444|def guess_ext_from_content_type(ct: str) -> str|
+|`NetworkImageRecorder`|class|pub|2445-2507|class NetworkImageRecorder|
+|`NetworkImageRecorder.__init__`|fn|priv|2451-2462|def __init__(self, out_dir: Path)|
+|`NetworkImageRecorder.attach`|fn|pub|2463-2507|def attach(self, page)|
+|`NetworkImageRecorder.on_response`|fn|pub|2471-2504|def on_response(resp)|
+|`DocumentViewerDownloader`|class|pub|2508-2707|class DocumentViewerDownloader(BaseDownloader)|
+|`DocumentViewerDownloader.TOC_SELECTORS`|var|pub|2515||
+|`DocumentViewerDownloader.CONTENT_SELECTORS`|var|pub|2524||
+|`DocumentViewerDownloader.TOC_SCROLL_SELECTORS`|var|pub|2537||
+|`DocumentViewerDownloader.matches_url`|fn|pub|2546-2556|def matches_url(cls, url: str) -> bool|
+|`DocumentViewerDownloader.probe_html`|fn|pub|2558-2569|def probe_html(cls, url: str, html: str) -> bool|
+|`DocumentViewerDownloader._pick_best_outerhtml`|fn|priv|2570-2601|def _pick_best_outerhtml(self, page, selectors: List[str]...|
+|`DocumentViewerDownloader._expand_full_toc`|fn|priv|2602-2603|def _expand_full_toc(|
+|`DocumentViewerDownloader._scroll_toc_container`|fn|priv|2663-2664|def _scroll_toc_container(|
+|`_find_scroll_container`|fn|priv|2721-2786|def _find_scroll_container(self, page)|
+|`_auto_scroll_element`|fn|priv|2787-2795|def _auto_scroll_element(|
+|`_auto_scroll`|fn|priv|2868-2874|def _auto_scroll(|
+|`_collect_cards_from_container`|fn|priv|2944-2951|def _collect_cards_from_container(|
+|`_best_card_for_fragment`|fn|priv|3029-3030|def _best_card_for_fragment(|
+|`score_value`|fn|pub|3049-3069|def score_value(val: str) -> int|
+|`_fragment_matches_url`|fn|priv|3086-3105|def _fragment_matches_url(self, fragment: str, data_url: ...|
+|`_toc_tree_from_html`|fn|priv|3106-3115|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
+|`_iter_nodes`|fn|priv|3117-3127|def _iter_nodes(nodes: List[TocNode]) -> Iterable[TocNode]|
+|`_first_numeric_index`|fn|priv|3129-3141|def _first_numeric_index(nodes: List[TocNode]) -> Optiona...|
+|`_trim_toc_nodes`|fn|priv|3143-3164|def _trim_toc_nodes(nodes: List[TocNode]) -> List[TocNode]|
+|`_limit_toc_nodes`|fn|priv|3166-3167|def _limit_toc_nodes(|
+|`_limit_by_reading_order`|fn|priv|3179-3180|def _limit_by_reading_order(|
+|`_prune_toc_to_allowed`|fn|priv|3218-3219|def _prune_toc_to_allowed(|
+|`_first_toc_entry_title`|fn|priv|3242-3254|def _first_toc_entry_title(nodes: List[TocNode]) -> Optio...|
+|`_is_important_notice_label`|fn|priv|3256-3265|def _is_important_notice_label(title: Optional[str]) -> bool|
+|`_is_important_notice_section`|fn|priv|3267-3282|def _is_important_notice_section(section_html: str) -> bool|
+|`_select_section_nodes`|fn|priv|3284-3309|def _select_section_nodes(nodes: List[TocNode]) -> List[T...|
+|`_dedup_toc_nodes_by_href`|fn|priv|3310-3348|def _dedup_toc_nodes_by_href(self, nodes: List[TocNode]) ...|
+|`dedup_list`|fn|pub|3319-3346|def dedup_list(items: List[TocNode]) -> List[TocNode]|
+|`_is_section_scrollable`|fn|priv|3349-3371|def _is_section_scrollable(self, page, viewport_multiplie...|
+|`_remove_toc_elements`|fn|priv|3372-3408|def _remove_toc_elements(self, soup: BeautifulSoup) -> None|
+|`_convert_doxygen_definition_lists`|fn|priv|3409-3475|def _convert_doxygen_definition_lists(self, soup: Beautif...|
+|`_extract_fragment_only`|fn|priv|3476-3477|def _extract_fragment_only(|
+|`score_value`|fn|pub|3496-3519|def score_value(val: str) -> int|
+|`pick_best_section`|fn|pub|3520-3543|def pick_best_section(elements)|
+|`matches_fragment`|fn|pub|3554-3573|def matches_fragment(el) -> bool|
+|`_wait_for_fragment`|fn|priv|3601-3653|def _wait_for_fragment(self, page, fragment: str, timeout...|
+|`_click_toc_link`|fn|priv|3654-3682|def _click_toc_link(self, page, fragment: str) -> bool|
+|`run`|fn|pub|3683-3882|def run(self) -> None|
+|`make_anchor`|fn|pub|3693-3704|def make_anchor(raw_fragment: str, title: str, used: Set[...|
+|`normalize_text`|fn|pub|3705-3715|def normalize_text(value: str) -> str|
+|`strip_ti_disclaimer`|fn|pub|3716-3746|def strip_ti_disclaimer(section_html: str) -> str|
+|`DoxygenExportDownloader`|class|pub|4154-4353|class DoxygenExportDownloader(BaseDownloader)|
+|`DoxygenExportDownloader.matches_url`|fn|pub|4162-4175|def matches_url(cls, url: str) -> bool|
+|`DoxygenExportDownloader.probe_html`|fn|pub|4177-4188|def probe_html(cls, url: str, html: str) -> bool|
+|`DoxygenExportDownloader._scope`|fn|priv|4189-4202|def _scope(self) -> Tuple[str, str]|
+|`DoxygenExportDownloader._fetch_soup`|fn|priv|4203-4214|def _fetch_soup(self, url: str) -> BeautifulSoup|
+|`DoxygenExportDownloader._is_in_scope`|fn|priv|4215-4231|def _is_in_scope(self, url: str, host: str, scope_dir_url...|
+|`DoxygenExportDownloader._page_title`|fn|priv|4232-4247|def _page_title(self, soup: BeautifulSoup) -> str|
+|`DoxygenExportDownloader._document_title`|fn|priv|4248-4279|def _document_title(self, soup: BeautifulSoup) -> str|
+|`DoxygenExportDownloader._extract_main`|fn|priv|4280-4303|def _extract_main(self, soup: BeautifulSoup) -> Beautiful...|
+|`DoxygenExportDownloader._remove_toc_elements`|fn|priv|4304-4330|def _remove_toc_elements(self, soup: BeautifulSoup) -> None|
+|`DoxygenExportDownloader._links_to_html_pages`|fn|priv|4331-4332|def _links_to_html_pages(|
+|`_expand_nav_tree`|fn|priv|4357-4393|def _expand_nav_tree(self, page) -> None|
+|`_expand_nav_tree_full`|fn|priv|4394-4593|def _expand_nav_tree_full(self, page) -> None|
+|`_expand_nav_tree_limited`|fn|priv|4602-4711|def _expand_nav_tree_limited(self, page, limit: int) -> None|
+|`_cleanup_nav_tree_styles`|fn|priv|4712-4743|def _cleanup_nav_tree_styles(self, page) -> None|
+|`_fetch_nav_tree_with_playwright`|fn|priv|4744-4833|def _fetch_nav_tree_with_playwright(self) -> Tuple[str, str]|
+|`_nav_link_href`|fn|priv|4834-4859|def _nav_link_href(self, link, base_url: str) -> str|
+|`_toc_tree_from_html`|fn|priv|4860-4869|def _toc_tree_from_html(self, toc_html: str) -> List[TocN...|
+|`_toc_nodes_from_nav_html`|fn|priv|4870-4912|def _toc_nodes_from_nav_html(self, nav_html: str) -> List...|
+|`parse_ul`|fn|pub|4883-4907|def parse_ul(ul) -> List[TocNode]|
+|`_iter_toc_nodes`|fn|priv|4914-4924|def _iter_toc_nodes(nodes: List[TocNode]) -> Iterable[Toc...|
+|`_select_main_container`|fn|priv|4925-4946|def _select_main_container(self, soup: BeautifulSoup)|
+|`_find_fragment_anchor`|fn|priv|4947-4974|def _find_fragment_anchor(self, main, fragment: str)|
+|`_normalize_heading_text`|fn|priv|4976-4984|def _normalize_heading_text(value: str) -> str|
+|`_strip_duplicate_section_title`|fn|priv|4985-4986|def _strip_duplicate_section_title(|
+|`_extract_section_html`|fn|priv|5029-5030|def _extract_section_html(|
+|`direct_child`|fn|pub|5058-5069|def direct_child(el)|
+|`_build_toc`|fn|priv|5093-5157|def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]|
+|`run`|fn|pub|5158-5357|def run(self) -> None|
+|`MAX_PAGES`|var|pub|5346||
+|`ResourceExplorerModule`|class|pub|5525-5557|class ResourceExplorerModule|
+|`ResourceExplorerModule.select`|fn|pub|5532-5533|def select(|
+|`ResourceExplorerModule.run`|fn|pub|5546-5557|def run(self, downloader: "ResourceExplorerDownloader", s...|
+|`RMModuleDoxigen`|class|pub|5558-5615|class RMModuleDoxigen(ResourceExplorerModule)|
+|`RMModuleDoxigen.select`|fn|pub|5567-5568|def select(|
+|`RMModuleDoxigen.run`|fn|pub|5592-5615|def run(self, downloader: "ResourceExplorerDownloader", s...|
+|`ResourceExplorerDownloader`|class|pub|5616-5748|class ResourceExplorerDownloader(BaseDownloader)|
+|`ResourceExplorerDownloader.__init__`|fn|priv|5623-5634|def __init__(self, *args, **kwargs)|
+|`ResourceExplorerDownloader.matches_url`|fn|pub|5636-5646|def matches_url(cls, url: str) -> bool|
+|`ResourceExplorerDownloader.probe_html`|fn|pub|5648-5658|def probe_html(cls, url: str, html: str) -> bool|
+|`ResourceExplorerDownloader._select_module`|fn|priv|5659-5660|def _select_module(|
+|`ResourceExplorerDownloader._render_with_playwright`|fn|priv|5676-5713|def _render_with_playwright(self) -> str|
+|`ResourceExplorerDownloader.run`|fn|pub|5714-5748|def run(self) -> None|
+|`build_arg_parser`|fn|pub|5754-5799|def build_arg_parser() -> argparse.ArgumentParser|
+|`print_strict_help`|fn|pub|5800-5845|def print_strict_help(program: str, version: str, parser:...|
+|`main`|fn|pub|5846-5897|def main() -> int|
 
 
 ---

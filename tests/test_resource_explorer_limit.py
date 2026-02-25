@@ -15,10 +15,7 @@ RESOURCE_EXPLORER_URL = (
     "A__AD2nw6Uu4txAz2eqZdShBg__DIGITAL-POWER-SDK-AM263X__k-hvNHd__LATEST"
 )
 LIMIT = 30
-GUID_ANCHOR_RE = re.compile(
-    r"^guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}"
-    r"-guid-[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$"
-)
+TITLE_ANCHOR_RE = re.compile(r"^title-[1-9]\d*$")
 
 _DOWNLOADED = False
 
@@ -101,8 +98,12 @@ def test_resource_explorer_limit_downloads_first_30_sections():
             if frag:
                 toc_fragments.append(frag)
 
-    invalid_guid_fragments = [frag for frag in toc_fragments if not GUID_ANCHOR_RE.fullmatch(frag)]
-    assert not invalid_guid_fragments, f"TOC contiene anchor non GUID: {invalid_guid_fragments[:5]}"
+    invalid_title_fragments = [frag for frag in toc_fragments if not TITLE_ANCHOR_RE.fullmatch(frag)]
+    assert not invalid_title_fragments, f"TOC contains non title-* anchors: {invalid_title_fragments[:5]}"
+    toc_numbers = sorted({int(frag.split("-", 1)[1]) for frag in toc_fragments})
+    assert toc_numbers == list(range(1, len(toc_numbers) + 1)), (
+        "TOC fragments must be progressive title-* anchors without gaps"
+    )
     missing_in_doc = [frag for frag in toc_fragments if frag not in heading_ids]
     assert not missing_in_doc, f"Anchor mancanti per link TOC: {missing_in_doc[:5]}"
     legacy_page_ids = [hid for hid in heading_ids if hid.startswith("page-")]
