@@ -904,23 +904,34 @@ def build_toc_html(
             return f"{document_filename}{href}"
         return document_filename
 
-    def render_nodes(nodes: List[TocNode]) -> str:
+    def render_nodes(nodes: List[TocNode], indent_level: int = 0) -> str:
         """
         @brief Execute `render_nodes`.
         @details Implements deterministic control flow as defined by module runtime semantics.
         @param nodes Input argument for `render_nodes`.
+        @param indent_level Input argument for `render_nodes`.
         @return str Return value of `render_nodes`.
         """
         if not nodes:
             return ""
-        items = []
+        list_indent = "    " * indent_level
+        item_indent = "    " * (indent_level + 1)
+        lines = [f"{list_indent}<ul>"]
         for n in nodes:
             href = resolved_href(n.href)
-            children_html = render_nodes(n.children)
-            items.append(
-                f'<li><a target="{escape_html(target_frame)}" href="{href}">{escape_html(n.title)}</a>{children_html}</li>'
+            children_html = render_nodes(n.children, indent_level + 1)
+            if children_html:
+                lines.append(
+                    f'{item_indent}<li><a target="{escape_html(target_frame)}" href="{href}">{escape_html(n.title)}</a>'
+                )
+                lines.append(children_html)
+                lines.append(f"{item_indent}</li>")
+                continue
+            lines.append(
+                f'{item_indent}<li><a target="{escape_html(target_frame)}" href="{href}">{escape_html(n.title)}</a></li>'
             )
-        return f"<ul>{''.join(items)}</ul>"
+        lines.append(f"{list_indent}</ul>")
+        return "\n".join(lines)
 
     toc_html = render_nodes(toc_items)
 

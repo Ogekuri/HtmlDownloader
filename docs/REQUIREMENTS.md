@@ -116,7 +116,7 @@ No explicit performance optimizations identified.
 - **REQ-004**: MUST export Doxygen pages within detected scope, rewrite assets to local paths, and generate `document.html`, `toc.html`, and `index.html`.
 - **REQ-005**: MUST print selected downloader and output paths to stdout, and MUST print progress/check logs only when verbose or debug is enabled.
 - **REQ-006**: MUST sanitize URL-derived filenames by replacing invalid filesystem characters and query-derived unsafe patterns.
-- **REQ-007**: MUST generate a hierarchical TOC with valid anchors opened in frame `doc`, title `TOC`, and no extra "open full document" link.
+- **REQ-007**: MUST generate a hierarchical TOC with valid anchors opened in frame `doc`, title `TOC`, no extra "open full document" link, and one serialized `<li>` per dedicated output line.
 - **REQ-008**: MUST expose `--verbose` and `--debug`, with debug implying verbose and including additional diagnostic detail.
 - **REQ-009**: MUST expose `--limit <max>` as a positive integer and MUST reject non-positive values at argument validation.
 - **REQ-010**: MUST prepend Doxygen `document.html` with a document title extracted from `#titlearea`, `#projectname`, and `#projectnumber` when available.
@@ -149,7 +149,7 @@ No explicit performance optimizations identified.
 - **TST-001**: MUST verify TI export generates readable `document.html`, `index.html`, and `assets/` with local images and navigable heading anchors.
 - **TST-002**: MUST verify Doxygen export respects 250-page cap, generates `page-N` sections, and rewrites assets to local references.
 - **TST-003**: MUST verify required CLI arguments, automatic downloader selection, and explicit error when no downloader matches.
-- **TST-004**: MUST verify style stripping, TOC hierarchy, TOC title, frame targeting, and two-frame `index.html` layout for both downloader families.
+- **TST-004**: MUST verify style stripping, TOC hierarchy, TOC title, TOC `<li>` line-by-line serialization, frame targeting, and two-frame `index.html` layout for both downloader families.
 - **TST-005**: MUST verify TI TOC starts from the first numeric section, excludes trailing IMPORTANT NOTICE entry, and contains expected intermediate sections.
 - **TST-006**: MUST verify each TI TOC link resolves to an existing `document.html` anchor and opens correctly in frame `doc`.
 - **TST-007**: MUST verify TI output begins from first numeric section and excludes TI disclaimer paragraphs while preserving intended major section content.
