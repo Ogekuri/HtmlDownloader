@@ -5179,13 +5179,14 @@ class DoxygenExportDownloader(BaseDownloader):
 
         self.log.debug("[debug] doxygen-export: starting crawl")
 
-        if self.limit and nav_html:
+        if nav_html:
             toc_nodes = self._toc_nodes_from_nav_html(nav_html)
             toc_nodes = limit_toc_nodes(toc_nodes, self.limit)
             flat_nodes = list(self._iter_toc_nodes(toc_nodes))
             if flat_nodes:
+                toc_mode = "limitata" if self.limit else "completa"
                 self.log.verbose(
-                    f"[verbose] TOC limitata a {len(flat_nodes)} voci in ordine di lettura"
+                    f"[verbose] TOC {toc_mode}: {len(flat_nodes)} voci in ordine di lettura"
                 )
 
                 entries: List[Tuple[TocNode, str, str, str]] = []
@@ -5225,7 +5226,7 @@ class DoxygenExportDownloader(BaseDownloader):
                 page_positions = {url: 0 for url in page_fragments}
 
                 self.log.verbose(
-                    "[verbose] Costruzione documento unificato da TOC limitata..."
+                    f"[verbose] Costruzione documento unificato da TOC {toc_mode}..."
                 )
 
                 for idx, (node, page_url, frag, title) in enumerate(entries, start=1):
@@ -5276,7 +5277,7 @@ class DoxygenExportDownloader(BaseDownloader):
                     container.append(sec)
 
                 self.log.verbose(
-                    f"[verbose] Documento da TOC limitata: {len(container.find_all('section'))} sezioni, {duplicates_skipped} duplicati saltati"
+                    f"[verbose] Documento da TOC {toc_mode}: {len(container.find_all('section'))} sezioni, {duplicates_skipped} duplicati saltati"
                 )
 
                 ensure_heading_ids(doc)
@@ -5339,7 +5340,7 @@ class DoxygenExportDownloader(BaseDownloader):
                 return
             else:
                 self.log.debug(
-                    "[debug] TOC limitata vuota, fallback al crawling completo"
+                    "[debug] TOC estratta vuota, fallback al crawling completo"
                 )
 
         # Crawl pages

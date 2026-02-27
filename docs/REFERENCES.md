@@ -40,7 +40,7 @@ import sys
 
 ---
 
-# cli.py | Python | 5899L | 186 symbols | 20 imports | 340 comments
+# cli.py | Python | 5900L | 186 symbols | 20 imports | 340 comments
 > Path: `src/htmldownloader/cli.py`
 - Brief: Module implementation for HtmlDownloader runtime.
 - Details: Contains executable logic and internal helpers used by the CLI workflow.
@@ -1156,14 +1156,14 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: self Input argument for `run`.
 - Return: None Return value of `run`.
 
-- var `MAX_PAGES = 250` (L5346)
-### class `class ResourceExplorerModule` (L5525-5557)
+- var `MAX_PAGES = 250` (L5347)
+### class `class ResourceExplorerModule` (L5526-5558)
 - Brief: Define class `ResourceExplorerModule`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def select(` (L5532-5533)
+- fn `def select(` (L5533-5534)
   - Brief: Define class `ResourceExplorerModule`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5546-5557)
+- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5547-5558)
   - Brief: Execute `select`.
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1178,13 +1178,13 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: Optional[Dict[str, str]] Return value of `select`.
   - Return: None Return value of `run`.
 
-### class `class RMModuleDoxigen(ResourceExplorerModule)` : ResourceExplorerModule (L5558-5615)
+### class `class RMModuleDoxigen(ResourceExplorerModule)` : ResourceExplorerModule (L5559-5616)
 - Brief: Define class `RMModuleDoxigen`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def select(` (L5567-5568)
+- fn `def select(` (L5568-5569)
   - Brief: Define class `RMModuleDoxigen`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5592-5615)
+- fn `def run(self, downloader: "ResourceExplorerDownloader", selection: Dict[str, str]) -> None` (L5593-5616)
   - Brief: Execute `select`.
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1199,10 +1199,10 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Return: Optional[Dict[str, str]] Return value of `select`.
   - Return: None Return value of `run`.
 
-### class `class ResourceExplorerDownloader(BaseDownloader)` : BaseDownloader (L5616-5748)
+### class `class ResourceExplorerDownloader(BaseDownloader)` : BaseDownloader (L5617-5749)
 - Brief: Define class `ResourceExplorerDownloader`.
 - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
-- fn `def __init__(self, *args, **kwargs)` `priv` (L5623-5634)
+- fn `def __init__(self, *args, **kwargs)` `priv` (L5624-5635)
   - Brief: Define class `ResourceExplorerDownloader`.
   - Brief: Execute `__init__`.
   - Details: Encapsulates behavior used by downloader orchestration and processing pipeline.
@@ -1211,21 +1211,21 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: *args Input argument for `__init__`.
   - Param: **kwargs Input argument for `__init__`.
   - Return: Any Return value of `__init__`.
-- fn `def matches_url(cls, url: str) -> bool` (L5636-5646)
+- fn `def matches_url(cls, url: str) -> bool` (L5637-5647)
   - Brief: Execute `matches_url`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `matches_url`.
   - Param: url Input argument for `matches_url`.
   - Return: bool Return value of `matches_url`.
-- fn `def probe_html(cls, url: str, html: str) -> bool` (L5648-5658)
+- fn `def probe_html(cls, url: str, html: str) -> bool` (L5649-5659)
   - Brief: Execute `probe_html`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: cls Input argument for `probe_html`.
   - Param: url Input argument for `probe_html`.
   - Param: html Input argument for `probe_html`.
   - Return: bool Return value of `probe_html`.
-- fn `def _select_module(` `priv` (L5659-5660)
-- fn `def _render_with_playwright(self) -> str` `priv` (L5676-5713)
+- fn `def _select_module(` `priv` (L5660-5661)
+- fn `def _render_with_playwright(self) -> str` `priv` (L5677-5714)
   - Brief: Execute `_select_module`.
   - Brief: Execute `_render_with_playwright`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
@@ -1236,18 +1236,18 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
   - Param: self Input argument for `_render_with_playwright`.
   - Return: Optional[Tuple[ResourceExplorerModule, Dict[str, str]]] Return value of `_select_module`.
   - Return: str Return value of `_render_with_playwright`.
-- fn `def run(self) -> None` (L5714-5748)
+- fn `def run(self) -> None` (L5715-5749)
   - Brief: Execute `run`.
   - Details: Implements deterministic control flow as defined by module runtime semantics.
   - Param: self Input argument for `run`.
   - Return: None Return value of `run`.
 
-### fn `def build_arg_parser() -> argparse.ArgumentParser` (L5754-5799)
+### fn `def build_arg_parser() -> argparse.ArgumentParser` (L5755-5800)
 - Brief: Execute `build_arg_parser`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Return: argparse.ArgumentParser Return value of `build_arg_parser`.
 
-### fn `def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None` (L5800-5845)
+### fn `def print_strict_help(program: str, version: str, parser: argparse.ArgumentParser) -> None` (L5801-5846)
 - Brief: Execute `print_strict_help`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Param: program Input argument for `print_strict_help`.
@@ -1255,7 +1255,7 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 - Param: parser Input argument for `print_strict_help`.
 - Return: None Return value of `print_strict_help`.
 
-### fn `def main() -> int` (L5846-5897)
+### fn `def main() -> int` (L5847-5898)
 - Brief: Execute `main`.
 - Details: Implements deterministic control flow as defined by module runtime semantics.
 - Return: int Return value of `main`.
@@ -1432,23 +1432,23 @@ from bs4 import NavigableString  # pyright: ignore[reportMissingImports]
 |`direct_child`|fn|pub|5058-5069|def direct_child(el)|
 |`_build_toc`|fn|priv|5093-5157|def _build_toc(self, doc: BeautifulSoup) -> List[TocNode]|
 |`run`|fn|pub|5158-5357|def run(self) -> None|
-|`MAX_PAGES`|var|pub|5346||
-|`ResourceExplorerModule`|class|pub|5525-5557|class ResourceExplorerModule|
-|`ResourceExplorerModule.select`|fn|pub|5532-5533|def select(|
-|`ResourceExplorerModule.run`|fn|pub|5546-5557|def run(self, downloader: "ResourceExplorerDownloader", s...|
-|`RMModuleDoxigen`|class|pub|5558-5615|class RMModuleDoxigen(ResourceExplorerModule)|
-|`RMModuleDoxigen.select`|fn|pub|5567-5568|def select(|
-|`RMModuleDoxigen.run`|fn|pub|5592-5615|def run(self, downloader: "ResourceExplorerDownloader", s...|
-|`ResourceExplorerDownloader`|class|pub|5616-5748|class ResourceExplorerDownloader(BaseDownloader)|
-|`ResourceExplorerDownloader.__init__`|fn|priv|5623-5634|def __init__(self, *args, **kwargs)|
-|`ResourceExplorerDownloader.matches_url`|fn|pub|5636-5646|def matches_url(cls, url: str) -> bool|
-|`ResourceExplorerDownloader.probe_html`|fn|pub|5648-5658|def probe_html(cls, url: str, html: str) -> bool|
-|`ResourceExplorerDownloader._select_module`|fn|priv|5659-5660|def _select_module(|
-|`ResourceExplorerDownloader._render_with_playwright`|fn|priv|5676-5713|def _render_with_playwright(self) -> str|
-|`ResourceExplorerDownloader.run`|fn|pub|5714-5748|def run(self) -> None|
-|`build_arg_parser`|fn|pub|5754-5799|def build_arg_parser() -> argparse.ArgumentParser|
-|`print_strict_help`|fn|pub|5800-5845|def print_strict_help(program: str, version: str, parser:...|
-|`main`|fn|pub|5846-5897|def main() -> int|
+|`MAX_PAGES`|var|pub|5347||
+|`ResourceExplorerModule`|class|pub|5526-5558|class ResourceExplorerModule|
+|`ResourceExplorerModule.select`|fn|pub|5533-5534|def select(|
+|`ResourceExplorerModule.run`|fn|pub|5547-5558|def run(self, downloader: "ResourceExplorerDownloader", s...|
+|`RMModuleDoxigen`|class|pub|5559-5616|class RMModuleDoxigen(ResourceExplorerModule)|
+|`RMModuleDoxigen.select`|fn|pub|5568-5569|def select(|
+|`RMModuleDoxigen.run`|fn|pub|5593-5616|def run(self, downloader: "ResourceExplorerDownloader", s...|
+|`ResourceExplorerDownloader`|class|pub|5617-5749|class ResourceExplorerDownloader(BaseDownloader)|
+|`ResourceExplorerDownloader.__init__`|fn|priv|5624-5635|def __init__(self, *args, **kwargs)|
+|`ResourceExplorerDownloader.matches_url`|fn|pub|5637-5647|def matches_url(cls, url: str) -> bool|
+|`ResourceExplorerDownloader.probe_html`|fn|pub|5649-5659|def probe_html(cls, url: str, html: str) -> bool|
+|`ResourceExplorerDownloader._select_module`|fn|priv|5660-5661|def _select_module(|
+|`ResourceExplorerDownloader._render_with_playwright`|fn|priv|5677-5714|def _render_with_playwright(self) -> str|
+|`ResourceExplorerDownloader.run`|fn|pub|5715-5749|def run(self) -> None|
+|`build_arg_parser`|fn|pub|5755-5800|def build_arg_parser() -> argparse.ArgumentParser|
+|`print_strict_help`|fn|pub|5801-5846|def print_strict_help(program: str, version: str, parser:...|
+|`main`|fn|pub|5847-5898|def main() -> int|
 
 
 ---
