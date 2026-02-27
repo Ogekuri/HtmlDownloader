@@ -1,8 +1,15 @@
 # Changelog
 
-## [0.1.1](https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.1) - 2026-02-25
+## [0.1.2](https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.2) - 2026-02-27
 ### ⛰️  Features
 - Update workflow.
+
+### 🐛  Bug Fixes
+- unify TOC generation for full export [useReq] *(doxygen-export)*
+  - Use nav-tree TOC parsing for both limited and full Doxygen runs.
+  - Preserve limit behavior while fixing full-export tree/title mismatches.
+  - Add regression test for no-limit nav-tree labels/hierarchy.
+  - Update WORKFLOW.md and regenerate REFERENCES.md.
 
 ### 🚜  Changes
 - renumber TOC/document heading IDs to title-N [useReq] *(anchors)*
@@ -62,7 +69,7 @@
 # History
 
 - \[0.1.0\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
-- \[0.1.1\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.1
+- \[0.1.2\]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.2
 
 [0.1.0]: https://github.com/Ogekuri/HtmlDownloader/releases/tag/v0.1.0
-[0.1.1]: https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.1
+[0.1.2]: https://github.com/Ogekuri/HtmlDownloader/compare/v0.1.0..v0.1.2
